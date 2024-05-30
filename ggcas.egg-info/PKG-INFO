@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: ggcas
+Version: 0.1.0
+Summary: Software to gather and analyze astrometry and photometry data from Gaia
+Home-page: https://github.com/yourusername/my_package
+Author: Pietro Ferraiuolo
+Author-email: pietro.ferraiuolo@inaf.it
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+
+# My Package
+
+A brief description of what my package does.
+
+## Installation
+
+```sh
+pip install my_package
