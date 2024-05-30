@@ -4,30 +4,28 @@ Created on May 2024
 
     Author: P. Ferraiuolo
 """
-from setuptools import setup, find_packages
+import os
+import setuptools
 
-setup(
-    name='ggcas',
-    version='0.1.0',
-    packages=find_packages(),
-    install_requires=[
-        'numpy',
-        'pandas',
-        'matplotlib',
-        'astropy',
-        'astroquery',
-        'scipy'
-    ],
-    author='Pietro Ferraiuolo',
-    author_email='pietro.ferraiuolo@inaf.it',
-    description='Software to gather and analyze astrometry and photometry data from Gaia',
+about = {}
+here = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(here, 'ggcas', '__version__.py'), 'r') as _:
+    exec(_.read(), about)
+
+with open ('requirements.txt', 'r') as _:
+    requires = [line.split()[0] for line in _]
+    
+setuptools.setup(
+    name=about['__title__'],
+    version=about['__version__'],
+    packages=setuptools.find_packages(),
+    install_requires=requires,
+    author=about['__author__'],
+    author_email=about['__author_email__'],
+    description=about['__description__'],
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/yourusername/my_package',
-    classifiers=[
-        'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-    ],
+    url=about['__url__'],
+    license=about['__license__'],
     python_requires='>=3.10',
 )

@@ -14,17 +14,18 @@ def freeQuery(data: Optional[Union[str,list]], conditions: Optional[Union[str,li
     if isinstance(conditions, str):
         conditions = conditions.split(',')
 
+    cond = ''
+    for i in range(len(conditions)-1):
+        cond += conditions[i]+"""
+        AND """
+    cond += conditions[len(conditions)-1]
+    
     base_query = """SELECT 
     {data}
     FROM gaiadr3.gaia_source
     WHERE {cond}
     """
 
-    cond = ''
-    for i in range(len(conditions)-1):
-        cond += conditions[i]+"""
-        AND """
-    cond += conditions[len(conditions)-1]
     query = base_query.format(data=dat, cond=cond)
 
     job = Gaia.launch_job(query)

@@ -8,27 +8,37 @@ import datetime as dt
 from astropy.table import Table
 import astropy.units as u
 from astroquery.gaia import Gaia
-Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source"
-Gaia.ROW_LIMIT = -1
+from typing import Optional, Union
 
 
 class GaiaQuery:
     
-    def __init__(self):
+    def __init__(self, gaia_table: Optional[Union[str, list]] = "gaiadr3.gaia_source"):
         '''The Constructor'''
-        self._path = "C:/Users/Er_da/Desktop/Poteff/data/query/"
+        Gaia.MAIN_GAIA_TABLE = gaia_table
+        Gaia.ROW_LIMIT = -1
+        
+        self._table = gaia_table
+        self._q     = Gaia
+        self._path  = "C:/Users/Er_da/Desktop/G-GCAS/data/query/"
+        self._baseQ = """SELECT {data}
+                FROM {table} 
+                WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
+                  {cond}
+                """
+        
         
     def _tn(self):
         '''
-        
+        Returns a tracking number, with format YYYYMMDD_HHMMSS
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
-
+        tn : str
+            Tracking number as string.
         '''
-        return dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+        tn = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+        return tn
     
     def _checkPathExist(self, dest: str):
         '''
@@ -53,7 +63,7 @@ class GaiaQuery:
         else:
             return fold
     
-    def freeQuery(self, ra, dec, radius, data: list):
+    def freeQuery(self, ra, dec, radius, data: Optional[Union[str,list]], conditions: Optional[Union[str,list]] = None):
         '''
         
 
@@ -65,7 +75,9 @@ class GaiaQuery:
             DESCRIPTION.
         radius : TYPE
             DESCRIPTION.
-        data : list
+        data : Optional[Union[str,list]]
+            DESCRIPTION.
+        conditions : Optional[Union[str,list]]
             DESCRIPTION.
 
         Returns
@@ -80,15 +92,32 @@ class GaiaQuery:
         else:
             ra = str(ra)
             dec = str(dec)
+            
         radius = str(radius)
+        
         circle = ra + "," + dec + "," + radius
-        select=""
-        for i in range(len(data)-1):
-            select += data[i]+', '
-        select += data[len(data)-1]
-        query = "SELECT "+ select +" \
-                FROM gaiadr3.gaia_source \
-                WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS'," + circle +"))=1"
+        
+        dat=''
+        if isinstance(data, list):
+            dat = ''
+            for i in range(len(data)-1):
+                dat += data[i]+', '
+            dat += data[len(data)-1]
+        else: dat=data
+
+        if isinstance(conditions, str):
+            conditions = conditions.split(',')
+                
+        if conditions is not None:
+            cond = '    AND '
+            for i in range(len(conditions)-1):
+                cond += conditions[i]+"""
+            AND """
+            cond += conditions[len(conditions)-1]
+        else: cond=''
+        
+        query = self._baseQ.format(data=dat, table=self._table, circle=circle, cond=cond)
+
         job = Gaia.launch_job_async(query)
         query = job.get_results()
         print("Sample number of sources: {:d}".format(len(query)))
@@ -121,12 +150,16 @@ class GaiaQuery:
             dec = str(dec)
         radius = str(radius)
         circle = ra + "," + dec + "," + radius
-        query = "SELECT source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error \
-                FROM gaiadr3.gaia_source \
-                WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS'," + circle +"))=1"
+        
+        astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
+        conds = ''
+        
+        query = self._baseQ.format(data=astrometry, table=self._table, circle=circle, cond=conds)
+        
         job = Gaia.launch_job_async(query)
         astro_cluster = job.get_results()
         print(" Sample number of sources: {:d}".format(len(astro_cluster)))
+        
         return astro_cluster
     
     def getPhotometry(self, ra, dec, radius):
@@ -156,12 +189,15 @@ class GaiaQuery:
             dec = str(dec)
         radius = str(radius)
         circle = ra + "," + dec + "," + radius
-        query = "SELECT source_id, bp_rp, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot \
-                FROM gaiadr3.gaia_source \
-                WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS'," + circle +"))=1"                     
+        
+        photometry = 'source_id, bp_rp, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot, ruwe, astrometric_excess_noise_sig'
+        conds = ''
+        query = self._baseQ.format(data=photometry, table=self._table, circle=circle, cond=conds)
         job = Gaia.launch_job_async(query)
         photo_cluster = job.get_results()
+        
         print(" Sample number of sources: {:d}".format(len(photo_cluster)))
+        
         return photo_cluster
     
     def getRV(self, ra, dec, radius, conditions=None):
