@@ -5,7 +5,8 @@ Created on May 2024
 Information about the current version of the g-gcas package.
 """
 
-__title__ = 'G-GCAS : Gaia Globular Cluster Analysis Software'
+__title__ = 'ggcas'
+__long_title__ = 'G-GCAS : Gaia Globular Cluster Analysis Software"
 __description__ = 'Software to gather and analyze astrometry and photometry data from Gaia'
 __version__ = '0.0.1'
 __author__ = 'Pietro Ferraiuolo'
