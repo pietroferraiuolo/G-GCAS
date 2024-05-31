@@ -3,7 +3,7 @@
 Created on May 2024
     -Author: P.Ferraiuolo
 """
-
+import os
 import pandas as pd
 import astropy.units as u
 
@@ -12,7 +12,7 @@ class Cluster:
     def __init__(self, name: str):
         '''The constructor'''
         parms       = self._loadClusterParameters(name.upper())
-        self.id   = name.upper()
+        self.id     = name.upper()
         self.ra     = parms.loc['ra']*u.deg
         self.dec    = parms.loc['dec']*u.deg
         self.dist   = parms.loc['dist']*u.kpc
@@ -38,7 +38,7 @@ class Cluster:
         cat_row : TYPE
             Pandas Series with all the necessary paramenters to ilitialize the Cluster Class.
         '''
-        self._path = 'C:/Users/Er_da/Desktop/Poteff/ggcas/data/'
-        self._catalog = pd.read_excel(self._path+'Catalogue.xlsx', index_col=0)
-        cat_row = self._catalog.loc[name.upper()]
+        path = os.environ['PYGCASCONF']#'C:/Users/Er_da/Desktop/Poteff/ggcas/data/'
+        catalog = pd.read_excel(os.path.join(path, 'Catalogue.xlsx'), index_col=0)
+        cat_row = catalog.loc[name.upper()]
         return cat_row
