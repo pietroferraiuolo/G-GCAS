@@ -42,3 +42,4 @@ class Cluster:
         catalog = pd.read_excel(os.path.join(path, 'Catalogue.xlsx'), index_col=0)
         cat_row = catalog.loc[name.upper()]
         return cat_row
+    

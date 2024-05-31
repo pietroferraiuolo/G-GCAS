@@ -26,7 +26,11 @@ class GaiaQuery:
                 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
                   {cond}
                 """
-        
+        self._joinQ = """SELECT {data}
+                FROM {table} 
+                WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
+                  {cond}
+                """
         
     def _tn(self):
         '''
@@ -62,8 +66,8 @@ class GaiaQuery:
             return fold
         else:
             return fold
-    
-    def freeQuery(self, ra, dec, radius, data: Optional[Union[str,list]], conditions: Optional[Union[str,list]] = None):
+        
+    def _adqlWriter(self, ra, dec, radius, data: Optional[Union[str,list]] = None, conditions: Optional[Union[str,list]] = None):
         '''
         
 
@@ -75,10 +79,10 @@ class GaiaQuery:
             DESCRIPTION.
         radius : TYPE
             DESCRIPTION.
-        data : Optional[Union[str,list]]
-            DESCRIPTION.
-        conditions : Optional[Union[str,list]]
-            DESCRIPTION.
+        data : Optional[Union[str,list]], optional
+            DESCRIPTION. The default is None.
+        conditions : Optional[Union[str,list]], optional
+            DESCRIPTION. The default is None.
 
         Returns
         -------
@@ -86,6 +90,7 @@ class GaiaQuery:
             DESCRIPTION.
 
         '''
+        
         if isinstance(ra, u.Quantity) and isinstance(dec, u.Quantity):
             ra = str(ra/u.deg)
             dec= str(dec/u.deg)
@@ -93,35 +98,67 @@ class GaiaQuery:
             ra = str(ra)
             dec = str(dec)
             
-        radius = str(radius)
+        radius  = str(radius)
         
-        circle = ra + "," + dec + "," + radius
+        circle  = ra + "," + dec + "," + radius
+        dat     = ''
+        cond    = ''
         
-        dat=''
-        if isinstance(data, list):
-            dat = ''
-            for i in range(len(data)-1):
-                dat += data[i]+', '
-            dat += data[len(data)-1]
-        else: dat=data
-
-        if isinstance(conditions, str):
-            conditions = conditions.split(',')
-                
+        if data is not None:
+            if isinstance(data, list):
+                for i in range(len(data)-1):
+                    dat += data[i]+', '
+                dat += data[len(data)-1]
+            else: dat=data
+        
         if conditions is not None:
+            if isinstance(conditions, str):
+                conditions = conditions.split(',')
             cond = '    AND '
             for i in range(len(conditions)-1):
                 cond += conditions[i]+"""
             AND """
             cond += conditions[len(conditions)-1]
-        else: cond=''
         
         query = self._baseQ.format(data=dat, table=self._table, circle=circle, cond=cond)
+        
+        return query
+        
+    
+    def freeQuery(self, ra, dec, radius, **kwargs):
+        '''
+        
+
+        Parameters
+        ----------
+        ra : TYPE
+            DESCRIPTION.
+        dec : TYPE
+            DESCRIPTION.
+        radius : TYPE
+            DESCRIPTION.
+        **kwargs : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        result : TYPE
+            DESCRIPTION.
+
+        '''
+
+        if 'data' in kwargs :
+            data = kwargs['data']
+        if 'conditions' in kwargs:
+            conditions = kwargs['conditions']
+    
+        query = self._adqlWriter(ra, dec, radius, data, conditions)
 
         job = Gaia.launch_job_async(query)
-        query = job.get_results()
+        result = job.get_results()
+        
         print("Sample number of sources: {:d}".format(len(query)))
-        return query
+        return result
     
     def getAstrometry(self, ra, dec, radius):
         '''
@@ -141,20 +178,10 @@ class GaiaQuery:
         astro_cluster : TYPE
             DESCRIPTION.
 
-        '''
-        if isinstance(ra, u.Quantity) and isinstance(dec, u.Quantity):
-            ra = str(ra/u.deg)
-            dec= str(dec/u.deg)
-        else:
-            ra = str(ra)
-            dec = str(dec)
-        radius = str(radius)
-        circle = ra + "," + dec + "," + radius
-        
+        '''        
         astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
-        conds = ''
         
-        query = self._baseQ.format(data=astrometry, table=self._table, circle=circle, cond=conds)
+        query = self._adqlWriter(ra, dec, radius, data=astrometry)
         
         job = Gaia.launch_job_async(query)
         astro_cluster = job.get_results()
@@ -181,18 +208,10 @@ class GaiaQuery:
             DESCRIPTION.
 
         '''
-        if isinstance(ra, u.Quantity) and isinstance(dec, u.Quantity):
-            ra = str(ra/u.deg)
-            dec= str(dec/u.deg)
-        else:
-            ra = str(ra)
-            dec = str(dec)
-        radius = str(radius)
-        circle = ra + "," + dec + "," + radius
-        
         photometry = 'source_id, bp_rp, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot, ruwe, astrometric_excess_noise_sig'
-        conds = ''
-        query = self._baseQ.format(data=photometry, table=self._table, circle=circle, cond=conds)
+        
+        query = self._adqlWriter(ra, dec, radius, data=photometry)
+        
         job = Gaia.launch_job_async(query)
         photo_cluster = job.get_results()
         
