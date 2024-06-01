@@ -64,7 +64,7 @@ def scatter_2hist(x, y):
 
     plt.show()
         
-def cm_diag(g, b_r, t):
+def colorMagnitude(g, b_r, teff_gspphot):
     '''
     
 
@@ -85,7 +85,7 @@ def cm_diag(g, b_r, t):
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7,7))
     
     ax.set_facecolor((0.9,0.9,0.9))
-    plt.scatter(b_r, g, c=t, alpha=0.8, cmap='rainbow_r')
+    plt.scatter(b_r, g, c=teff_gspphot, alpha=0.8, cmap='rainbow_r')
     plt.colorbar(label=r'$T_{eff}$')
     
     plt.ylim(max(g)+0.51, min(g)-0.51)
@@ -97,7 +97,7 @@ def cm_diag(g, b_r, t):
     plt.show()
     
     
-def pm_plot(pmra, pmdec):
+def properMotion(pmra, pmdec):
     '''
     
 
@@ -121,7 +121,7 @@ def pm_plot(pmra, pmdec):
     ax.axis('equal')
     plt.scatter(pmra, pmdec, c='black', alpha=0.4, s=3)
     
-def spatial_plot(ra, dec):
+def raDec(ra, dec):
     '''
     
 

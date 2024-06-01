@@ -19,7 +19,6 @@ class GaiaQuery:
         Gaia.ROW_LIMIT = -1
         
         self._table = gaia_table
-        self._q     = Gaia
         self._path  = "C:/Users/Er_da/Desktop/G-GCAS/data/query/"
         self._baseQ = """SELECT {data}
                 FROM {table} 
@@ -89,8 +88,7 @@ class GaiaQuery:
         query : TYPE
             DESCRIPTION.
 
-        '''
-        
+        ''' 
         if isinstance(ra, u.Quantity) and isinstance(dec, u.Quantity):
             ra = str(ra/u.deg)
             dec= str(dec/u.deg)
@@ -123,6 +121,19 @@ class GaiaQuery:
         query = self._baseQ.format(data=dat, table=self._table, circle=circle, cond=cond)
         
         return query
+        
+    def printTable(self, dump = False):
+        
+        table = Gaia.load_table(self._table)
+        print(table.description)
+        print('')
+        i=0
+        for columns in table.columns:
+            print(i, columns.name)
+            i+=1
+            
+        if dump==True:
+            return table.columns
         
     
     def freeQuery(self, ra, dec, radius, **kwargs):
@@ -160,7 +171,7 @@ class GaiaQuery:
         print("Sample number of sources: {:d}".format(len(query)))
         return result
     
-    def getAstrometry(self, ra, dec, radius):
+    def getAstrometry(self, ra, dec, radius, **kwargs):
         '''
         
 
@@ -172,7 +183,9 @@ class GaiaQuery:
             DESCRIPTION.
         radius : TYPE
             DESCRIPTION.
-
+        **kwargs : TYPE
+        DESCRIPTION.
+        
         Returns
         -------
         astro_cluster : TYPE
@@ -180,8 +193,10 @@ class GaiaQuery:
 
         '''        
         astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
-        
-        query = self._adqlWriter(ra, dec, radius, data=astrometry)
+        if 'conditions' in kwargs:
+            cond = kwargs['conditions']
+            
+        query = self._adqlWriter(ra, dec, radius, data=astrometry, conditions=cond)
         
         job = Gaia.launch_job_async(query)
         astro_cluster = job.get_results()
@@ -189,7 +204,7 @@ class GaiaQuery:
         
         return astro_cluster
     
-    def getPhotometry(self, ra, dec, radius):
+    def getPhotometry(self, ra, dec, radius, **kwargs):
         '''
         
 
@@ -201,16 +216,20 @@ class GaiaQuery:
             DESCRIPTION.
         radius : TYPE
             DESCRIPTION.
-
+        **kwargs : TYPE
+            DESCRIPTION.
+            
         Returns
         -------
         photo_cluster : TYPE
             DESCRIPTION.
 
         '''
-        photometry = 'source_id, bp_rp, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot, ruwe, astrometric_excess_noise_sig'
-        
-        query = self._adqlWriter(ra, dec, radius, data=photometry)
+        photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
+        if 'conditions' in kwargs:
+            cond = kwargs['conditions']
+            
+        query = self._adqlWriter(ra, dec, radius, data=photometry, conditions=cond)
         
         job = Gaia.launch_job_async(query)
         photo_cluster = job.get_results()
@@ -219,7 +238,7 @@ class GaiaQuery:
         
         return photo_cluster
     
-    def getRV(self, ra, dec, radius, conditions=None):
+    def getRV(self, ra, dec, radius, **kwargs):
         '''
         
 
@@ -231,26 +250,21 @@ class GaiaQuery:
             DESCRIPTION.
         radius : TYPE
             DESCRIPTION.
-        conditions : TYPE, optional
-            DESCRIPTION. The default is None.
-
+        **kwargs : TYPE
+            DESCRIPTION.
+            
         Returns
         -------
         rv : TYPE
             DESCRIPTION.
 
         '''
-        if isinstance(ra, u.Quantity) and isinstance(dec, u.Quantity):
-            ra = str(ra/u.deg)
-            dec= str(dec/u.deg)
-        else:
-            ra = str(ra)
-            dec = str(dec)
-        radius = str(radius)
-        circle = ra + "," + dec + "," + radius
-        query = "SELECT source_id, radial_velocity, radial_velocity_error \
-                FROM gaiadr3.gaia_source \
-                WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS'," + circle +"))=1"
+        
+        rv = 'source_id, radial_velocity, radial_velocity_error'
+        if 'conditions' in kwargs:
+            cond = kwargs['conditions']
+        
+        query = self._adqlWriter(ra, dec, radius, data=rv, conditions=cond)
                             
         job = Gaia.launch_job_async(query)
         rv = job.get_results()

@@ -38,7 +38,7 @@ class Cluster:
         cat_row : TYPE
             Pandas Series with all the necessary paramenters to ilitialize the Cluster Class.
         '''
-        path = os.environ['PYGCASCONF']#'C:/Users/Er_da/Desktop/Poteff/ggcas/data/'
+        path = os.environ['PYGCASCONF']
         catalog = pd.read_excel(os.path.join(path, 'Catalogue.xlsx'), index_col=0)
         cat_row = catalog.loc[name.upper()]
         return cat_row
