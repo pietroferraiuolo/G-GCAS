@@ -6,7 +6,7 @@ import os
 import numpy as np
 from astropy.table import QTable
 
-datapath="C:/Users/Er_da/Desktop/Poteff/ggcas/data/query/"
+datapath=os.environ['PYGCASCONF']
 
 def loadQuery(tn: str):
     '''
@@ -23,7 +23,8 @@ def loadQuery(tn: str):
         DESCRIPTION.
 
     '''
-    file = datapath + "/" + tn + '.txt'
+    file = os.path.join(datapath, (tn+'.txt'))
+    
     try:
         data = QTable.read(file, format='ascii.tab')
         return data
@@ -46,6 +47,7 @@ def dataList(name: str):
 
     '''
     filelist = os.listdir(datapath+name.upper()+'/')
+    
     for ii in filelist:
         print(ii)
         

@@ -9,17 +9,24 @@ from astropy.table import Table
 import astropy.units as u
 from astroquery.gaia import Gaia
 from typing import Optional, Union
-
+import configparser
 
 class GaiaQuery:
     
     def __init__(self, gaia_table: Optional[Union[str, list]] = "gaiadr3.gaia_source"):
-        '''The Constructor'''
+        '''The Constructor
+        
+        Parameters
+        ----------
+        gaia_table: str | list
+            DESCRIPTION.
+        
+        '''
         Gaia.MAIN_GAIA_TABLE = gaia_table
         Gaia.ROW_LIMIT = -1
         
         self._table = gaia_table
-        self._path  = "C:/Users/Er_da/Desktop/G-GCAS/data/query/"
+        self._path  = os.environ['PYGCASCONF']
         self._baseQ = """SELECT {data}
                 FROM {table} 
                 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
@@ -49,16 +56,16 @@ class GaiaQuery:
 
         Parameters
         ----------
-        dest : TYPE
+        dest : str
             DESCRIPTION.
 
         Returns
         -------
-        path : TYPE
+        fold : str
             DESCRIPTION.
 
         '''
-        fold = self._path+dest.upper()+'/'
+        fold = os.path.join(self._path, dest.upper())
         if not os.path.exists(fold):
             os.makedirs(fold)
             print(f"Path '{fold}' did not exist. Created.")
@@ -121,8 +128,46 @@ class GaiaQuery:
         query = self._baseQ.format(data=dat, table=self._table, circle=circle, cond=cond)
         
         return query
+    
+    def _infoToFile(filename: str, config_data):
+        '''
+        
+
+        Parameters
+        ----------
+        filename : TYPE
+            DESCRIPTION.
+        config_data : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        None.
+
+        '''
+        config = configparser.ConfigParser()
+
+        for section, options in config_data.items():
+            config[section] = options
+
+        with open(filename, 'w') as configfile:
+            config.write(configfile)
         
     def printTable(self, dump = False):
+        '''
+        
+
+        Parameters
+        ----------
+        dump : TYPE, optional
+            DESCRIPTION. The default is False.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        '''
         
         table = Gaia.load_table(self._table)
         print(table.description)
@@ -192,9 +237,10 @@ class GaiaQuery:
             DESCRIPTION.
 
         '''        
-        astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
         if 'conditions' in kwargs:
             cond = kwargs['conditions']
+            
+        astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
             
         query = self._adqlWriter(ra, dec, radius, data=astrometry, conditions=cond)
         
@@ -225,7 +271,9 @@ class GaiaQuery:
             DESCRIPTION.
 
         '''
+        
         photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
+        
         if 'conditions' in kwargs:
             cond = kwargs['conditions']
             
@@ -259,10 +307,10 @@ class GaiaQuery:
             DESCRIPTION.
 
         '''
-        
-        rv = 'source_id, radial_velocity, radial_velocity_error'
         if 'conditions' in kwargs:
             cond = kwargs['conditions']
+        
+        rv = 'source_id, radial_velocity, radial_velocity_error'
         
         query = self._adqlWriter(ra, dec, radius, data=rv, conditions=cond)
                             
@@ -271,7 +319,7 @@ class GaiaQuery:
         print(" Sample number of sources: {:d}".format(len(rv)))
         return rv
     
-    def saveQuery(self, dat, name: str):
+    def _saveQuery(self, dat, name: str):
         '''
         
 
@@ -289,13 +337,14 @@ class GaiaQuery:
         '''
         tn = self._tn()
         fold = self._checkPathExist(name.upper())
-        path = fold+"/"+tn+'.txt'
+        path = os.path.join(fold, (tn+'.txt'))
+        
         if isinstance(dat, Table)==False:
             data = Table(dat)
             
         data.write(path, format='ascii.tab')
         
-        return (print(fold+tn+'.txt'))
+        return (print(path))
     
 
 
