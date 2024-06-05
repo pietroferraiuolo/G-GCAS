@@ -1,0 +1,7 @@
+astropy
+astroquery
+matplotlib
+numpy
+pandas
+scipy
+sympy
