@@ -5,7 +5,7 @@ Created on May 2024
 import sympy as sp
 import numpy as np
 
-def errPropagation(func, variables, vars_values,  compute=True):
+def errPropagation(func, variables, corr=False):
     '''
     
 
@@ -26,8 +26,11 @@ def errPropagation(func, variables, vars_values,  compute=True):
         DESCRIPTION.
 
     '''
+    if corr==True:
+        corr = np.unos((len(variables),len(variables))-np.eye(len(variables))
+    else:
+        corr = np.eye(len(variables))
 
-    corr = np.eye(len(variables))
     errors=[]
     for ii in range(len(variables)):
         errors.append(sp.symbols('epsilon_{}'.format(variables[ii])))
@@ -53,19 +56,4 @@ def errPropagation(func, variables, vars_values,  compute=True):
     # Propagazione dell'errore
     error_formula = sp.sqrt(sum_of_squares + 2 * sum_of_correlations)
 
-    if compute==True:
-        values = dict()
-        for xx in range(len(variables)):
-            values[variables[xx]] = 0
-
-        computed_error = np.zeros(len(vars_values[0]))
-        for ii in range(len(vars_values[0])):
-            for xx in range(len(variables)):
-                values[variables[xx]] = vars_values[xx][ii]
-
-            computed_error[ii] = sp.N(error_formula.subs(values))
-
-        return computed_error
-    else:
-        return error_formula
-
+    return error_formula
