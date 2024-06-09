@@ -4,7 +4,9 @@ Created on May 2024
 """
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.textpath import FontProperties
 from typing import Optional, Union
+from scipy.stats import gaussian_kde
 
 label_font = {'family': 'serif',
         'color':  'black',
@@ -19,30 +21,69 @@ title_font = {'family': 'sans-serif',
         }
 
 
-def scatter_2hist(x, y):
+def scatter_2hist(x, y, kde=False, **kwargs):
     '''
-    
+    Makes a 2D scatter of two quantities, with the respective histogram distributions projected on each axis
 
     Parameters
     ----------
-    x : TYPE
-        DESCRIPTION.
-    y : TYPE
-        DESCRIPTION.
-    show : TYPE, optional
-        DESCRIPTION. The default is False.
+    x : ArrayLike
+        Data to be scattered on x-axis
+    y : ArrayLike
+        Data to be scattered on y-axis
 
-    Returns
-    -------
-    None.
+    Other Parameters
+    ----------------
+    **kwargs : Additional parameters for customizing the plot
 
+        xlabel : str
+            xlabel of the plot
+        ylabel : str
+            ylabel of the plot
+        title : str
+            title of the figure
+        alpha : float
+            transparency of the data points of the scatter
+        colorx : str
+            color of the histogram on x-axis
+        colory : str
+            color of the histogram on y-axis
+        scatter_color : str
+            color of the scattered dots
     '''
-    fig = plt.figure(figsize=(8,8))
 
+    if 'xlabel' in kwargs:
+        xlabel=kwargs['xlabel']
+    else: xlabel=''
+    if 'ylabel' in kwargs:
+        ylabel=kwargs['ylabel']
+    else: ylabel=''
+    if 'title' in kwargs:
+        title=kwargs['title']
+    else: title=''
+    if 'alpha' in kwargs:
+        alpha=kwargs['alpha']
+    else: alpha=0.7
+    if 'colorx' in kwargs:
+        colorx=kwargs['colorx']
+    else: colorx='green'
+    if 'colory' in kwargs:
+        colory=kwargs['colory']
+    else: colory='blue'
+    if 'scatter_color' in kwargs:
+        sc=kwargs['scatter_color']
+    else: sc='black'
+    if 's' in kwargs:
+        s=kwargs['s']
+    elif 'size' in kwargs:
+        s=kwargs['size']
+    else:
+        s=5
+    
+    fig = plt.figure(figsize=(8,8))
     gs = fig.add_gridspec(2, 2,  width_ratios=(4, 1), height_ratios=(1, 4),
                           left=0.1, right=0.9, bottom=0.1, top=0.9,
-                          wspace=0.05, hspace=0.05)
-
+                          wspace=0.025, hspace=0.025)
     ax = fig.add_subplot(gs[1, 0])
     ax_histx = fig.add_subplot(gs[0, 0], sharex=ax)
     ax_histy = fig.add_subplot(gs[1, 1], sharey=ax)
@@ -50,37 +91,48 @@ def scatter_2hist(x, y):
     ax_histy.tick_params(axis="y", labelleft=False)
 
     # the scatter plot:
-    ax.scatter(x, y, color='black', alpha=0.8)
+    ax.scatter(x, y, color=sc, alpha=alpha, s=s)
     ax_histx.set_ylabel('Counts')
     ax_histy.set_xlabel('Counts')
+    ax.set_xlabel(xlabel, fontdict=label_font)
+    ax.set_ylabel(ylabel, fontdict=label_font)
    
     binwidth = 0.25
     xymax = max(np.max(np.abs(x)), np.max(np.abs(y)))
     lim = (int(xymax/binwidth) + 1) * binwidth
 
     bins = np.arange(-lim, lim + binwidth, binwidth)
-    ax_histx.hist(x, bins=bins, color='blue', alpha=0.6)
-    ax_histy.hist(y, bins=bins, orientation='horizontal', color='green', alpha=0.6)
+    ax_histx.hist(x, bins=bins, color=colorx, alpha=0.6)
+    ax_histy.hist(y, bins=bins, orientation='horizontal', color=colory, alpha=0.6)
+
+    plt.suptitle(title, size=21, weight='semibold')
+
+    if kde:
+        kdex = gaussian_kde(x)
+        xk = np.linspace(min(x), max(x), 10000)
+        kdex_values = kdex(xk)*len(x)*binwidth
+
+        kdey = gaussian_kde(y)
+        yk = np.linspace(min(y), max(y), 10000)
+        kdey_values = kdey(yk)*len(y)*binwidth
+
+        ax_histx.plot(xk, kdex_values, color='r')
+        ax_histy.plot(kdey_values, yk, color='r')
 
     plt.show()
         
 def colorMagnitude(g, b_r, teff_gspphot):
     '''
-    
+    Perform a scatter plot to create a color-magnitude diagram of the sample, using photometry and temperature information
 
     Parameters
     ----------
-    g : TYPE
-        DESCRIPTION.
-    b_r : TYPE
-        DESCRIPTION.
-    t : TYPE
-        DESCRIPTION.
-
-    Returns
-    -------
-    None.
-
+    g : float | ArrayLike
+        Gaia mean magnitude in the G band.
+    b_r : fliat | ArrayLike
+        Gaia color, defined and the BP mean magnitude minus the RP mean magnitude.
+    t : float | ArrayLike
+        Gaia computed effective surface temperature.
     '''
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7,7))
     
@@ -145,37 +197,68 @@ def raDec(ra, dec):
     ax.axis('equal')
     plt.scatter(ra, dec, c='black', alpha=0.4, s=3)
 
-def histogram(data, xlabel='x'):
+def histogram(data, xlabel='x', kde=False, **kwargs):
     '''
-    
+    Plots the data distribution with a histogram. The number of bins is defined as 1.5*sqrt(N). If kde is set on Tue, the kerned desdity estimation will be computed and plotted over the histogram.
 
     Parameters
     ----------
-    data : TYPE
+    data : ArrayLike
         DESCRIPTION.
     xlabel : str
-        DESCRIPTION.
+        DESCRIPTION. The default value is 'x'.
+    kde : Boolean
+        DESCRIPTION. The default value is False.
+
+    Other Parameters
+    ----------------
+    **kwargs : Additional parameters for customizing the plot.
+    
+        alpha : float
+            Transparency of the bins.
+        color : str
+            Color of the histogram's bins.
 
     Returns
     -------
-    TYPE
+    bins : ArrayLike
         DESCRIPTION.
-    TYPE
+    counts : ArrayLike
         DESCRIPTION.
 
     '''
+    if 'alpha' in kwargs:
+        alpha=kwargs['alpha']
+    else: alpha=1
+    if 'color' in kwargs:
+        color=kwargs['color']
+    else: color='gray'
+
     n_bin = int(1.5*np.sqrt(len(data)))
     
     plt.figure(figsize=(9,8))
     
-    h = plt.hist(data, bins=n_bin, color='black', alpha=0.85)
+    h = plt.hist(data, bins=n_bin, color=color, alpha=alpha)
     plt.ylabel('counts')
     plt.xlabel(xlabel, fontdict=label_font)
     title = xlabel+' Distribution'
     plt.title(title, fontdict=label_font)
+    
+    bins = h[1][:len(h[0])]
+    binwidth = bins[1] - bins[0]
+    counts = h[0]
+
+    if kde:
+        kde = gaussian_kde(data)
+        xk = np.linspace(min(data), max(data), 10000)
+        kde_values = kde(xk)*len(data)*binwidth
+
+        plt.plot(xk, kde_values, c='r', label=r'kde')
+        plt.legend(loc='best', fontsize='large')
+    
     plt.show()
     
-    return h[1][:len(h[0])], h[0]
+    return bins, counts
     
 def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, xlabel: str='x', ylabel: str='y'):
     '''
@@ -243,29 +326,3 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, xlabel: st
     plt.show()
     
     return mean_x, err_xm
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
