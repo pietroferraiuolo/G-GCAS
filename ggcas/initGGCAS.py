@@ -1,7 +1,7 @@
 import os
 from ggcas.cluster import Cluster
 from ggcas import plots as gplt
-#from ggcas import funcions, analyzer
+from ggcas import funcions, analyzer
 from ggcas.query import GaiaQuery 
 
 gq = GaiaQuery()
@@ -30,8 +30,6 @@ GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE
 """)
 
 print('Data path is {}'.format(os.environ['PYGCASCONF']))
-<<<<<<< Updated upstream
-=======
 
 def help():
     TEXT="""
@@ -49,5 +47,3 @@ G-GCAS PACKAGE DOCUMENTATION
     """
     
     print(TEXT)
-    
->>>>>>> Stashed changes

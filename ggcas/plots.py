@@ -160,10 +160,6 @@ def properMotion(pmra, pmdec):
     pmdec : TYPE
         DESCRIPTION.
 
-    Returns
-    -------
-    None.
-
     '''
     fig, ax = plt.subplots(figsize=(8,8))
     plt.xlabel(r'$\mu_{\alpha*}$ [deg]', fontdict=label_font)
@@ -171,7 +167,7 @@ def properMotion(pmra, pmdec):
     plt.title('Proper Motion Distribution', fontdict=title_font)
     
     ax.axis('equal')
-    plt.scatter(pmra, pmdec, c='black', alpha=0.4, s=3)
+    plt.scatter(pmra, pmdec, c='black', alpha=0.5, s=3)
     
 def raDec(ra, dec):
     '''
@@ -183,10 +179,6 @@ def raDec(ra, dec):
         DESCRIPTION.
     dec : TYPE
         DESCRIPTION.
-
-    Returns
-    -------
-    None.
 
     '''
     fig, ax = plt.subplots(figsize=(8,8))

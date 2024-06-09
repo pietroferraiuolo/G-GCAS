@@ -86,7 +86,7 @@ def computeError(func, variables, vars_values):
         DESCRIPTION.
 
     '''
-    err_func = gfunc.errPropagation(func, variables, corrr=True))
+    err_func = gfunc.errPropagation(func, variables, corrr=True)
     values = dict()
     for x in range(len(variables)):
         values[variables[x]] = 0
