@@ -30,3 +30,24 @@ GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE
 """)
 
 print('Data path is {}'.format(os.environ['PYGCASCONF']))
+<<<<<<< Updated upstream
+=======
+
+def help():
+    TEXT="""
+G-GCAS PACKAGE DOCUMENTATION
+
+- cluster
+
+- functions
+
+- query
+
+- plots
+
+- analysis
+    """
+    
+    print(TEXT)
+    
+>>>>>>> Stashed changes
