@@ -5,6 +5,8 @@ Created on May 2024
 import numpy as np
 import sympy as sp
 
+# Fare che ogni funzione restituisca la funzione e la lista delle variabili
+
 def errPropagation(func, variables, corr=False):
     '''
     
