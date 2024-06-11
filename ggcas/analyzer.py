@@ -47,8 +47,8 @@ def angular_distance(ra0, dec0, ra1, dec1, ra0_err, dec0_err, corr=None):
     #d2r = np.pi/180  # Definisci d2r come una variabile simbolica se necessario
 
     # Usa le funzioni di SymPy per tutte le operazioni matematiche
-    #w = 2 * sp.asin(sp.sqrt(sp.sin((dec0 - dec1) * 0.5 * d2r)**2 +
-                            #sp.cos(dec0 * d2r) * sp.cos(dec1 * d2r) * sp.sin((ra0 - ra1) * 0.5 * d2r)**2)) / d2r
+    w = 2 * sp.asin(sp.sqrt(sp.sin((dec0 - dec1) * 0.5 * d2r)**2 +
+                            sp.cos(dec0 * d2r) * sp.cos(dec1 * d2r) * sp.sin((ra0 - ra1) * 0.5 * d2r)**2)) / d2r
     
     
     

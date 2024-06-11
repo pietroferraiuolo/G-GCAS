@@ -5,8 +5,6 @@ Created on May 2024
 import numpy as np
 import sympy as sp
 
-# Fare che ogni funzione restituisca la funzione e la lista delle variabili
-
 def errPropagation(func, variables, corr=False):
     '''
     
@@ -60,12 +58,23 @@ def errPropagation(func, variables, corr=False):
 
     return error_formula
 
-# def angularDistance
+def angularDistance():
+    ra1, ra0, dec1, dec0 = sp.symbols('ra1 ra0 dec1 dec0')
+    d2r = np.pi/180
+    w = 2*sp.asin(sp.sqrt(sp.sin((dec0-dec1)*0.5*d2r)**2 + sp.cos(dec0*d2r)*sp.cos(dec1*d2r)*sp.sin((ra0-ra1)*0.5*d2r)**2))/d2r
+    return w, [ra1, dec1, ra0, dec0]
 
-# def losDistance
+def losDistance():
+    ww = sp.symbols('omega')
+    r = 1/ww
+    return r, ww
 
-# def radDistance_2D
+def radDistance_2D():
+    rx, ww = sp.symbols('r_gc theta')
+    r2d = rx*sp.tan(ww)
+    return r2d, [rx, ww]
 
-# def radDistance_3D
-
-# def mean(data, data_err = None)
+def radDistance_3D():
+    d, r2d = sp.symbols('d, r_2d')
+    R = sp.sqrt(d**2 + r2d**2)
+    return R, [d, r2d]

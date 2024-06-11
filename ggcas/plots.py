@@ -4,7 +4,6 @@ Created on May 2024
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.textpath import FontProperties
 from typing import Optional, Union
 from scipy.stats import gaussian_kde
 
@@ -22,8 +21,8 @@ title_font = {'family': 'sans-serif',
 
 
 def scatter_2hist(x, y, kde=False, **kwargs):
-    '''
-    Makes a 2D scatter of two quantities, with the respective histogram distributions projected on each axis
+    """
+    Make a 2D scatter of two quantities, with the respective histogram distributions projected on each axis.
 
     Parameters
     ----------
@@ -50,8 +49,7 @@ def scatter_2hist(x, y, kde=False, **kwargs):
             color of the histogram on y-axis
         scatter_color : str
             color of the scattered dots
-    '''
-
+    """
     if 'xlabel' in kwargs:
         xlabel=kwargs['xlabel']
     else: xlabel=''
@@ -122,8 +120,8 @@ def scatter_2hist(x, y, kde=False, **kwargs):
     plt.show()
         
 def colorMagnitude(g, b_r, teff_gspphot):
-    '''
-    Perform a scatter plot to create a color-magnitude diagram of the sample, using photometry and temperature information
+    """
+    Perform a scatter plot to create a color-magnitude diagram of the sample, using photometry and temperature information.
 
     Parameters
     ----------
@@ -133,7 +131,7 @@ def colorMagnitude(g, b_r, teff_gspphot):
         Gaia color, defined and the BP mean magnitude minus the RP mean magnitude.
     t : float | ArrayLike
         Gaia computed effective surface temperature.
-    '''
+    """
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7,7))
     
     ax.set_facecolor((0.9,0.9,0.9))
@@ -196,16 +194,16 @@ def histogram(data, xlabel='x', kde=False, **kwargs):
     Parameters
     ----------
     data : ArrayLike
-        DESCRIPTION.
-    xlabel : str
-        DESCRIPTION. The default value is 'x'.
+        Imput dataset for the histogram.
     kde : Boolean
-        DESCRIPTION. The default value is False.
+        Gaussian Kernel density estimation of the histogram. The default value is False.
 
     Other Parameters
     ----------------
     **kwargs : Additional parameters for customizing the plot.
     
+        xlabel : str
+            Label of the plot's x-axis.
         alpha : float
             Transparency of the bins.
         color : str
@@ -219,6 +217,9 @@ def histogram(data, xlabel='x', kde=False, **kwargs):
         DESCRIPTION.
 
     '''
+    if 'xlabel' in kwargs:
+        xlabel=kwargs['xlabel']
+    else: xlabel=''
     if 'alpha' in kwargs:
         alpha=kwargs['alpha']
     else: alpha=1
@@ -244,8 +245,14 @@ def histogram(data, xlabel='x', kde=False, **kwargs):
         kde = gaussian_kde(data)
         xk = np.linspace(min(data), max(data), 10000)
         kde_values = kde(xk)*len(data)*binwidth
-
-        plt.plot(xk, kde_values, c='r', label=r'kde')
+        mean=np.mean(data)
+        std=np.std(data)
+        
+        label=r"""Gaussian KDE
+mean={:.2e}
+$\sigma^2$={:.2e}"""
+        
+        plt.plot(xk, kde_values, c='r', label=label.format(mean, std))
         plt.legend(loc='best', fontsize='large')
     
     plt.show()
@@ -253,9 +260,9 @@ def histogram(data, xlabel='x', kde=False, **kwargs):
     return bins, counts
     
 def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, xlabel: str='x', ylabel: str='y'):
-    '''
+    """
     
-
+    
     Parameters
     ----------
     x : TYPE
@@ -273,7 +280,7 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, xlabel: st
     -------
     None.
 
-    '''
+    """
     nb2 = int(1.5*np.sqrt(len(x)))
     mean_x = np.mean(x)
     
