@@ -11,7 +11,7 @@ class Cluster:
     
     def __init__(self, name: str):
         '''The constructor'''
-        parms       = self._loadClusterParameters(name.upper())
+        parms       = loadClusterParameters(name.upper())
         self.id     = name.upper()
         self.ra     = parms.loc['ra']*u.deg
         self.dec    = parms.loc['dec']*u.deg
@@ -22,7 +22,7 @@ class Cluster:
         self.logc   = parms.loc['logc']
         self.cflag  = parms.loc['collapsed']=='Y'
         
-    
+
     def _loadClusterParameters(self, name: str):
         '''
         Loads the parameters of the requested cluster from the Harris Catalog 
