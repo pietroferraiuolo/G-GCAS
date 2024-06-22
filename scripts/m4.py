@@ -18,7 +18,7 @@ import numpy as np
 from scipy import constants
 import matplotlib.pyplot as plt
 import astropy.units as u
-from astropy.constants import au
+#from astropy.constants import au
 import astropy.units as u
 from astroquery.gaia import Gaia
 Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source"
@@ -52,7 +52,7 @@ title_font = {'family': 'sans-serif',
         }
 
 
-drive.mount('/content/gdrive')
+#drive.mount('/content/gdrive')
 codefold = "/content/gdrive/MyDrive/Tesi_di_laurea/Codes"                        # Cartella del codice
 imfold = '/content/gdrive/MyDrive/Tesi_di_laurea/Immagini'                       # Cartella immagini
 
@@ -68,7 +68,7 @@ class Cluster: # This class contains information about globular cluster
 
 NGC6121 = Cluster(s_ra=245.8958, s_dec=-26.5256, dist=1.851, c=1.65, r_cd=1.16, r_hd=4.33, w0=7.41)
 
-output.clear()
+#output.clear()
 
 def angular_distance(ra0, dec0, ra1, dec1, ra0_err, dec0_err, corr):
     '''
@@ -619,7 +619,7 @@ v2h = plt.hist(V2p, bins=bins_(len(vx_phot)), color='black', alpha=0.85)
 ax.text(60, v2h[0].max()/2, r'$<v^2>$={:.2f} $\pm$ {:.2f} km$^2$/s$^2$'.format(V2p_m.value, V2pm_e.value), fontsize=15)
 plt.ylabel('Counts')
 plt.xlabel(r'$v^2$ [km$^2$/s$^2$]', fontdict=label_font)
-output.clear()
+#output.clear()
 
 print('Calculated from data:\n<V^2> = {:.2f} +- {:.2f}'.format(V2p_m.value, V2pm_e))
 print('Calculated from previous calculus:\n<V^2> = {:.2f} +- {:.2f} km2 / s2'.format((np.mean(vx_phot**2).value+np.mean(vy_phot**2).value+np.mean(v_los_GCRF3**2)),
@@ -1209,7 +1209,7 @@ axs[1].set_xlabel(r'$R_{3D}$ [pc]', fontdict=label_font)
 axs[1].set_ylabel('Counts')
 axs[1].set_title('Radial Distance Distribution', fontdict=title_font)
 axs[0].axis('equal')
-output.clear()
+#output.clear()
 
 n_vr = N_v
 
@@ -1367,7 +1367,7 @@ ax.text(100, v2h[0].max()/2, r'$<v^2>$={:.1f} $\pm$ {:.1f} km$^2$/s$^2$'.format(
 plt.ylabel('Counts')
 plt.xlabel(r'$v^2$ [km$^2$/s$^2$]', fontdict=label_font)
 plt.title('Total Velocity Distribution', fontdict=title_font)
-output.clear()
+#output.clear()
 
 print('Calculated from data:\n<V^2> = {:.2f} +- {:.2f}'.format(V2_m.value, V2m_e))
 print('Calculated from previous calculus:\n<V^2> = {:.2f} +- {:.2f} km2 / s2'.format((np.mean(vx2).value+np.mean(vy2).value+np.mean(v_GCRF**2)),
@@ -1442,7 +1442,7 @@ ax.text(np.nanmax(mmShell[1])/3, mmh[0].max()/2, r'$<v^2>$ = {:.2f}$\pm${:.2f} k
 plt.xlabel(r'$V^2_{tot}$', fontdict=label_font)
 plt.title(r'$N_T$ = {:d}'.format(len(mmShell[0])), fontdict=title_font)
 plt.legend(fontsize='x-large')
-output.clear()
+#output.clear()
 
 print('v^2_s,max = {:.3f} +- {:.3f}'.format(mmShell[1][15],mmShell[2][15]))
 print('Relative error: {:.2f}%'.format(mmShell[2][15]/mmShell[1][15] *100))
@@ -1487,7 +1487,7 @@ ax.text(np.nanmax(mShell[1])/3, mh[0].max()/2, r'$<v^2>$ = {:.2f}$\pm${:.2f} km$
 plt.xlabel(r'$V^2_{tot}$', fontdict=label_font)
 plt.title(r'$N_T$ = {:d}'.format(len(mShell[0])), fontdict=title_font)
 plt.legend(fontsize='x-large')
-output.clear()
+#output.clear()
 
 print('v^2_s,max = {:.2f} +- {:.2f}'.format(mShell[1][3],mShell[2][3]))
 print('Relative error: {:.2f}%'.format(mShell[2][3]/mShell[1][3] *100))
@@ -1533,7 +1533,7 @@ ax.text(mmmShell[1].max()/3, mmmh[0].max()/2, r'$<v^2>$ = {:.2f}$\pm${:.2f} km$^
 plt.xlabel(r'$V^2_{tot}$', fontdict=label_font)
 plt.title(r'$N_T$ = {:d}'.format(len(mShell[0])), fontdict=title_font)
 plt.legend(fontsize='x-large')
-output.clear()
+#output.clear()
 
 print('v^2_s,max = {:.3f} +- {:.3f}'.format(mmmShell[1][28],mmmShell[2][28]))
 print('Relative error: {:.2f}%'.format(mmmShell[2][28]/mmmShell[1][28] *100))
@@ -1571,7 +1571,7 @@ axs[2].set_xlabel(r'$V^2_{tot}$', fontdict=label_font)
 axs[2].set_title(r'$N_T$ = {:d}'.format(len(mmmShell[0])), fontdict=title_font)
 axs[2].legend(fontsize='x-large')
 
-output.clear()
+#output.clear()
 
 mdata = {'N bin': mh[0],
          'Central Bin V^2 [km2/s2]': vc[0:mbin],
@@ -1724,7 +1724,7 @@ for i in range (1, mbin):
   plt.plot([mh[1][i],mh[1][i]], [0, mh[0][i]], color='black', alpha=0.45)
 #plt.title(r'$N_T$ = {:d}'.format(len(mShell[0])), fontdict=title_font)
 #plt.legend(fontsize='x-large')
-output.clear()
+#output.clear()
 
 fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10,10))
 #ax.set_facecolor((0.9,0.9,0.9))

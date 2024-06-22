@@ -8,6 +8,9 @@ import pandas as pd
 import astropy.units as u
 
 class Cluster:
+    """
+    
+    """
     
     def __init__(self, name: str):
         '''The constructor'''
@@ -21,8 +24,12 @@ class Cluster:
         self.w0     = parms.loc['w0']
         self.logc   = parms.loc['logc']
         self.cflag  = parms.loc['collapsed']=='Y'
+<<<<<<< Updated upstream
         
 
+=======
+            
+>>>>>>> Stashed changes
     def _loadClusterParameters(self, name: str):
         '''
         Loads the parameters of the requested cluster from the Harris Catalog 
@@ -42,4 +49,3 @@ class Cluster:
         catalog = pd.read_excel(os.path.join(path, 'Catalogue.xlsx'), index_col=0)
         cat_row = catalog.loc[name.upper()]
         return cat_row
-    

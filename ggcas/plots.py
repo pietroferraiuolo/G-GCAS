@@ -2,9 +2,9 @@
 Created on May 2024
     -Author: P.Ferraiuolo
 """
+from typing import Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
-from typing import Optional, Union
 from scipy.stats import gaussian_kde
 
 label_font = {'family': 'serif',
@@ -12,17 +12,18 @@ label_font = {'family': 'serif',
         'weight': 'normal',
         'size': 18,
         }
-
 title_font = {'family': 'sans-serif',
         'color':  'black',
         'weight': 'semibold',
         'size': 21,
         }
 
-
 def scatter_2hist(x, y, kde=False, **kwargs):
     """
+    Make a scatter plot with histograms
+
     Make a 2D scatter of two quantities, with the respective histogram distributions projected on each axis.
+
 
     Parameters
     ----------
@@ -50,33 +51,14 @@ def scatter_2hist(x, y, kde=False, **kwargs):
         scatter_color : str
             color of the scattered dots
     """
-    if 'xlabel' in kwargs:
-        xlabel=kwargs['xlabel']
-    else: xlabel=''
-    if 'ylabel' in kwargs:
-        ylabel=kwargs['ylabel']
-    else: ylabel=''
-    if 'title' in kwargs:
-        title=kwargs['title']
-    else: title=''
-    if 'alpha' in kwargs:
-        alpha=kwargs['alpha']
-    else: alpha=0.7
-    if 'colorx' in kwargs:
-        colorx=kwargs['colorx']
-    else: colorx='green'
-    if 'colory' in kwargs:
-        colory=kwargs['colory']
-    else: colory='blue'
-    if 'scatter_color' in kwargs:
-        sc=kwargs['scatter_color']
-    else: sc='black'
-    if 's' in kwargs:
-        s=kwargs['s']
-    elif 'size' in kwargs:
-        s=kwargs['size']
-    else:
-        s=5
+    xlabel=kwargs.get('xlabel','')
+    ylabel=kwargs.get('ylabel','')
+    title=kwargs.get('title','')
+    alpha=kwargs.get('alpha', 0.7)
+    colorx=kwargs.get('colorx', 'green')
+    colory=kwargs.get('colory', 'blue')
+    sc=kwargs.get('scatter_color', 'black')
+    s=kwargs.get('size', 5)
     
     fig = plt.figure(figsize=(8,8))
     gs = fig.add_gridspec(2, 2,  width_ratios=(4, 1), height_ratios=(1, 4),
@@ -187,7 +169,7 @@ def raDec(ra, dec):
     ax.axis('equal')
     plt.scatter(ra, dec, c='black', alpha=0.4, s=3)
 
-def histogram(data, xlabel='x', kde=False, **kwargs):
+def histogram(data, kde=False, **kwargs):
     '''
     Plots the data distribution with a histogram. The number of bins is defined as 1.5*sqrt(N). If kde is set on Tue, the kerned desdity estimation will be computed and plotted over the histogram.
 
@@ -217,18 +199,11 @@ def histogram(data, xlabel='x', kde=False, **kwargs):
         DESCRIPTION.
 
     '''
-    if 'xlabel' in kwargs:
-        xlabel=kwargs['xlabel']
-    else: xlabel=''
-    if 'alpha' in kwargs:
-        alpha=kwargs['alpha']
-    else: alpha=1
-    if 'color' in kwargs:
-        color=kwargs['color']
-    else: color='gray'
+    xlabel=kwargs.get('xlabel','')
+    alpha=kwargs.get('alpha', 1)
+    color=kwargs.get('color','gray')
 
     n_bin = int(1.5*np.sqrt(len(data)))
-    
     plt.figure(figsize=(9,8))
     
     h = plt.hist(data, bins=n_bin, color=color, alpha=alpha)
@@ -259,7 +234,7 @@ $\sigma^2$={:.2e}"""
     
     return bins, counts
     
-def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, xlabel: str='x', ylabel: str='y'):
+def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     """
     
     
@@ -271,16 +246,24 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, xlabel: st
         DESCRIPTION.
     xerr : TYPE, optional
         DESCRIPTION. The default is None.
-    xlabel : TYPE, optional
-        DESCRIPTION. The default is 'x'.
-    ylabel : TYPE, optional
-        DESCRIPTION. The default is 'y'.
+    **kwarg : Optional Args:
+        
+        - xlabel : str
+            DESCRIPTION. The default is 'x'.
+        - ylabel : str
+            DESCRIPTION. The default is 'y'.
+        - color : str
+            DESCRIPTION. 
 
     Returns
     -------
     None.
-
     """
+    xlabel=kwargs.get('xlabel', 'x')
+    ylabel=kwargs.get('ylabel', 'y')
+    color=kwargs.get('color','gray')
+    s=kwargs.get('size', 10)
+    
     nb2 = int(1.5*np.sqrt(len(x)))
     mean_x = np.mean(x)
     
@@ -288,18 +271,20 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, xlabel: st
     fig.subplots_adjust(hspace=0)
 
     if xerr is not None:
-        ax1.errorbar(x, y, xerr=xerr, fmt='x', color='red', linewidth=1., markersize=3, alpha=0.8)
+        if isinstance(xerr, float):
+            xerr = np.full(len(x), xerr)
+        ax1.errorbar(x, y, xerr=xerr, fmt='x', color=color, linewidth=1., markersize=3, alpha=0.8)
         err_xm = np.sqrt(sum(i*i for i in xerr)/len(x))
     else:
-        ax1.scatter(x, y, c='red', alpha=0.8, s=10)
+        ax1.scatter(x, y, c=color, alpha=0.8, s=s)
         err_xm = np.std(x)/np.sqrt(len(x))
 
     ax1.set_ylim(y.min()*0.8, y.max()*1.2)
 
     #Media scritta
-    ax1.text(x.max()*0.1, y.max(), r'$<${}$>=(${:.2f}$\,\pm\,${:.2f}$)$'.format(xlabel, mean_x, err_xm), color='black', fontsize=15)
+    ax1.text(x.max()*0.1, y.max(), r'$<${}$>=(${:.2f}$\,\pm\,${:.2f}$)$'.format(xlabel, mean_x, err_xm), color='black', fontsize=13.5)
 
-    vh = ax0.hist(x, bins=nb2, color='red', histtype='step', orientation='vertical')
+    vh = ax0.hist(x, bins=nb2, color=color, histtype='step', orientation='vertical')
 
     #linea
     ax1.plot( [mean_x, mean_x], [min(y)*(0.75), max(y)*(1.25)], linestyle='--', c='black', alpha=0.85)
@@ -321,7 +306,7 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, xlabel: st
     ax1.tick_params(which="minor",direction="in", size=3)
     title = xlabel+' distribution '
     
-    fig = plt.suptitle(title, fontsize=25)
+    fig = plt.suptitle(title, fontsize=23.5)
     plt.show()
     
     return mean_x, err_xm
