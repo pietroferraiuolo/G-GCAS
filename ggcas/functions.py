@@ -2,33 +2,35 @@
 Created on May 2024
     -Author: P.Ferraiuolo
 """
+from typing import Dict, Any
 import numpy as np
 import sympy as sp
+import astropy.units as u
 
-def errPropagation(func, variables, corr=False):
+def errPropagation(func, variables, correlation=False) -> Dict[str, Any]:
     """
-    
-    
+    Computes the imput function's error with the standard error propagation
+    formula.
+
     Parameters
     ----------
     func : sympy expression
         DESCRIPTION.
     variables : list of sympy symbols
         DESCRIPTION.
-    errors : float | ArrayLike
-        DESCRIPTION.
-    corr : float | ArrayLike, optional
-        DESCRIPTION. If None, no correlation is assumed and cond is the NxN identity matrix.
+    corr : boolean, optional
+        DESCRIPTION. The default is False.
+
     Returns
     -------
-    error_propagation : sympy expression
-        DESCRIPTION.
-    errors : list of sympy symbols
-        DESCRIPTION.
-    corr : list of sympy symbols
-        DESCRIPTION.
-    """    
-    if corr is True:
+    result : dict
+        A dictionary containing the results.
+        Keys:
+        - "error_formula" : sympy expression
+        - "error_variables" : list of sympy symbols
+        - "correlations" : list of sympy symbols (only if corr=True)
+    """
+    if correlation is True:
         corr = np.ones((len(variables), len(variables))) - np.eye(len(variables))
     else:
         corr = np.eye(len(variables))
@@ -37,7 +39,7 @@ def errPropagation(func, variables, corr=False):
         errors.append(sp.symbols('epsilon_{}'.format(var)))
         for j, _ in enumerate(variables):
             if i != j:
-                corr[i][j] = sp.symbols('rho_{}_{}'.format(i, j))
+                corr[i][j] = corr[i][j]*sp.symbols('rho_{}_{}'.format(i, j))
     # Calcola le derivate parziali
     partials = [sp.diff(func, var) for var in variables]
     # Primo termine della formula (somma degli errori quadratici)
@@ -47,20 +49,54 @@ def errPropagation(func, variables, corr=False):
     for i, _ in enumerate(variables):
         for j, _ in enumerate(variables):
             if i != j:
-                sum_of_correlations += (partials[i] * partials[j] * errors[i] * errors[j] * corr[i][j])
+                sum_of_correlations +=(partials[i]*partials[j]*errors[i]*errors[j]*corr[i][j])
     # Propagazione dell'errore
     error_formula = sp.sqrt(sum_of_squares + 2 * sum_of_correlations)
-    return error_formula, errors, corr
+    returns = {
+        "error_formula": error_formula,
+        "error_variables": errors
+    }
+    if correlation:
+        returns["correlations"] = corr
+    return returns
 
-def angularDistance():
+def velocityConversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
+    """
+    Converts the proper motion into velocities in km/s, with its error, if provided.
+
+    Parameters
+    ----------
+    mu : TYPE
+        DESCRIPTION.
+    gc_distance : TYPE
+        DESCRIPTION.
+    mu_error : TYPE, optional
+        DESCRIPTION. The default is 0.
+    gc_distance_error : TYPE, optional
+        DESCRIPTION. The default is 0.
+
+    Returns
+    -------
+    vkms : TYPE
+        DESCRIPTION.
+    vkms_err : TYPE
+        DESCRIPTION.
+
+    """
+    vkms = mu.to(u.mas/u.yr).to(u.rad/u.s)*gc_distance.to(u.kpc).to(u.km) / u.rad
+    vkms_err = np.sqrt(gc_distance**2 * mu_error.to(u.rad/u.s)**2 + \
+                       mu.to(u.rad/u.s)**2 * gc_distance_error**2)/u.rad
+    return vkms, vkms_err
+
+def angularSeparation():
     """
     
 
     Returns
     -------
-    w : TYPE
+    w : sympy expression
         DESCRIPTION.
-    list
+    variables : list of sympy symbols
         DESCRIPTION.
 
     """
@@ -76,15 +112,15 @@ def losDistance():
 
     Returns
     -------
-    r : TYPE
+    r : sympy expression
         DESCRIPTION.
-    ww : TYPE
+    parallax : sympy symbol
         DESCRIPTION.
 
     """
-    ww = sp.symbols('omega')
-    r = 1/ww
-    return r, ww
+    parallax = sp.symbols('omega')
+    r = 1/parallax
+    return r, parallax
 
 def radDistance_2D():
     """
@@ -92,15 +128,15 @@ def radDistance_2D():
 
     Returns
     -------
-    r2d : TYPE
+    r2d : sympy expression
         DESCRIPTION.
-    list
+    variables : list of sympy symbols
         DESCRIPTION.
 
     """
-    rx, ww = sp.symbols('r_gc theta')
-    r_2d = rx*sp.tan(ww)
-    return r_2d, [rx, ww]
+    rx, parallax = sp.symbols('r_gc theta')
+    r_2d = rx*sp.tan(parallax)
+    return r_2d, [rx, parallax]
 
 def radDistance_3D():
     """
@@ -108,9 +144,9 @@ def radDistance_3D():
 
     Returns
     -------
-    R : TYPE
+    R : sympy expression
         DESCRIPTION.
-    list
+    variables : list of sympy symbols
         DESCRIPTION.
 
     """

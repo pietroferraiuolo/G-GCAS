@@ -1,7 +1,7 @@
 import os
 from ggcas.cluster import Cluster
 from ggcas import plots as gplt
-from ggcas import funcions, analyzer
+from ggcas import functions, analyzer
 from ggcas.query import GaiaQuery 
 
 gq = GaiaQuery()

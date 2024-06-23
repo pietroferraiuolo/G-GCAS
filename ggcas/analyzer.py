@@ -9,8 +9,9 @@ import sympy as sp
 from ggcas import functions as gfunc
 
 datapath=os.environ['PYGCASCONF']
+loaded_name = ''
 
-def computeError(func, variables, vars_values):
+def computeError(func, variables, variables_values, corr=False):
     '''
     
 
@@ -29,18 +30,15 @@ def computeError(func, variables, vars_values):
         DESCRIPTION.
 
     '''
-    err_func = gfunc.errPropagation(func, variables, corrr=True)
+    err_func = gfunc.errPropagation(func, variables, correlation=corr)
     values = dict()
     for x in range(len(variables)):
         values[variables[x]] = 0
-    
-    computed_error = np.zeros(len(vars_values[0]))
-    for i in range(len(vars_values[0])):
+    computed_error = np.zeros(len(variables_values[0]))
+    for i in range(len(variables_values[0])):
         for x in range(len(variables)):
-            values[variables[x]] = vars_values[x][i]
-            
-        computed_error[i] = sp.N(err_func.subs(values))
-    
+            values[variables[x]] = variables_values[x][i]
+        computed_error[i] = sp.N(err_func['error_formula'].subs(values))
     return computed_error
     
 def loadQuery(tn: str):
@@ -59,7 +57,6 @@ def loadQuery(tn: str):
 
     '''
     file = os.path.join(datapath, (tn+'.txt'))
-    
     try:
         data = QTable.read(file, format='ascii.tab')
         return data
@@ -81,9 +78,9 @@ def dataList(name: str):
         DESCRIPTION.
 
     '''
+    global loaded_name
+    loaded_name = name    
     filelist = os.listdir(datapath+name.upper()+'/')
-    
     for ii in filelist:
         print(ii)
-        
     return filelist
