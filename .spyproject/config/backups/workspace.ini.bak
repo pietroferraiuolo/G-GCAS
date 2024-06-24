@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['scripts\\m4.py', 'conf.py', 'ggcas\\analyzer.py', 'ggcas\\functions.py']
+recent_files = ['scripts\\m4.py', 'ggcas\\analyzer.py', 'ggcas\\functions.py', 'ggcas\\cluster.py', 'ggcas\\plots.py', 'ggcas\\query.py']
 
 [main]
 version = 0.2.0
