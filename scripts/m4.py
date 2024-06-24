@@ -19,7 +19,6 @@ from scipy import constants
 import matplotlib.pyplot as plt
 import astropy.units as u
 #from astropy.constants import au
-import astropy.units as u
 from astroquery.gaia import Gaia
 Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source"
 Gaia.ROW_LIMIT = -1
@@ -914,8 +913,6 @@ vh2 = plt.hist(v_los_GCRF**2, bins=nv2, color='black', alpha=0.85)
 ax.text(30, vh2[0].max()/2, r'$<v_r^2>$={:.1f} $\pm$ {:.1f} km$^2$/s$^2$'.format(np.mean(v_los_GCRF**2), vr2m_e), fontsize=15)
 plt.xlabel(r'$v_r^2$  $[{\rm km/s}]$', fontdict=label_font)
 plt.ylabel('Counts', fontdict=label_font)
-
-from matplotlib.textpath import FontProperties
 
 fig, (ax0, ax1) = plt.subplots(nrows=2, ncols=1, height_ratios=[1,3.5], figsize=(8,8), sharex=True)
 fig.subplots_adjust(hspace=0)

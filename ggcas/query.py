@@ -16,14 +16,19 @@ class GaiaQuery:
     
     """
     def __init__(self, gaia_table: Optional[Union[str, list]] = "gaiadr3.gaia_source"):
-        '''The Constructor
+        """
         
+
         Parameters
         ----------
-        gaia_table: str | list
-            DESCRIPTION.
-        
-        '''
+        gaia_table : str | list of str, optional
+            DESCRIPTION. The default is "gaiadr3.gaia_source".
+
+        Returns
+        -------
+        None.
+
+        """
         Gaia.MAIN_GAIA_TABLE = gaia_table
         Gaia.ROW_LIMIT = -1
         self._table     = gaia_table

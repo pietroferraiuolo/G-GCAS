@@ -5,7 +5,6 @@ Created on May 2024
 from typing import Dict, Any
 import numpy as np
 import sympy as sp
-import astropy.units as u
 
 def errPropagation(func, variables, correlation=False) -> Dict[str, Any]:
     """
@@ -59,34 +58,6 @@ def errPropagation(func, variables, correlation=False) -> Dict[str, Any]:
     if correlation:
         returns["correlations"] = corr
     return returns
-
-def velocityConversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
-    """
-    Converts the proper motion into velocities in km/s, with its error, if provided.
-
-    Parameters
-    ----------
-    mu : TYPE
-        DESCRIPTION.
-    gc_distance : TYPE
-        DESCRIPTION.
-    mu_error : TYPE, optional
-        DESCRIPTION. The default is 0.
-    gc_distance_error : TYPE, optional
-        DESCRIPTION. The default is 0.
-
-    Returns
-    -------
-    vkms : TYPE
-        DESCRIPTION.
-    vkms_err : TYPE
-        DESCRIPTION.
-
-    """
-    vkms = mu.to(u.mas/u.yr).to(u.rad/u.s)*gc_distance.to(u.kpc).to(u.km) / u.rad
-    vkms_err = np.sqrt(gc_distance**2 * mu_error.to(u.rad/u.s)**2 + \
-                       mu.to(u.rad/u.s)**2 * gc_distance_error**2)/u.rad
-    return vkms, vkms_err
 
 def angularSeparation():
     """
