@@ -31,7 +31,7 @@ def computeError(func, variables, variables_values, corr=False):
         DESCRIPTION.
 
     '''#!!! to check
-    err_func = gfunc.errPropagation(func, variables, correlation=corr)
+    err_func = gfunc.error_propagation(func, variables, correlation=corr)
     values = dict()
     for x in range(len(variables)):
         values[variables[x]] = 0
@@ -101,12 +101,19 @@ def densityProfile(data):
     return rho
     
 def loadQuery(name, tn: str):
-    '''
+    """
     
 
     Parameters
     ----------
+    name : TYPE
+        DESCRIPTION.
     tn : str
+        DESCRIPTION.
+
+    Raises
+    ------
+    e
         DESCRIPTION.
 
     Returns
@@ -114,17 +121,17 @@ def loadQuery(name, tn: str):
     data : TYPE
         DESCRIPTION.
 
-    '''
+    """
     data = os.path.join(querypath, name)
     file = os.path.join(querypath, (tn+'.txt'))
     try:
         data = QTable.read(file, format='ascii.tab')
         return data
     except FileNotFoundError as e:
-        raise e
+        raise e(f"File {file} does not exist.")
         
 def dataList(name: str):
-    '''
+    """
     
 
     Parameters
@@ -137,7 +144,7 @@ def dataList(name: str):
     filelist : TYPE
         DESCRIPTION.
 
-    ''' 
+    """
     filelist = os.listdir(os.path.join(datapath, name.upper()))
     for ii in filelist:
         print(ii)
