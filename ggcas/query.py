@@ -1,7 +1,17 @@
-# -*- coding: utf-8 -*-
 """
-Created on May 2024
-    -Author: P. Ferraiuolo
+Author(s)
+---------
+    - Pietro Ferraiuolo : Written in 2024
+
+Description
+-----------
+
+How to Use
+----------
+
+Examples
+--------
+
 """
 import os
 from typing import Optional, Union
@@ -242,7 +252,9 @@ class GaiaQuery:
             if isinstance(save, str):
                 self._saveQuery(result, save)
             else:
-                raise TypeError("'save' was {save}, but must be a string. Please specify the name of the object or of the destination folder".format(save=type(save)))
+                raise TypeError(f"'save' was {save}, but must be a string. \
+                                Please specify the name of the object or of the\
+                                    destination folder")
         return result
     
     def getAstrometry(self, ra, dec, radius, save: str = False, **kwargs):
@@ -273,7 +285,8 @@ class GaiaQuery:
             DESCRIPTION.
 
         '''    
-        astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
+        astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, \
+            parallax_error, pmra, pmra_error, pmdec, pmdec_error'
         self._queryInfo = {
             'Scan Info': {
                 'RA': ra,
@@ -299,7 +312,9 @@ class GaiaQuery:
             if isinstance(save, str):
                 self._saveQuery(astro_cluster, save)
             else:
-                raise TypeError("'save' was {save}, but must be a string. Please specify the name of the object or of the destination folder".format(save=type(save)))
+                raise TypeError(f"'save' was {save}, but must be a string. \
+                                Please specify the name of the object or of \
+                                    the destination folder")
         return astro_cluster
     
     def getPhotometry(self, ra, dec, radius, save: str = False, **kwargs):
@@ -330,7 +345,8 @@ class GaiaQuery:
             DESCRIPTION.
 
         '''
-        photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
+        photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, \
+            phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
         self._queryInfo = {
             'Scan Info': {
                 'RA': ra,
@@ -356,7 +372,9 @@ class GaiaQuery:
             if isinstance(save, str):
                 self._saveQuery(photo_cluster, save)
             else:
-                raise TypeError("'save' was {save}, but must be a string. Please specify the name of the object or of the destination folder".format(save=type(save)))        
+                raise TypeError(f"'save' was {save}, but must be a string. \
+                                Please specify the name of the object or of \
+                                    the destination folder")
         return photo_cluster
     
     def getRV(self, ra, dec, radius, save: str = False, **kwargs):
@@ -413,7 +431,9 @@ class GaiaQuery:
             if isinstance(save, str):
                 self._saveQuery(rv_cluster, save)
             else:
-                raise TypeError("'save' was {save}, but must be a string. Please specify the name of the object or of the destination folder".format(save=type(save))) 
+                raise TypeError(f"'save' was {save}, but must be a string. \
+                                Please specify the name of the object or of \
+                                    the destination folder")
         return rv_cluster
     
     def _saveQuery(self, dat, name: str):

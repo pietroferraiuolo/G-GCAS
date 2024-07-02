@@ -1,12 +1,22 @@
 """
-Created on May 2024
-    -Author: P.Ferraiuolo
+Author(s)
+---------
+    - Pietro Ferraiuolo : Written in 2024
+
+Description
+-----------
+
+How to Use
+----------
+
+Examples
+--------
+
 """
 import os
 import numpy as np
 import sympy as sp
 import astropy.units as u
-from astropy.table import QTable
 from ggcas import functions as gfunc
 
 datapath    = os.environ['PYGCASCONF']
@@ -30,7 +40,7 @@ def computeError(func, variables, variables_values, corr=False):
     computed_error : TYPE
         DESCRIPTION.
 
-    '''#!!! to check
+    '''#FIXME
     err_func = gfunc.error_propagation(func, variables, correlation=corr)
     values = dict()
     for x in range(len(variables)):
@@ -100,52 +110,3 @@ def densityProfile(data):
     rho = dh[0]/(V**3)
     return rho
     
-def loadQuery(name, tn: str):
-    """
-    
-
-    Parameters
-    ----------
-    name : TYPE
-        DESCRIPTION.
-    tn : str
-        DESCRIPTION.
-
-    Raises
-    ------
-    e
-        DESCRIPTION.
-
-    Returns
-    -------
-    data : TYPE
-        DESCRIPTION.
-
-    """
-    data = os.path.join(querypath, name)
-    file = os.path.join(querypath, (tn+'.txt'))
-    try:
-        data = QTable.read(file, format='ascii.tab')
-        return data
-    except FileNotFoundError as e:
-        raise e(f"File {file} does not exist.")
-        
-def dataList(name: str):
-    """
-    
-
-    Parameters
-    ----------
-    name : str
-        DESCRIPTION.
-
-    Returns
-    -------
-    filelist : TYPE
-        DESCRIPTION.
-
-    """
-    filelist = os.listdir(os.path.join(datapath, name.upper()))
-    for ii in filelist:
-        print(ii)
-    return filelist

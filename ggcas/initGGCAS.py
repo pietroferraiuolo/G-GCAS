@@ -1,7 +1,9 @@
 import os
 from ggcas.cluster import Cluster
+from ggcas import utils as gutils
 from ggcas import plots as gplt
-from ggcas import functions, analyzer
+from ggcas import functions as gfunc
+from ggcas.analyzer import *
 from ggcas.query import GaiaQuery 
 
 gq = GaiaQuery()
@@ -29,7 +31,10 @@ GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE
 
 """)
 
-print('Data path is {}'.format(os.environ['PYGCASCONF']))
+try:
+    print('Data path is {}'.format(os.environ['PYGCASCONF']))
+except KeyError:
+    raise KeyError("Environment variable not found. Please set the PYGCASCONF env variable that points to the data folder: '.../G-Gcas/ggcas/data/'")
 
 def help():
     TEXT="""
@@ -40,6 +45,8 @@ G-GCAS PACKAGE DOCUMENTATION
 - functions
 
 - query
+
+- utils
 
 - plots
 

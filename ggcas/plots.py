@@ -1,6 +1,17 @@
 """
-Created on May 2024
-    -Author: P.Ferraiuolo
+Author(s)
+---------
+    - Pietro Ferraiuolo : Written in 2024
+
+Description
+-----------
+
+How to Use
+----------
+
+Examples
+--------
+
 """
 from typing import Optional, Union
 import numpy as np
