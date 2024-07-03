@@ -5,13 +5,22 @@ Author(s)
 
 Description
 -----------
+A module which contains the Cluster class, which contains all the information o
+f a specified cluster.
 
 How to Use
 ----------
+Initialize the class with a cluster's name. As example
 
-Examples
---------
+>>> from ggcas.cluster import Cluster
+>>> ngc104 = Cluster('ngc104')
 
+Now we can call methods to read the parameters
+
+>>> ngc104.id
+'NGC104'
+>>> ngc104.w0
+8.82
 """
 import os
 import pandas as pd
@@ -21,7 +30,8 @@ class Cluster:
     """
     Class for the cluster parameter loading. 
     
-    Contains loaded parameters from the Harris Catalogue 2010 Edition
+    Upon initializing, it is loaded with the specified cluster's parameters, ta
+    ken from the Harris Catalogue 2010 Edition.
     
     Methods
     -------
@@ -56,7 +66,11 @@ class Cluster:
         cat_row : TYPE
             Pandas Series with all the necessary paramenters to ilitialize the Cluster Class.
         """
-        path = os.environ['PYGCASCONF']
+        try:
+            path = os.environ['PYGCASCONf']
+        except KeyError as exc:
+            raise KeyError("Environment variable not found! Define the PYGCASCONF\
+                           env variable that points to '.../G-GCAS/ggcas/data") from exc
         catalog = pd.read_excel(os.path.join(path, 'Catalogue.xlsx'), index_col=0)
         cat_row = catalog.loc[name.upper()]
         return cat_row

@@ -15,6 +15,7 @@ Examples
 """
 import os
 from astropy.table import QTable
+import datetime as dt
 datapath    = os.environ['PYGCASCONF']
 querypath   = os.path.join(datapath, 'query')
 
@@ -67,3 +68,16 @@ def dataList(name: str):
     for ii in filelist:
         print(ii)
     return filelist
+
+def timestamp():
+    """
+    
+
+    Returns
+    -------
+    tn : TYPE
+        DESCRIPTION.
+
+    """
+    tn = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+    return tn

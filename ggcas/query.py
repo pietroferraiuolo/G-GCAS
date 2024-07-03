@@ -6,6 +6,7 @@ Author(s)
 Description
 -----------
 
+
 How to Use
 ----------
 
@@ -15,10 +16,10 @@ Examples
 """
 import os
 from typing import Optional, Union
-import datetime as dt
 from astropy.table import Table
 import astropy.units as u
 from astroquery.gaia import Gaia
+from ggcas.utils import timestamp
 import configparser
 
 class GaiaQuery:
@@ -55,18 +56,6 @@ class GaiaQuery:
                 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
                   {cond}
                 """
-                
-    def _tn(self):
-        '''
-        Returns a tracking number, with format YYYYMMDD_HHMMSS
-
-        Returns
-        -------
-        tn : str
-            Tracking number as string.
-        '''
-        tn = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
-        return tn
     
     def _checkPathExist(self, dest: str):
         """
@@ -90,7 +79,7 @@ class GaiaQuery:
         return self._fold
         
     def _formatCheck(self, data: Optional[Union[str,list]], conditions: Optional[Union[str,list]]):
-        '''
+        """
         
 
         Parameters
@@ -107,7 +96,7 @@ class GaiaQuery:
         cond : TYPE
             DESCRIPTION.
 
-        '''
+        """
         dat     = ''
         cond    = ''
         if data is not None:
@@ -128,7 +117,7 @@ class GaiaQuery:
         return dat, cond
         
     def _adqlWriter(self, ra, dec, radius, data, conditions):
-        '''
+        """
         
 
         Parameters
@@ -146,9 +135,10 @@ class GaiaQuery:
 
         Returns
         -------
-        None.
+        query : TYPE
+            DESCRIPTION.
 
-        '''
+        """
         if isinstance(ra, u.Quantity) and isinstance(dec, u.Quantity):
             ra = str(ra/u.deg)
             dec= str(dec/u.deg)
@@ -166,7 +156,7 @@ class GaiaQuery:
         return query
         
     def printTable(self, dump = False):
-        '''
+        """
         
 
         Parameters
@@ -176,10 +166,10 @@ class GaiaQuery:
 
         Returns
         -------
-        TYPE
+        res : TYPE
             DESCRIPTION.
 
-        '''
+        """
         table = Gaia.load_table(self._table)
         print(table.description)
         print('')
@@ -193,7 +183,7 @@ class GaiaQuery:
         return res
     
     def freeQuery(self, ra, dec, radius, save: str = False, **kwargs):
-        '''
+        """
         
 
         Parameters
@@ -219,7 +209,7 @@ class GaiaQuery:
         result : TYPE
             DESCRIPTION.
 
-        '''
+        """
         self._queryInfo = {
             'Scan Info': {
                 'RA': ra,
@@ -253,12 +243,12 @@ class GaiaQuery:
                 self._saveQuery(result, save)
             else:
                 raise TypeError(f"'save' was {save}, but must be a string. \
-                                Please specify the name of the object or of the\
+                                Specify the name of the object or of the\
                                     destination folder")
         return result
     
     def getAstrometry(self, ra, dec, radius, save: str = False, **kwargs):
-        '''
+        """
         
 
         Parameters
@@ -284,7 +274,7 @@ class GaiaQuery:
         astro_cluster : TYPE
             DESCRIPTION.
 
-        '''    
+        """
         astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, \
             parallax_error, pmra, pmra_error, pmdec, pmdec_error'
         self._queryInfo = {
@@ -313,12 +303,12 @@ class GaiaQuery:
                 self._saveQuery(astro_cluster, save)
             else:
                 raise TypeError(f"'save' was {save}, but must be a string. \
-                                Please specify the name of the object or of \
+                                Specify the name of the object or of \
                                     the destination folder")
         return astro_cluster
     
     def getPhotometry(self, ra, dec, radius, save: str = False, **kwargs):
-        '''
+        """
         
 
         Parameters
@@ -344,7 +334,7 @@ class GaiaQuery:
         photo_cluster : TYPE
             DESCRIPTION.
 
-        '''
+        """
         photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, \
             phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
         self._queryInfo = {
@@ -373,12 +363,12 @@ class GaiaQuery:
                 self._saveQuery(photo_cluster, save)
             else:
                 raise TypeError(f"'save' was {save}, but must be a string. \
-                                Please specify the name of the object or of \
+                                Specify the name of the object or of \
                                     the destination folder")
         return photo_cluster
     
     def getRV(self, ra, dec, radius, save: str = False, **kwargs):
-        '''
+        """
         
 
         Parameters
@@ -404,7 +394,7 @@ class GaiaQuery:
         rv_cluster : TYPE
             DESCRIPTION.
 
-        '''
+        """
         rv = 'source_id, radial_velocity, radial_velocity_error'
         self._queryInfo = {
             'Scan Info': {
@@ -432,12 +422,11 @@ class GaiaQuery:
                 self._saveQuery(rv_cluster, save)
             else:
                 raise TypeError(f"'save' was {save}, but must be a string. \
-                                Please specify the name of the object or of \
-                                    the destination folder")
+                                Specify the name of the object or of the destination folder")
         return rv_cluster
     
     def _saveQuery(self, dat, name: str):
-        '''
+        """
         
 
         Parameters
@@ -447,13 +436,9 @@ class GaiaQuery:
         name : str
             DESCRIPTION.
 
-        Returns
-        -------
-        None.
-
-        '''
+        """
         config = configparser.ConfigParser()
-        tn = self._tn()
+        tn = timestamp()
         fold = self._checkPathExist(name.upper())
         path = os.path.join(fold, (tn+'.txt'))
         info = os.path.join(fold, (tn+'.ini'))

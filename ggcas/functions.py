@@ -50,17 +50,17 @@ def error_propagation(func, variables, correlation=False) -> Dict[str, Any]:
         for j, _ in enumerate(variables):
             if i != j:
                 corr[i][j] = corr[i][j]*sp.symbols('rho_{}_{}'.format(i, j))
-    # Calcola le derivate parziali
+    # Partial derivatives computation
     partials = [sp.diff(func, var) for var in variables]
-    # Primo termine della formula (somma degli errori quadratici)
+    # Quadratic errors sum
     sum_of_squares = sum((partials[i]**2 * errors[i]**2) for i, _ in enumerate(variables))
-    # Secondo termine della formula (somma delle correlazioni)
+    # Correlation sums
     sum_of_correlations = 0
     for i, _ in enumerate(variables):
         for j, _ in enumerate(variables):
             if i != j:
                 sum_of_correlations +=(partials[i]*partials[j]*errors[i]*errors[j]*corr[i][j])
-    # Propagazione dell'errore
+    # Total error propagation
     error_formula = sp.sqrt(sum_of_squares + 2 * sum_of_correlations)
     returns = {
         "error_formula": error_formula,

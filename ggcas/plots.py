@@ -5,12 +5,17 @@ Author(s)
 
 Description
 -----------
+Module which contains useful plots for visualizing globular cluster's kinetic d
+ata.
+Refer to the individual functions documentation for more information about thei
+r use.
 
 How to Use
 ----------
+Just import the module 
 
-Examples
---------
+    >>> from ggcas import plots as gplt
+    >>> gplt.scatter_2hist(...) # your data
 
 """
 from typing import Optional, Union
@@ -31,10 +36,9 @@ title_font = {'family': 'sans-serif',
 
 def scatter_2hist(x, y, kde=False, **kwargs):
     """
-    Make a scatter plot with histograms
-
-    Make a 2D scatter of two quantities, with the respective histogram distributions projected on each axis.
-
+    Make a 2D scatter of two data arrays, with the respective histogram distrib
+    utions projected on each axis. The kde option allows for gaussian regresssi
+    on on the plotted data.
 
     Parameters
     ----------
@@ -42,6 +46,8 @@ def scatter_2hist(x, y, kde=False, **kwargs):
         Data to be scattered on x-axis
     y : ArrayLike
         Data to be scattered on y-axis
+    kde : boolean, optional
+        Option to show the Gaussian regression on the data. Default is false.
 
     Other Parameters
     ----------------
@@ -102,10 +108,11 @@ def scatter_2hist(x, y, kde=False, **kwargs):
         ax_histx.plot(xk, kdex_values, color='r')
         ax_histy.plot(kdey_values, yk, color='r')
     plt.show()
-        
+
 def colorMagnitude(g, b_r, teff_gspphot):
     """
-    Perform a scatter plot to create a color-magnitude diagram of the sample, using photometry and temperature information.
+    Make a scatter plot to create a color-magnitude diagram of the sample, usin
+    g BP and RP photometry and temperature information.
 
     Parameters
     ----------
@@ -125,29 +132,41 @@ def colorMagnitude(g, b_r, teff_gspphot):
     plt.ylabel(r"$G$", fontdict=label_font)
     plt.title("Color-Magnitude Diagram", fontsize=17)
     plt.show()
-    
-def properMotion(pmra, pmdec):
-    '''
-    
+
+def properMotion(pmra, pmdec, **kwargs):
+    """
+    Make a scatter plot in the proper motion space of the sample
 
     Parameters
     ----------
-    pmra : TYPE
-        DESCRIPTION.
-    pmdec : TYPE
-        DESCRIPTION.
+    pmra : ArrayLike
+        Right Ascension direction of the proper mition.
+    pmdec : ArrayLike
+        Declination direction for the proper motion.
 
-    '''
+    Other Parameters
+    ----------------
+    **kwargs : additional parameters for customizing the plot.
+        color : str
+            Color of the scattered data points.
+        s : int or float
+            Size of the scattered data points.
+        alpha : float
+            Transparency of the scattered data points.
+    """
+    col  = kwargs.get('color', 'black')
+    size = kwargs.get('s', 3)
+    alpha= kwargs.get('alpha', 0.5)
     fig, ax = plt.subplots(figsize=(8,8))
     plt.xlabel(r'$\mu_{\alpha*}$ [deg]', fontdict=label_font)
     plt.ylabel(r'$\mu_\delta$ [deg]', fontdict=label_font)
     plt.title('Proper Motion Distribution', fontdict=title_font)
     ax.axis('equal')
-    plt.scatter(pmra, pmdec, c='black', alpha=0.5, s=3)
-    
-def raDec(ra, dec):
-    '''
-    
+    plt.scatter(pmra, pmdec, c=col, alpha=alpha, s=size)
+
+def spatial(ra, dec, **kwargs):
+    """
+    Make a scatter plot in the spatial plot, that is in the Ra-Dec plane.
 
     Parameters
     ----------
@@ -155,30 +174,44 @@ def raDec(ra, dec):
         DESCRIPTION.
     dec : TYPE
         DESCRIPTION.
-
-    '''
+        
+    Other Parameters
+    ----------------
+    **kwargs : additional parameters for customizing the plot
+        color : str
+            Color of the scattered data points.
+        s : int or float
+            Size of the scattered data points.
+        alpha : float
+            Transparency of the scattered data points.
+    """
+    col  = kwargs.get('color', 'black')
+    size = kwargs.get('s', 3)
+    alpha= kwargs.get('alpha', 0.5)
     fig, ax = plt.subplots(figsize=(8,8))
     plt.xlabel(r'$DEC$ [deg]', fontdict=label_font)
     plt.ylabel(r'$RA$ [deg]', fontdict=label_font)
     plt.title('Spatial Distribution', fontdict=title_font)
     ax.axis('equal')
-    plt.scatter(ra, dec, c='black', alpha=0.4, s=3)
+    plt.scatter(ra, dec, c=col, alpha=alpha, s=size)
 
 def histogram(data, kde=False, **kwargs):
-    '''
-    Plots the data distribution with a histogram. The number of bins is defined as 1.5*sqrt(N). If kde is set on Tue, the kerned desdity estimation will be computed and plotted over the histogram.
+    """
+    Plots the data distribution with a histogram. The number of bins is defined
+    as 1.5*sqrt(N). If kde is True, the kernel density estimation will be compu
+    ted and plotted over the histogram.
 
     Parameters
     ----------
     data : ArrayLike
-        Imput dataset for the histogram.
-    kde : Boolean
-        Gaussian Kernel density estimation of the histogram. The default value is False.
+        Input dataset for the histogram.
+    kde : boolean
+        Option for the computation of the Gaussian Kernel density estimation of
+        the histogram. The default is False.
 
     Other Parameters
     ----------------
     **kwargs : Additional parameters for customizing the plot.
-    
         xlabel : str
             Label of the plot's x-axis.
         alpha : float
@@ -189,11 +222,27 @@ def histogram(data, kde=False, **kwargs):
     Returns
     -------
     bins : ArrayLike
-        DESCRIPTION.
+        List of bin positions on x axis.
     counts : ArrayLike
-        DESCRIPTION.
+        Count number for each bin.
+        
+    Example
+    -------
+    The output can be used to make other plots and computations. For example
+    
+    >>> import numpy as np
+    >>> from ggcas import plots as gplt
+    >>> x = np.random.randn(1000)
+    >>> y = np.random.randn(1000)
+    >>> b, n = gplt.histogram(x, y)
+    
+    Then, with the result, you can make for example a scatter plot
+    
+    >>> plt.scatter(x, y)
+    
+    and so on.
 
-    '''
+    """
     xlabel=kwargs.get('xlabel','')
     alpha=kwargs.get('alpha', 1)
     color=kwargs.get('color','gray')
@@ -220,31 +269,31 @@ $\sigma^2$={:.2e}"""
         plt.legend(loc='best', fontsize='large')
     plt.show()
     return bins, counts
-    
+
 def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     """
-    
+    Make a scatter plot of a quantity 'x', with its projected histogram, relati
+    ve to a quantity 'y'.
     
     Parameters
     ----------
-    x : TYPE
-        DESCRIPTION.
-    y : TYPE
-        DESCRIPTION.
-    xerr : TYPE, optional
-        DESCRIPTION. The default is None.
-    **kwarg : Optional Args:
-        
-        - xlabel : str
-            DESCRIPTION. The default is 'x'.
-        - ylabel : str
-            DESCRIPTION. The default is 'y'.
-        - color : str
-            DESCRIPTION. 
-
-    Returns
-    -------
-    None.
+    x : ndarray
+        Input data.
+    y : ndarray
+        Related data.
+    xerr : int of ndarray, optional
+        Error on the input data points. Can be either a single value or an arra
+        y with the same size as the input data. The default is None.
+    
+    Other Parameters
+    ----------------
+    **kwarg : additional arguments for customizing the plot.
+        xlabel : str
+            Label on x axis. The default is 'x'.
+        ylabel : str
+            Label on y axis. The default is 'y'.
+        color : str
+            Color of the scattered data points.
     """
     xlabel=kwargs.get('xlabel', 'x')
     ylabel=kwargs.get('ylabel', 'y')
@@ -252,23 +301,29 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     s=kwargs.get('size', 10)
     nb2 = int(1.5*np.sqrt(len(x)))
     mean_x = np.mean(x)
-    fig, (ax0, ax1) = plt.subplots(nrows=2, ncols=1, height_ratios=[1,3.5], figsize=(8.5,8), sharex=True)
+    fig, (ax0, ax1) = plt.subplots(nrows=2, ncols=1, height_ratios=[1,3.5], \
+                                   figsize=(8.5,8), sharex=True)
     fig.subplots_adjust(hspace=0)
     if xerr is not None:
         if isinstance(xerr, float):
             xerr = np.full(len(x), xerr)
-        ax1.errorbar(x, y, xerr=xerr, fmt='x', color=color, linewidth=1., markersize=3, alpha=0.8)
+        ax1.errorbar(x, y, xerr=xerr, fmt='x', color=color, linewidth=1.,\
+                     markersize=3, alpha=0.8)
         err_xm = np.sqrt(sum(i*i for i in xerr)/len(x))
     else:
         ax1.scatter(x, y, c=color, alpha=0.8, s=s)
         err_xm = np.std(x)/np.sqrt(len(x))
     ax1.set_ylim(y.min()*0.8, y.max()*1.2)
     #Media scritta
-    ax1.text(x.max()*0.1, y.max(), r'$<${}$>=(${:.2f}$\,\pm\,${:.2f}$)$'.format(xlabel, mean_x, err_xm), color='black', fontsize=13.5)
+    ax1.text(x.max()*0.1, y.max(),
+             r'$<${}$>=(${:.2f}$\,\pm\,${:.2f}$)$'.format(xlabel, mean_x, err_xm),
+             color='black', fontsize=13.5)
     vh = ax0.hist(x, bins=nb2, color=color, histtype='step', orientation='vertical')
     #linea
-    ax1.plot( [mean_x, mean_x], [min(y)*(0.75), max(y)*(1.25)], linestyle='--', c='black', alpha=0.85)
-    ax0.plot( [mean_x, mean_x], [0, vh[0].max()],  linestyle='--', c='black', alpha=0.85)
+    ax1.plot([mean_x, mean_x], [min(y)*(0.75), max(y)*(1.25)], linestyle='--',\
+             c='black', alpha=0.85)
+    ax0.plot([mean_x, mean_x], [0, vh[0].max()],  linestyle='--', c='black',\
+             alpha=0.85)
     #labels
     ax1.set_ylabel(ylabel, fontdict=label_font)
     ax1.set_xlabel(xlabel, fontdict=label_font)
