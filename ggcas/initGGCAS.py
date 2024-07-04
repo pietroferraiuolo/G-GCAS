@@ -4,10 +4,14 @@ Author(s):
     - Pietro Ferraiuolo: written in 2024
 
 Description
-===========
+-----------
 
 How to Use it
+-------------
+
+Documentation
 =============
+
 
 """
 import os
@@ -45,9 +49,9 @@ GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE
 
 try:
     print('Data path is {}'.format(os.environ['PYGCASCONF']))
-except KeyError:
+except KeyError as ect:
     raise KeyError("Environment variable not found. Please set the PYGCASCONF\
-                   env variable that points to the data folder: '.../G-Gcas/ggcas/data/'")
+                   env variable that points to the data folder: '.../G-Gcas/ggcas/data/'") from ect
 
 def help():
     TEXT="""

@@ -37,6 +37,13 @@ class Cluster:
     -------
     _loadClusterParameters(self, name) : function
         Loads the desired cluster's parameters
+        
+    How to Use
+    ----------
+    Initialize the class with a cluster's name. As example
+
+    >>> from ggcas.cluster import Cluster
+    >>> ngc104 = Cluster('ngc104')
     """
     def __init__(self, name: str):
         """The constructor"""
