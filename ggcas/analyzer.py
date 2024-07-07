@@ -22,7 +22,7 @@ from ggcas import functions as gfunc
 datapath    = os.environ['PYGCASCONF']
 querypath   = os.path.join(datapath, 'query')
 
-def computeError(func, variables, variables_values, corr=False):
+def compute_error(func, variables, variables_values, corr=False):
     '''
     
 
@@ -52,7 +52,7 @@ def computeError(func, variables, variables_values, corr=False):
         computed_error[i] = sp.N(err_func['error_formula'].subs(values))
     return computed_error
 
-def velocityConversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
+def velocity_conversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
     """
     Converts the proper motion into velocities in km/s, with its error, if provided.
 
@@ -80,7 +80,7 @@ def velocityConversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
                        mu.to(u.rad/u.s)**2 * gc_distance_error**2)/u.rad
     return vkms, vkms_err
 
-def densityProfile(data):
+def density_profile(data):
     """
     
 
@@ -109,4 +109,19 @@ def densityProfile(data):
       rr2[x+1] = rr2[x] + bw
     rho = dh[0]/(V**3)
     return rho
-    
+
+def compute_radial_distance(parallax, ra, dec):
+    w = gfunc.angular_separation()
+    r = gfunc.los_distance()
+    r2d = gfunc.radial_distance_2d()
+    r3d = gfunc.radial_distance_3d()
+    return r3d
+
+# Template per il riempimento dei valori delle variabili
+# valori = []
+# for i in range(0, len(data)):
+#     dato = {x:dato1[i], y:dato2[i]}
+#     valori.append(dato)
+#
+# Esecuzione calcolo numerico
+# calcolo = [func.subs(valore) for val in valori]

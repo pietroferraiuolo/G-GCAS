@@ -19,102 +19,82 @@ import datetime as dt
 datapath    = os.environ['PYGCASCONF']
 querypath   = os.path.join(datapath, 'query')
 
-def findQuery(tn):
+def load_query(file):
     """
-    
+    Loads the data found in the file as an astropy quantity table.
 
     Parameters
     ----------
-    tn : TYPE
-        DESCRIPTION.
+    file : str
+        Complete file path of the data, obtainable through the ''get_file_list''
+        function.
 
     Returns
     -------
-    data : TYPE
-        DESCRIPTION.
-
+    data : astropy table
+        The loaded data of the file.
     """
-    data = []
-    for fold in os.listdir(querypath):
-        cluster_fold = os.path.join(querypath, fold)
-        if tn in os.listdir(cluster_fold):
-            data.append([cluster_fold, tn])
-    return data
-
-def loadQuery(tn: str, cluster_name:str=None, file_extension:str='txt'):
-    """
-    Loads a query file into an astropy.table QTable (quantity table).
-
-    Parameters
-    ----------
-    tn : str
-        DESCRIPTION.
-    cluster_name : str, optional
-        DESCRIPTION. The default is None.
-    file_extension : str, optional
-        DESCRIPTION. The default is 'txt'.
-
-    Raises
-    ------
-    FileNotFoundError
-        DESCRIPTION.
-
-    Returns
-    -------
-    data : TYPE
-        DESCRIPTION.
-
-    """
-    ext = '.'+file_extension
-    name = tn+ext
-    if cluster_name is not None:
-        cluster_name = cluster_name.upper()
-        data = os.path.join(querypath, cluster_name)
-        file = os.path.join(querypath, name)
-        try:
-            data = QTable.read(file, format='ascii.tab')
-        except FileNotFoundError as e:
-            raise FileNotFoundError(f"No such file: '{file}'") from e
-    else:
-        clist = os.listdir(querypath)
-        file_found = False
-        if len(clist) != 0:
-            for fold in clist:
-                cluster_fold = os.path.join(querypath, fold)
-                if name in os.listdir(cluster_fold):
-                    file = os.path.join(cluster_fold, name)
-                    data = QTable.read(file, format='ascii.tab')
-                    file_found = f'File found in {cluster_fold}'
-                    print(file_found)
-            if file_found is False:
-                raise FileNotFoundError(f"No such file found: '{name}'")
-        else:
-            raise FileNotFoundError(f"No data found in '{querypath}'")
+    data = QTable.read(file, format='ascii.tab')
     return data
         
-def dataList(name: str):
+def get_file_list(gc_name, tn:str=None, key:str=None):
     """
-    Function that returns the list of files inside a cluster's data folder.
+    Returns the file list of a given globular cluster datapath.
 
     Parameters
     ----------
-    name : str
-        Name of the cluster. 
-        Each cluster with save data will have an upper case folder with its nam
-        e in it. simply pass in the name of the cluster.
+    gc_name: str
+        Name of the globular cluster to search data of.
+    key : str, optional
+        A key which identify specific files to return.
 
     Returns
     -------
-    filelist : list of str
-        List of files inside the cluster's folder.
+    fl : list os str
+        List of sorted files inside the folder.
 
+    Examples
+    --------
+    Here are some examples regarding the use of the 'key' argument. Let's say w
+    e need a list of files inside ''tn = '20160516_114916' '' in the IFFunction
+    s folder. 
+
+        >>> datafold = '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/'
+        >>> getFileList(gc_name)
+        ['.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_data.txt',
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/spatial_data.txt',
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt',
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_info.ini',
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/dynamical_data.txt',
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/king_model.txt']
+        
+    Let's suppose we want only the list of 'xxx_data.txt' files:
+    
+        >>> getFileList(tn, fold=fold, key='_data')
+        ['.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_data.txt',
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/spatial_data.txt',
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt']
     """
-    filelist = sorted(os.listdir(os.path.join(datapath, name.upper())))
-    for ii in filelist:
-        print(ii)
-    return filelist
+    fold = os.path.join(querypath, gc_name)
+    if tn is None:
+        fl = []
+        for item in os.listdir(fold):
+            tn = os.path.join(fold, item)
+            fl.append(sorted(os.listdir(tn)))
+    else:
+        fl = sorted(os.listdir(os.pathj.join(fold, tn)))
+    if key is not None:
+        try:
+            selected_list = []
+            for file in fl:
+                if key in file:
+                    selected_list.append(file)
+        except TypeError:
+            raise TypeError("'key' argument must be a string")
+        fl = selected_list
+    return fl
 
-def timestamp():
+def _timestamp():
     """
     Creates a new tracking number in the format 'yyyymmdd_HHMMSS'
 

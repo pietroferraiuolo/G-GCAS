@@ -5,10 +5,8 @@ Author(s)
 
 Description
 -----------
-
-
-How to Use
-----------
+Thi module contains the GaiaQuery class, which handles the ADQL language to mak
+e queries for globular clusters data retrievement fast and easy. 
 
 Examples
 --------
@@ -19,26 +17,42 @@ from typing import Optional, Union
 from astropy.table import Table
 import astropy.units as u
 from astroquery.gaia import Gaia
-from ggcas.utils import timestamp
+from ggcas.utils import _timestamp
 import configparser
 
 class GaiaQuery:
     """
+    Classs for the Gaia Query language execution. 
     
+    Description
+    -----------
+    With this class, it is possible to easily perform async queries and retriev
+    e data from the ESA/GAIA catalogue. It is possible to use different data re
+    leases by loading different data tables in the initialization of the class.
+
+    How to Use it
+    -------------
+    Import the class and initialize it
+    
+    >>> from ggcas.query import GaiaQuery
+    >>> gq = GaiaQuery()
+    >>> 'Initialize with Gaia table: gaiadr3.gaia_source'
+    
+    To use a different Gaia catalogue simply initialize the class to it:
+        
+    >>> table = 'gaiadr2.gaia_source'
+    >>> gq = GaiaQuery(gaia_table=table)
+    >>> 'Initialized with Gaia table: gaiadr2.gaia_source'
     """
     def __init__(self, gaia_table: Optional[Union[str, list]] = "gaiadr3.gaia_source"):
         """
-        
+        The Constructor
 
         Parameters
         ----------
-        gaia_table : str | list of str, optional
-            DESCRIPTION. The default is "gaiadr3.gaia_source".
-
-        Returns
-        -------
-        None.
-
+        gaia_table : str or list of str, optional
+            Gaia table(s) to initialize the class with. The default is the 3th 
+            Gaia data release "gaiadr3.gaia_source".
         """
         Gaia.MAIN_GAIA_TABLE = gaia_table
         Gaia.ROW_LIMIT = -1
@@ -56,6 +70,7 @@ class GaiaQuery:
                 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
                   {cond}
                 """
+        print(f"Initialized with Gaia table: {gaia_table}")
     
     def _checkPathExist(self, dest: str):
         """
@@ -182,7 +197,7 @@ class GaiaQuery:
             res = table.columns
         return res
     
-    def freeQuery(self, ra, dec, radius, save: str = False, **kwargs):
+    def freeQuery(self, ra, dec, radius, save: str = True, **kwargs):
         """
         
 
@@ -247,7 +262,7 @@ class GaiaQuery:
                                     destination folder")
         return result
     
-    def getAstrometry(self, ra, dec, radius, save: str = False, **kwargs):
+    def getAstrometry(self, ra, dec, radius, save: str = True, **kwargs):
         """
         
 
@@ -307,7 +322,7 @@ class GaiaQuery:
                                     the destination folder")
         return astro_cluster
     
-    def getPhotometry(self, ra, dec, radius, save: str = False, **kwargs):
+    def getPhotometry(self, ra, dec, radius, save: str = True, **kwargs):
         """
         
 
@@ -367,7 +382,7 @@ class GaiaQuery:
                                     the destination folder")
         return photo_cluster
     
-    def getRV(self, ra, dec, radius, save: str = False, **kwargs):
+    def getRV(self, ra, dec, radius, save: str = True, **kwargs):
         """
         
 
@@ -438,7 +453,7 @@ class GaiaQuery:
 
         """
         config = configparser.ConfigParser()
-        tn = timestamp()
+        tn = _timestamp()
         fold = self._checkPathExist(name.upper())
         path = os.path.join(fold, (tn+'.txt'))
         info = os.path.join(fold, (tn+'.ini'))
