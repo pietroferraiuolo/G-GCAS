@@ -12,16 +12,12 @@ How to Use it
 Documentation
 =============
 
-
 """
 import os
 from ggcas.cluster import Cluster
-from ggcas import utils as gutils
-from ggcas import plots as gplt
-from ggcas import functions as gfunc
+from ggcas import utils as gutils, functions as gfunc, plots as gplt
 from ggcas.analyzer import *
-from ggcas.query import GaiaQuery 
-
+from ggcas.query import GaiaQuery
 gq = GaiaQuery()
 
 print("""

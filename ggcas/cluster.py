@@ -5,8 +5,8 @@ Author(s)
 
 Description
 -----------
-A module which contains the Cluster class, which contains all the information o
-f a specified cluster.
+A module which contains the Cluster class, which contains all the information of
+a specified cluster.
 
 How to Use
 ----------
@@ -25,6 +25,7 @@ Now we can call methods to read the parameters
 import os
 import pandas as pd
 import astropy.units as u
+from ggcas.utility import folder_paths as fn
 
 class Cluster:
     """
@@ -47,8 +48,9 @@ class Cluster:
     """
     def __init__(self, name: str):
         """The constructor"""
-        parms       = self._loadClusterParameters(name.upper())
         self.id     = name.upper()
+        parms       = self.__load_cluster_parameters(name.upper())
+        self.king   = self._load_king_model()
         self.ra     = parms.loc['ra']*u.deg
         self.dec    = parms.loc['dec']*u.deg
         self.dist   = parms.loc['dist']*u.kpc
@@ -58,7 +60,7 @@ class Cluster:
         self.logc   = parms.loc['logc']
         self.cflag  = parms.loc['collapsed']=='Y'
 
-    def _loadClusterParameters(self, name: str):
+    def _load_cluster_parameters(self, name: str):
         """
         Loads the parameters of the requested cluster from the Harris Catalog 
         2010 Globular Cluster Database, written in the Catalogue.xlsx file
@@ -73,11 +75,10 @@ class Cluster:
         cat_row : TYPE
             Pandas Series with all the necessary paramenters to ilitialize the Cluster Class.
         """
-        try:
-            path = os.environ['PYGCASCONf']
-        except KeyError as exc:
-            raise KeyError("Environment variable not found! Define the PYGCASCONF\
-                           env variable that points to '.../G-GCAS/ggcas/data") from exc
-        catalog = pd.read_excel(os.path.join(path, 'Catalogue.xlsx'), index_col=0)
+        catalog = pd.read_excel(fn.CATALOG_FILE, index_col=0)
         cat_row = catalog.loc[name.upper()]
         return cat_row
+    
+    def _load_king_model(self):
+        
+        return

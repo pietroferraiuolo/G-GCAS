@@ -16,7 +16,7 @@ Examples
 import os
 from astropy.table import QTable
 import datetime as dt
-datapath    = os.environ['PYGCASCONF']
+datapath    = os.environ['GCASDATA']
 querypath   = os.path.join(datapath, 'query')
 
 def load_query(file):
@@ -56,24 +56,24 @@ def get_file_list(gc_name, tn:str=None, key:str=None):
     Examples
     --------
     Here are some examples regarding the use of the 'key' argument. Let's say w
-    e need a list of files inside ''tn = '20160516_114916' '' in the IFFunction
-    s folder. 
+    e need a list of files inside ''tn = '20160516_114916' '' for GC 'ngc104' 
 
-        >>> datafold = '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/'
-        >>> getFileList(gc_name)
+        >>> gc_name = 'ngc104'
+        >>> tn = '20160516_114916'
+        >>> get_file_list(gc_name, tn=tn)
         ['.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/spatial_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_info.ini',
-         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/dynamical_data.txt',
-         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/king_model.txt']
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/dynamical_data.txt']
         
     Let's suppose we want only the list of 'xxx_data.txt' files:
     
-        >>> getFileList(tn, fold=fold, key='_data')
+        >>> get_file_list(gc_name, tn=tn, key='_data')
         ['.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/spatial_data.txt',
-         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt']
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt',
+         '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/dynamical_data.txt']
     """
     fold = os.path.join(querypath, gc_name)
     if tn is None:
