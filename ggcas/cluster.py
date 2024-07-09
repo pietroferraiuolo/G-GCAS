@@ -49,7 +49,7 @@ class Cluster:
     def __init__(self, name: str):
         """The constructor"""
         self.id     = name.upper()
-        parms       = self.__load_cluster_parameters(name.upper())
+        parms       = self._load_cluster_parameters(name.upper())
         self.king   = self._load_king_model()
         self.ra     = parms.loc['ra']*u.deg
         self.dec    = parms.loc['dec']*u.deg

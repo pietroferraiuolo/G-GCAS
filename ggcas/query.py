@@ -73,9 +73,10 @@ class GaiaQuery:
     Methods
     -------
     print_table:
-        D
+        Print the loaded data table information.
     free_query:
-        D
+        Perform an ADQL search into the Gaia catalogue with full personalized 
+        parameters.
     get_atrometry:
         D
     get_photometry:
@@ -152,33 +153,43 @@ class GaiaQuery:
         if dump:
             return table.columns
 
-    def free_query(self, ra, dec, radius, save: str = True, **kwargs):
+    def free_query(self, ra, dec, radius, save: str = False, **kwargs):
         """
-        
+        This method allows to perform an ADQL search into the Gaia catalogue with
+        personalized parameters, such as data to collect and conditions to apply.
 
         Parameters
         ----------
-        ra : TYPE
-            DESCRIPTION.
-        dec : TYPE
-            DESCRIPTION.
-        radius : TYPE
-            DESCRIPTION.
+        ra : float | ArrayLike
+            Right ascension coordinate, in degrees, of the centre of the scan.
+        dec : float | ArrayLike
+            Declination coordinate, in degrees, of the centre of the scan..
+        radius : float | ArrayLike
+            Radius, in degrees, of the scan circle.
         save : str, optional
-            DESCRIPTION. The default is False.
-        **kwargs : TYPE
-            DESCRIPTION.
+            Whether to save the file or not. If the quesry is to be saved, the 
+            save argument must be the name of the globular cluster, so that the
+            software knows the folder where to save, with a new tracking number.
+        **kwargs : additional optional arguments
+            data: str or list of str
+                List of parameters to retrieve, from the ones printed by ''.print_table()''.
+                If this argument is missing, the only parameter retrieved is 'source_id'.
+            conditions: str or list of str
+                Listo of conditions on the parameters to apply upon scanning the
+                archive. If no conditions are supplied, no conditions are applied.
+
+        Returns
+        -------
+        result : astropy table
+            Result of the async query, stored into an astropy table.
 
         Raises
         ------
         TypeError
-            DESCRIPTION.
+            Raised if save is not a string.
 
-        Returns
+        Example
         -------
-        result : TYPE
-            DESCRIPTION.
-
         """
         self._queryInfo = {
             'Scan Info': {
@@ -216,32 +227,36 @@ class GaiaQuery:
                                     destination folder")
         return result
 
-    def get_astrometry(self, ra, dec, radius, save: str = True, **kwargs):
+    def get_astrometry(self, ra, dec, radius, save:str=False, **kwargs):
         """
         
 
         Parameters
         ----------
-        ra : TYPE
-            DESCRIPTION.
-        dec : TYPE
-            DESCRIPTION.
-        radius : TYPE
-            DESCRIPTION.
+        ra : float | ArrayLike
+            Right ascension coordinate, in degrees, of the centre of the scan.
+        dec : float | ArrayLike
+            Declination coordinate, in degrees, of the centre of the scan..
+        radius : float | ArrayLike
+            Radius, in degrees, of the scan circle.
         save : str, optional
-            DESCRIPTION. The default is False.
-        **kwargs : TYPE
-            DESCRIPTION.
-
-        Raises
-        ------
-        TypeError
-            DESCRIPTION.
+            Whether to save the file or not. If the quesry is to be saved, the 
+            save argument must be the name of the globular cluster, so that the
+            software knows the folder where to save, with a new tracking number.
+        **kwargs : additional optional arguments
+            conditions: str or list of str
+                Listo of conditions on the parameters to apply upon scanning the
+                archive. If no conditions are supplied, no conditions are applied.
 
         Returns
         -------
         astro_cluster : TYPE
             DESCRIPTION.
+
+        Raises
+        ------
+        TypeError
+            Raised if save is not a string.
 
         """
         astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, \
@@ -282,27 +297,30 @@ class GaiaQuery:
 
         Parameters
         ----------
-        ra : TYPE
-            DESCRIPTION.
-        dec : TYPE
-            DESCRIPTION.
-        radius : TYPE
-            DESCRIPTION.
+        ra : float | ArrayLike
+            Right ascension coordinate, in degrees, of the centre of the scan.
+        dec : float | ArrayLike
+            Declination coordinate, in degrees, of the centre of the scan..
+        radius : float | ArrayLike
+            Radius, in degrees, of the scan circle.
         save : str, optional
-            DESCRIPTION. The default is False.
-        **kwargs : TYPE
-            DESCRIPTION.
-
-        Raises
-        ------
-        TypeError
-            DESCRIPTION.
+            Whether to save the file or not. If the quesry is to be saved, the 
+            save argument must be the name of the globular cluster, so that the
+            software knows the folder where to save, with a new tracking number.
+        **kwargs : additional optional arguments
+            conditions: str or list of str
+                Listo of conditions on the parameters to apply upon scanning the
+                archive. If no conditions are supplied, no conditions are applied.
 
         Returns
         -------
         photo_cluster : TYPE
             DESCRIPTION.
 
+        Raises
+        ------
+        TypeError
+            Raised if save is not a string.
         """
         photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, \
             phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
@@ -342,27 +360,29 @@ class GaiaQuery:
 
         Parameters
         ----------
-        ra : TYPE
-            DESCRIPTION.
-        dec : TYPE
-            DESCRIPTION.
-        radius : TYPE
-            DESCRIPTION.
+        ra : float | ArrayLike
+            Right ascension coordinate, in degrees, of the centre of the scan.
+        dec : float | ArrayLike
+            Declination coordinate, in degrees, of the centre of the scan..
+        radius : float | ArrayLike
+            Radius, in degrees, of the scan circle.
         save : str, optional
-            DESCRIPTION. The default is False.
-        **kwargs : TYPE
-            DESCRIPTION.
-
-        Raises
-        ------
-        TypeError
-            DESCRIPTION.
-
+            Whether to save the file or not. If the quesry is to be saved, the 
+            save argument must be the name of the globular cluster, so that the
+            software knows the folder where to save, with a new tracking number.
+        **kwargs : additional optional arguments
+            conditions: str or list of str
+                Listo of conditions on the parameters to apply upon scanning the
+                archive. If no conditions are supplied, no conditions are applied.
         Returns
         -------
         rv_cluster : TYPE
             DESCRIPTION.
 
+        Raises
+        ------
+        TypeError
+            Raised if save is not a string.
         """
         rv = 'source_id, radial_velocity, radial_velocity_error'
         self._queryInfo = {
@@ -409,16 +429,18 @@ class GaiaQuery:
         config = configparser.ConfigParser()
         tn = _timestamp()
         fold = self._checkPathExist(name.upper())
-        path = os.path.join(fold, tn, QDATA)
-        info = os.path.join(fold, tn, QINFO)
+        tnfold = os.path.join(fold, tn)
+        os.mkdir(tnfold)
+        data = os.path.join(tnfold, QDATA)
+        info = os.path.join(tnfold, QINFO)
         if isinstance(dat, Table) is False:
             dat = Table(dat)
-        dat.write(path, format='ascii.tab')
+        dat.write(data, format='ascii.tab')
         for section, options in self._queryInfo.items():
             config[section] = options
         with open(info, 'w', encoding='UTF-8') as configfile:
             config.write(configfile)
-        print(path)
+        print(data)
         print(info)
 
     def _checkPathExist(self, dest: str):
@@ -519,6 +541,6 @@ class GaiaQuery:
         return query
 
     def __check_query_exists(self):
-
+        
         return
     
