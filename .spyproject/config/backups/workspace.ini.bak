@@ -4,7 +4,11 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
+<<<<<<< Updated upstream
 recent_files = ['scripts\\m4.py', 'ggcas\\analyzer.py', 'ggcas\\functions.py', 'ggcas\\utils.py', '..\\M4\\m4\\utils\\osutils.py', 'data tree.txt']
+=======
+recent_files = ['scripts\\m4.py', 'ggcas\\analyzer.py', 'ggcas\\query.py', 'ggcas\\functions.py', 'ggcas\\utils.py', 'ggcas\\initGGCAS.py']
+>>>>>>> Stashed changes
 
 [main]
 version = 0.2.0
