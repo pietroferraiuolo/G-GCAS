@@ -41,8 +41,20 @@ def compute_error(func, variables, variables_values, corr=False):
         DESCRIPTION.
 
     '''#FIXME
+# nval = []
+# for n in range(len(valori[0])):
+#     dato = {}
+#     for i, var in enumerate(variables):
+#         var_name = f"{var}"
+#         dato[var_name] = valori[i][n]
+#     nval.append(dato)
+# nval
+# Esecuzione calcolo numerico
+# calcolo = [sp.N(func.subs(val)) for val in valori]
+
+
     err_func = gfunc.error_propagation(func, variables, correlation=corr)
-    values = dict()
+    values = {}
     for x in range(len(variables)):
         values[variables[x]] = 0
     computed_error = np.zeros(len(variables_values[0]))
@@ -104,9 +116,9 @@ def density_profile(data):
     rr1[0] = 0.
     rr2[0] = bw
     for x in range (0, n_bin):
-      V[x] = (4/3)*np.pi*(rr2[x]**3 - rr1[x]**3)
-      rr1[x+1] = rr1[x] + bw
-      rr2[x+1] = rr2[x] + bw
+        V[x] = (4/3)*np.pi*(rr2[x]**3 - rr1[x]**3)
+        rr1[x+1] = rr1[x] + bw
+        rr2[x+1] = rr2[x] + bw
     rho = dh[0]/(V**3)
     return rho
 
