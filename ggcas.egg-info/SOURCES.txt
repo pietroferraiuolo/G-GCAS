@@ -6,6 +6,8 @@ ggcas/__init__.py
 ggcas/__version__.py
 ggcas/analyzer.py
 ggcas/cluster.py
+ggcas/functions.py
+ggcas/initGGCAS.py
 ggcas/plots.py
 ggcas/query.py
 ggcas.egg-info/PKG-INFO

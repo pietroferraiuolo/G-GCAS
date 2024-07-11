@@ -35,8 +35,10 @@
     .             |__data4
     |
     |
-    |__king-models
+    |__models
         |
         |__{gcn}
             |
-            |___'integration.txt'
+            |___'SM_king.txt'
+            |
+            |___'MM_king.txt'

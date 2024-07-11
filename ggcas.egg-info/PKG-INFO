@@ -1,15 +1,21 @@
 Metadata-Version: 2.1
 Name: ggcas
 Version: 0.0.1
-Summary: Software to gather and analyze astrometry and photometry data from Gaia
+Summary: Software to gather and analyze data retrieved on the Gaia archive
 Home-page: https://github.com/pietroferraiuolo/G-GCAS
 Author: Pietro Ferraiuolo
 Author-email: pietro.ferraiuolo@inaf.it
 License: The Unlicense
-Platform: UNKNOWN
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: astropy
+Requires-Dist: astroquery
+Requires-Dist: sympy
 
 G-GCAS : Gaia-Globular Cluster Analysis Software
 
@@ -24,5 +30,3 @@ Documentation
 
 ...
 how to use it
-
-
