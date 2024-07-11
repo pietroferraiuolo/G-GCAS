@@ -124,4 +124,4 @@ def compute_radial_distance(parallax, ra, dec):
 #     valori.append(dato)
 #
 # Esecuzione calcolo numerico
-# calcolo = [func.subs(valore) for val in valori]
+# calcolo = [sp.N(func.subs(val)) for val in valori]
