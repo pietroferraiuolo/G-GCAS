@@ -18,10 +18,10 @@ import sympy as sp
 import astropy.units as u
 from ggcas import functions as gfunc
 
-def compute_error(func, variables, var_data, var_errors, corr:bool=False, 
+def compute_error(func, variables, var_data, var_errors, corr:bool=False,
                                                         corr_values:list=None):
     """
-    
+
 
     Parameters
     ----------
@@ -33,8 +33,10 @@ def compute_error(func, variables, var_data, var_errors, corr:bool=False,
         DESCRIPTION.
     var_errors : TYPE
         DESCRIPTION.
-    corr : TYPE, optional
+    corr : bool, optional
         DESCRIPTION. The default is False.
+    corr_values : list, optional
+        DESCRIPTION. The default is None.
 
     Returns
     -------
@@ -47,10 +49,10 @@ def compute_error(func, variables, var_data, var_errors, corr:bool=False,
     errors = err_func['error_variables']['errors']
     vars_to_pass = []
     vals_to_pass = []
-    for i in range(len(variables)):
-        vars_to_pass.append(variables[i])
+    for i, var in enumerate(variables):
+        vars_to_pass.append(var)
         vals_to_pass.append(var_data[i])
-    for i in range(len(variables)):
+    for i,_  in enumerate(variables):
         vars_to_pass.append(errors[i])
         vals_to_pass.append(var_errors[i])
     if corr:
@@ -68,7 +70,7 @@ def compute_error(func, variables, var_data, var_errors, corr:bool=False,
 
 def compute_numerical_function(func, variables, var_data):
     """
-    Compute the numerical value of a function, passing by the function, it's 
+    Compute the numerical value of a function, passing by the function, it's
     variables and the data associated to the variables.
 
     Parameters
@@ -127,7 +129,7 @@ def velocity_conversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
 
 def density_profile(data):
     """
-    
+
 
     Parameters
     ----------
@@ -154,19 +156,3 @@ def density_profile(data):
         rr2[x+1] = rr2[x] + bw
     rho = dh[0]/(V**3)
     return rho
-
-def compute_radial_distance(parallax, ra, dec):
-    w = gfunc.angular_separation()
-    r = gfunc.los_distance()
-    r2d = gfunc.radial_distance_2d()
-    r3d = gfunc.radial_distance_3d()
-    return r3d
-
-# Template per il riempimento dei valori delle variabili
-# valori = []
-# for i in range(0, len(data)):
-#     dato = {x:dato1[i], y:dato2[i]}
-#     valori.append(dato)
-#
-# Esecuzione calcolo numerico
-# calcolo = [sp.N(func.subs(val)) for val in valori]

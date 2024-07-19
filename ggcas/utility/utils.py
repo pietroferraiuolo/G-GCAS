@@ -36,7 +36,7 @@ def load_query(file):
     """
     data = QTable.read(file, format='ascii.tab')
     return data
-        
+
 def get_file_list(gc_name, tn:str=None, key:str=None):
     """
     Returns the file list of a given globular cluster datapath.
@@ -56,7 +56,7 @@ def get_file_list(gc_name, tn:str=None, key:str=None):
     Examples
     --------
     Here are some examples regarding the use of the 'key' argument. Let's say w
-    e need a list of files inside ''tn = '20160516_114916' '' for GC 'ngc104' 
+    e need a list of files inside ''tn = '20160516_114916' '' for GC 'ngc104'
 
         >>> gc_name = 'ngc104'
         >>> tn = '20160516_114916'
@@ -66,9 +66,9 @@ def get_file_list(gc_name, tn:str=None, key:str=None):
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_info.ini',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/dynamical_data.txt']
-        
+
     Let's suppose we want only the list of 'xxx_data.txt' files:
-    
+
         >>> get_file_list(gc_name, tn=tn, key='_data')
         ['.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/spatial_data.txt',

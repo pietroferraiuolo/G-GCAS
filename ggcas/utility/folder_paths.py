@@ -26,7 +26,7 @@ def CLUSTER_DATA_FOLDER(name:str):
 
 def CLUSTER_MODEL_FOLDER(name:str):
     """
-    Returns the cluster's data path.
+    Returns the cluster's model path.
     """
     path = os.path.join(KING_MODELS_FOLDER, name.upper())
     return path

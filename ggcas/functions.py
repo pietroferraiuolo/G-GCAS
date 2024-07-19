@@ -65,8 +65,9 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
     error_formula = sp.sqrt(sum_of_squares + sum_of_correlations)
     corrs = []
     for x in corr:
-        if x!=0:
-            corrs.append(corr)
+        for c in x:
+            if c!=0:
+                corrs.append(c)
     returns = {
         "error_formula": error_formula,
         "error_variables": {
@@ -80,7 +81,7 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
 
 def angular_separation():
     """
-    
+
 
     Returns
     -------
@@ -100,7 +101,7 @@ def angular_separation():
 
 def los_distance():
     """
-    
+
 
     Returns
     -------
@@ -116,7 +117,7 @@ def los_distance():
 
 def radial_distance_2d():
     """
-    
+
 
     Returns
     -------
@@ -134,7 +135,7 @@ def radial_distance_2d():
 
 def radial_distance_3d():
     """
-    
+
 
     Returns
     -------
@@ -151,7 +152,7 @@ def radial_distance_3d():
 
 def total_velocity():
     """
-    
+
 
     Returns
     -------
@@ -168,7 +169,7 @@ def total_velocity():
 
 def effective_potential(shell = False):
     """
-    
+
 
     Parameters
     ----------
