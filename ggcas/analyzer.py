@@ -13,56 +13,89 @@ Examples
 --------
 
 """
-import os
 import numpy as np
 import sympy as sp
 import astropy.units as u
 from ggcas import functions as gfunc
 
-datapath    = os.environ['PYGCASCONF']
-querypath   = os.path.join(datapath, 'query')
-
-def compute_error(func, variables, variables_values, corr=False):
-    '''
+def compute_error(func, variables, var_data, var_errors, corr:bool=False, 
+                                                        corr_values:list=None):
+    """
     
 
     Parameters
     ----------
-    err_func : TYPE
+    func : TYPE
         DESCRIPTION.
     variables : TYPE
         DESCRIPTION.
-    vars_values : TYPE
+    var_data : TYPE
         DESCRIPTION.
+    var_errors : TYPE
+        DESCRIPTION.
+    corr : TYPE, optional
+        DESCRIPTION. The default is False.
 
     Returns
     -------
     computed_error : TYPE
         DESCRIPTION.
 
-    '''#FIXME
-# nval = []
-# for n in range(len(valori[0])):
-#     dato = {}
-#     for i, var in enumerate(variables):
-#         var_name = f"{var}"
-#         dato[var_name] = valori[i][n]
-#     nval.append(dato)
-# nval
-# Esecuzione calcolo numerico
-# calcolo = [sp.N(func.subs(val)) for val in valori]
-
-
+    """
     err_func = gfunc.error_propagation(func, variables, correlation=corr)
-    values = {}
-    for x in range(len(variables)):
-        values[variables[x]] = 0
-    computed_error = np.zeros(len(variables_values[0]))
-    for i in range(len(variables_values[0])):
-        for x in range(len(variables)):
-            values[variables[x]] = variables_values[x][i]
-        computed_error[i] = sp.N(err_func['error_formula'].subs(values))
+    func = err_func['error_formula']
+    errors = err_func['error_variables']['errors']
+    vars_to_pass = []
+    vals_to_pass = []
+    for i in range(len(variables)):
+        vars_to_pass.append(variables[i])
+        vals_to_pass.append(var_data[i])
+    for i in range(len(variables)):
+        vars_to_pass.append(errors[i])
+        vals_to_pass.append(var_errors[i])
+    if corr:
+        corr_values = [corr_values]
+        N = len(corr_values)
+        if N > 1:
+            for i in range(N):
+                vars_to_pass.append(err_func['correlations'][i])
+                vals_to_pass.append(corr_values[i])
+        else:
+            vars_to_pass.append(err_func['correlations'])
+            vals_to_pass.append(corr_values[0])
+    computed_error = compute_numerical_function(func, vars_to_pass, vals_to_pass)
     return computed_error
+
+def compute_numerical_function(func, variables, var_data):
+    """
+    Compute the numerical value of a function, passing by the function, it's 
+    variables and the data associated to the variables.
+
+    Parameters
+    ----------
+    func : sympy.core.function
+        Function to compute. Must be a sympy expression.
+    variables : list of sympy variables
+        Variables of the function, as sympy symbols, organizaed in a list.
+    var_data : list of ndarray
+        Numerical values of the variables, organized in a list ordered the same
+        way as the order of the variable list.
+
+    Returns
+    -------
+    computed_func : float | ArrayLike
+        List of values of the function computed for each data point.
+
+    """
+    val_dicts = []
+    for n in range(len(var_data[0])):
+        data_dict = {}
+        for i, var in enumerate(variables):
+            var_name = f"{var}"
+            data_dict[var_name] = var_data[i][n]
+        val_dicts.append(data_dict)
+    computed_func = [float(sp.N(func.subs(vals))) for vals in val_dicts]
+    return computed_func
 
 def velocity_conversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
     """

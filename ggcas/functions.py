@@ -17,7 +17,7 @@ from typing import Dict, Any
 import numpy as np
 import sympy as sp
 
-def error_propagation(func, variables, correlation=False) -> Dict[str, Any]:
+def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]:
     """
     Computes the imput function's error with the standard error propagation
     formula.
@@ -40,16 +40,17 @@ def error_propagation(func, variables, correlation=False) -> Dict[str, Any]:
         - "error_variables" : list of sympy symbols
         - "correlations" : list of sympy symbols (only if corr=True)
     """
-    if correlation is True:
-        corr = np.ones((len(variables), len(variables))) - np.eye(len(variables))
+    if correlation:
+        corr = np.ones((len(variables), len(variables)), dtype=object) -\
+                                           np.eye(len(variables), dtype=object)
     else:
-        corr = np.eye(len(variables))
+        corr = np.eye(len(variables), dtype=object)
     errors = []
-    for i, var in enumerate(variables):
-        errors.append(sp.symbols('epsilon_{}'.format(var)))
-        for j, _ in enumerate(variables):
+    for i, var1 in enumerate(variables):
+        errors.append(sp.symbols('epsilon_{}'.format(var1)))
+        for j, var2 in enumerate(variables):
             if i != j:
-                corr[i][j] = corr[i][j]*sp.symbols('rho_{}_{}'.format(i, j))
+                corr[i][j] = corr[i][j]*sp.symbols(f'rho_{var1}_{var2}')
     # Partial derivatives computation
     partials = [sp.diff(func, var) for var in variables]
     # Quadratic errors sum
@@ -61,10 +62,17 @@ def error_propagation(func, variables, correlation=False) -> Dict[str, Any]:
             if i != j:
                 sum_of_correlations +=(partials[i]*partials[j]*errors[i]*errors[j]*corr[i][j])
     # Total error propagation
-    error_formula = sp.sqrt(sum_of_squares + 2 * sum_of_correlations)
+    error_formula = sp.sqrt(sum_of_squares + sum_of_correlations)
+    corrs = []
+    for x in corr:
+        if x!=0:
+            corrs.append(corr)
     returns = {
         "error_formula": error_formula,
-        "error_variables": errors
+        "error_variables": {
+            'variables': variables,
+            'errors': errors
+            }
     }
     if correlation:
         returns["correlations"] = corr
