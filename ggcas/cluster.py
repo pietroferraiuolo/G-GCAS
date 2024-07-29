@@ -62,7 +62,30 @@ class Cluster:
         self.rh     = parms.loc['rh']/60 * u.deg
         self.w0     = parms.loc['w0']
         self.logc   = parms.loc['logc']
-        self.cflag  = parms.loc['collapsed']=='Y'
+        self.cflag  = ['True ' if parms.loc['collapsed']=='Y' else False][0]
+        
+    def __str__(self):
+        """String representation"""
+        text = \
+f"""Harris Catalog 2010 edition Parameters
+
+       Key        |         Value         |   Method      
+------------------|-----------------------|---------------
+Cluster Name      | {self.id}               |    .id
+Position in sky   | RA  {self.ra:.2f}        |    .ra
+                  | DEC {self.dec:.2f}        |    .dec
+Distance          | {self.dist:.2f}              |    .dist
+W0 Parameter      | {self.w0}                  |    .w0
+Concentration     | logc={self.logc:.2f}             |    .logc
+                  | Collapsed -> {self.cflag}    |    .cflag
+Core radius       | {self.rc:.2f}              |    .rc
+Half-Light radius | {self.rh:.2f}              |    .rh
+"""
+        return text
+
+    def __repr__(self):
+        """Representation"""
+        return f"< Cluster object: {self.id} >"
 
     def show_model(self, **kwargs):
         """
@@ -72,7 +95,7 @@ class Cluster:
         -------------------
         **kwargs :
             color : color of the main plot.
-            scale : scale of the axes, default linear, can be set to 'log'.
+            scale : scale of the axes, default linear.
         """
         scale = kwargs.get('scale', None)
         c = kwargs.get('color', 'black')
@@ -85,9 +108,9 @@ class Cluster:
         plt.xlabel(r"$\xi$ = $\dfrac{r}{r_t}$")
         plt.ylabel("w")
         plt.title('Integrated King Model')
-        if scale=='log':
-            plt.xscale('log')
-            plt.yscale('log')
+        if scale is not None:
+            plt.xscale(scale)
+            plt.yscale(scale)
         plt.legend(loc='best')
         plt.show()
 
