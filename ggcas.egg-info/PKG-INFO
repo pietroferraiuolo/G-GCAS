@@ -16,6 +16,7 @@ Requires-Dist: matplotlib
 Requires-Dist: astropy
 Requires-Dist: astroquery
 Requires-Dist: sympy
+Requires-Dist: datetime
 
 G-GCAS : Gaia-Globular Cluster Analysis Software
 

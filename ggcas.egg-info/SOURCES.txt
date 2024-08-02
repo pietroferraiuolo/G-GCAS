@@ -1,10 +1,11 @@
 LICENSE
+MANIFEST.in
 README.md
+requirements.txt
 setup.cfg
 setup.py
 ggcas/__init__.py
 ggcas/__version__.py
-ggcas/analyzer.py
 ggcas/cluster.py
 ggcas/functions.py
 ggcas/initGGCAS.py
@@ -15,6 +16,11 @@ ggcas.egg-info/SOURCES.txt
 ggcas.egg-info/dependency_links.txt
 ggcas.egg-info/requires.txt
 ggcas.egg-info/top_level.txt
+ggcas/analyzers/__init__.py
+ggcas/analyzers/_glpoints.py
+ggcas/analyzers/calculus.py
+ggcas/analyzers/effective_potential.py
+ggcas/analyzers/kinematics.py
 ggcas/king/__init__.py
 ggcas/king/gaus.py
 ggcas/king/king.py

@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['..\\..\\.spyder-py3\\temp.py', 'ggcas\\utility\\folder_paths.py', 'ggcas\\utility\\utils.py', 'ggcas\\cluster.py', 'ggcas\\query.py']
+recent_files = ['ggcas/utility/utils.py', 'ggcas/analyzer.py', 'ggcas/functions.py', 'ggcas/query.py', 'ggcas/cluster.py']
 
 [main]
 version = 0.2.0

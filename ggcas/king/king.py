@@ -2,7 +2,6 @@
 Created on May 2024
     -Author: P.Ferraiuolo
 """
-
 import numpy as np
 
 # Define global variables
@@ -100,7 +99,7 @@ NAMESID = [
 def gaus_legendre(fcn, a, b, points):
     """
     Integrates the function fcn(x) between a and b using the Gauss-Legendre method.
-    
+
     Parameters
     ----------
     fcn : callable
@@ -111,13 +110,12 @@ def gaus_legendre(fcn, a, b, points):
         The upper limit of integration.
     points : int
         The number of points to use for the integration (20, 40, 80, 96).
-        
+
     Returns
     -------
     float
         The integral of fcn(x) from a to b.
     """
-    
     if points == 20:
         # Gauss-Legendre 20-point nodes and weights
         x = np.array([0.076526521133497333755, 0.227785851141645078080,
@@ -125,7 +123,7 @@ def gaus_legendre(fcn, a, b, points):
                       0.636053680726515025453, 0.746331906460150792614,
                       0.839116971822218823395, 0.912234428251325905868,
                       0.963971927277913791268, 0.993128599185094924786])
-        
+
         w = np.array([0.152753387130725850698, 0.149172986472603746788,
                       0.142096109318382051329, 0.131688638449176626898,
                       0.118194531961518417312, 0.101930119817240435037,
@@ -143,7 +141,7 @@ def gaus_legendre(fcn, a, b, points):
                       0.902098806968874296728, 0.932812808278676533361,
                       0.957916819213791655805, 0.977259949983774262663,
                       0.990726238699457006453, 0.998237709710559200350])
-    
+
         w = np.array([0.077505947978424811264, 0.077039818164247965588,
                       0.076110361900626242372, 0.074723169057968264200,
                       0.072886582395804059061, 0.070611647391286779695,
@@ -176,7 +174,7 @@ def gaus_legendre(fcn, a, b, points):
                       0.974909140585727793386, 0.982848572738629070418,
                       0.989291302499755531027, 0.994227540965688277892,
                       0.997649864398237688900, 0.999553822651630629880])
-        
+
         w = np.array([0.039017813656306654811, 0.038958395962769531199,
                       0.038839651059051968932, 0.038661759774076463327,
                       0.038424993006959423185, 0.038129711314477638344,
@@ -223,7 +221,7 @@ def gaus_legendre(fcn, a, b, points):
                       0.982517263563014677447, 0.988054126329623799481,
                       0.992543900323762624572, 0.995981842987209290650,
                       0.998364375863181677724, 0.999689503883230766828])
-        
+
         w = np.array([0.032550614492363166242, 0.032516118713868835987,
                       0.032447163714064269364, 0.032343822568575928429,
                       0.032206204794030250669, 0.032034456231992663218,
@@ -248,27 +246,22 @@ def gaus_legendre(fcn, a, b, points):
                       0.006058545504235961683, 0.005014202742927517693,
                       0.003964554338444686674, 0.002910731817934946408,
                       0.001853960788946921732, 0.000796792065552012429])
-
     else:
         raise ValueError("Supported point values are 20, 40, 80, and 96.")
-            
     # Initialize the area
     area = 0.0
-    
     # Perform the integration
-    for i in range(points):
+    for i in range(int(points/2)):
         xi = (b - a) / 2.0 * x[i] + (b + a) / 2.0
         area += w[i] * fcn(xi)
         xi = -(b - a) / 2.0 * x[i] + (b + a) / 2.0
         area += w[i] * fcn(xi)
-        
     area *= (b - a) / 2.0
-    
     return area
+
 # Define INTGAU function
 def intgau(fcn, area):
     global indgau
-    
     if indgau == 1:
         area[0] = gaus_legendre(fcn, ESTR1, ESTR2, 20)
     elif indgau == 2:
@@ -283,7 +276,6 @@ def intgau(fcn, area):
 # Define OUTP function
 def outp(xx, y, dery, ihlf, ndim, prmt):
     global NFN, X, W, DW, RAPP, RPP
-
     if y[0] > 0.0:
         xrif = X[NFN] + prmt[2]
         if xx < xrif:
@@ -291,12 +283,10 @@ def outp(xx, y, dery, ihlf, ndim, prmt):
     else:
         prmt[4] = 1.0
         return
-
     NFN += 1
     if NFN == 8000:
         print('TROPPI PASSI')
         prmt[4] = 1.0
-
     X[NFN] = xx
     W[NFN] = y[0]
     DW[NFN] = y[1]
@@ -305,17 +295,14 @@ def outp(xx, y, dery, ihlf, ndim, prmt):
 # Define FCT function
 def fct(x, y, dery, fcn):
     global WWWW, ESTR2, RHO0, RPP
-
     WWWW = y[0]
     ESTR2 = y[0]
-
     if WWWW > 0.0:
         qd = np.array([0.0])  # Placeholder for qd computation
         intgau(fcn, qd)
         RPP = qd[0] / RHO0
     else:
         RPP = 0.0
-
     dery[0] = y[1]
     dery[1] = -(2.0 / x) * y[1] - 9.0 * RPP
 
@@ -356,47 +343,38 @@ def dhpcg(prmt, y, dery, ndim, ihlf, fct, outp, aux, fcn):
     x = prmt[0]
     h = prmt[2]
     prmt[4] = 0.0
-
     for i in range(ndim):
         aux[15, i] = 0.0
         aux[14, i] = dery[i]
         aux[0, i] = y[i]
-
     if h * (prmt[1] - x) < 0.0:
         ihlf = 13
     elif h * (prmt[1] - x) == 0.0:
         ihlf = 12
     else:
         ihlf = 0
-
     fct(x, y, dery, fcn)
     outp(x, y, dery, ihlf, ndim, prmt)
-
     if prmt[4] != 0.0:
         return
-
     if ihlf <= 0:
         for i in range(ndim):
             aux[7, i] = dery[i]
         isw = 1
     else:
         return
-
     while True:
         if isw == 1:
             x += h
             for i in range(ndim):
                 aux[1, i] = y[i]
-
             ihlf += 1
             x -= h
             for i in range(ndim):
                 aux[3, i] = aux[1, i]
-
             h *= 0.5
             n = 1
             isw = 2
-
         while True:
             if isw == 2:
                 x += h
@@ -406,7 +384,6 @@ def dhpcg(prmt, y, dery, ndim, ihlf, fct, outp, aux, fcn):
                     aux[1, i] = y[i]
                     aux[8, i] = dery[i]
                 isw = 3
-
             elif isw == 3:
                 delt = 0.0
                 for i in range(ndim):
@@ -421,7 +398,6 @@ def dhpcg(prmt, y, dery, ndim, ihlf, fct, outp, aux, fcn):
                         ihlf = 11
                         x += h
                         continue
-
             elif isw == 4:
                 x += h
                 fct(x, y, dery, fcn)
@@ -430,7 +406,6 @@ def dhpcg(prmt, y, dery, ndim, ihlf, fct, outp, aux, fcn):
                     aux[9, i] = dery[i]
                 n = 3
                 isw = 5
-
             elif isw == 5:
                 n = 1
                 x += h
@@ -440,15 +415,12 @@ def dhpcg(prmt, y, dery, ndim, ihlf, fct, outp, aux, fcn):
                     aux[10, i] = dery[i]
                     y[i] = aux[0, i] + h * (0.375 * aux[7, i] + 0.7916666666666667 * aux[8, i]
                                             - 0.20833333333333333 * aux[9, i] + 0.041666666666666667 * dery[i])
-
                 x += h
                 n += 1
                 fct(x, y, dery, fcn)
                 outp(x, y, dery, ihlf, ndim, prmt)
-
                 if prmt[4] != 0.0:
                     return
-
                 if n < 4:
                     for i in range(ndim):
                         aux[n, i] = y[i]
@@ -460,27 +432,23 @@ def dhpcg(prmt, y, dery, ndim, ihlf, fct, outp, aux, fcn):
                             delt = aux[8, i] + aux[9, i]
                             delt += delt + delt
                             y[i] = aux[0, i] + 0.3333333333333333 * h * (aux[7, i] + delt + aux[10, i])
-
                         n += 1
                         if n < 4:
                             for i in range(ndim):
                                 aux[n, i] = y[i]
                                 aux[n + 6, i] = dery[i]
                             istop = True
-
                         else:
                             for i in range(ndim):
                                 delt = aux[8, i] + aux[9, i]
                                 delt += delt + delt
                                 y[i] = aux[0, i] + 0.375 * h * (aux[7, i] + delt + aux[10, i])
-
                             n += 1
                             if n < 4:
                                 for i in range(ndim):
                                     aux[n, i] = y[i]
                                     aux[n + 6, i] = dery[i]
                                 istop = True
-
                             else:
                                 if istop:
                                     return
@@ -489,32 +457,25 @@ def dhpcg(prmt, y, dery, ndim, ihlf, fct, outp, aux, fcn):
 def main():
     global WWWW, ESTR1, ESTR2, W0, RHO0, indgau
     global X, W, DW, RAPP, NFN, RPP
-
     # Initialize variables and parameters
     PRMT = np.zeros(5)
     Y = np.zeros(2)
     DERY = np.zeros(2)
     AUX = np.zeros((16, 2))
-
     NFN = 0
     WWWW = 0.0
-
     # Set integration parameters
-    PRMT[0] = 1.0  # Example starting value for x
-    PRMT[1] = 10.  # Example end value for x
-    PRMT[2] = 0.01  # Example step size
-    PRMT[3] = 0.01  # Example tolerance
+    PRMT[0] = 0.001  # Example starting value for x
+    PRMT[1] = 1.0  # Example end value for x
+    PRMT[2] = 0.001  # Example step size
+    PRMT[3] = 1e-6  # Example tolerance
     PRMT[4] = 0.0  # Flag for termination
-
     indgau = 2  # Example setting for number of Gauss-Legendre points
-
     for i in range(6):
         W0 = 4.0 + i  # Example values for W0
         RHO0 = 1.0
-
         # Call DHPCG subroutine to integrate the King model
         dhpcg(PRMT, Y, DERY, 2, 0, fct, outp, AUX, fcnqd)
-
     # Example output
     print("X:", X[:NFN+1])
     print("W:", W[:NFN+1])
