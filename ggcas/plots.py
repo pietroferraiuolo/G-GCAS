@@ -12,7 +12,7 @@ r use.
 
 How to Use
 ----------
-Just import the module 
+Just import the module
 
     >>> from ggcas import plots as gplt
     >>> gplt.scatter_2hist(...) # your data
@@ -174,7 +174,7 @@ def spatial(ra, dec, **kwargs):
         DESCRIPTION.
     dec : TYPE
         DESCRIPTION.
-        
+
     Other Parameters
     ----------------
     **kwargs : additional parameters for customizing the plot
@@ -225,30 +225,38 @@ def histogram(data, kde=False, **kwargs):
         List of bin positions on x axis.
     counts : ArrayLike
         Count number for each bin.
-        
+
     Example
     -------
     The output can be used to make other plots and computations. For example
-    
+
     >>> import numpy as np
     >>> from ggcas import plots as gplt
     >>> x = np.random.randn(1000)
     >>> y = np.random.randn(1000)
     >>> b, n = gplt.histogram(x, y)
-    
+
     Then, with the result, you can make for example a scatter plot
-    
+
     >>> plt.scatter(x, y)
-    
+
     and so on.
 
     """
-    xlabel=kwargs.get('xlabel','')
-    alpha=kwargs.get('alpha', 1)
-    color=kwargs.get('color','gray')
+    xlabel =kwargs.get('xlabel','')
+    alpha  = kwargs.get('alpha', 1)
+    hcolor = kwargs.get('hcolor','gray')
+    kcolor = kwargs.get('kcolor', 'red')
+    if 'xlim' in kwargs :
+        if isinstance(kwargs['xlim'], tuple):
+            xlim = kwargs['xlim']
+        else:
+            raise TypeError("'xlim' arg must be a tuple")
+    else:
+        xlim = None
     n_bin = int(1.5*np.sqrt(len(data)))
     plt.figure(figsize=(9,8))
-    h = plt.hist(data, bins=n_bin, color=color, alpha=alpha)
+    h = plt.hist(data, bins=n_bin, color=hcolor, alpha=alpha)
     plt.ylabel('counts')
     plt.xlabel(xlabel, fontdict=label_font)
     title = xlabel+' Distribution'
@@ -263,10 +271,12 @@ def histogram(data, kde=False, **kwargs):
         mean=np.mean(data)
         std=np.std(data)
         label=r"""Gaussian KDE
-mean={:.2e}
-$\sigma^2$={:.2e}"""
-        plt.plot(xk, kde_values, c='r', label=label.format(mean, std))
+$\mu$   = {:.2e}
+$\sigma^2$  = {:.2e}"""
+        plt.plot(xk, kde_values, c=kcolor, label=label.format(mean, std))
         plt.legend(loc='best', fontsize='large')
+    if xlim is not None:
+        plt.xlim(xlim)
     plt.show()
     return bins, counts
 
@@ -274,7 +284,7 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     """
     Make a scatter plot of a quantity 'x', with its projected histogram, relati
     ve to a quantity 'y'.
-    
+
     Parameters
     ----------
     x : ndarray
@@ -284,7 +294,7 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     xerr : int of ndarray, optional
         Error on the input data points. Can be either a single value or an arra
         y with the same size as the input data. The default is None.
-    
+
     Other Parameters
     ----------------
     **kwarg : additional arguments for customizing the plot.

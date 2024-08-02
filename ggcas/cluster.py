@@ -63,13 +63,13 @@ class Cluster:
         self.w0     = parms.loc['w0']
         self.logc   = parms.loc['logc']
         self.cflag  = ['True ' if parms.loc['collapsed']=='Y' else False][0]
-        
+
     def __str__(self):
         """String representation"""
         text = \
 f"""Harris Catalog 2010 edition Parameters
 
-       Key        |         Value         |   Method      
+       Key        |         Value         |   Method
 ------------------|-----------------------|---------------
 Cluster Name      | {self.id}               |    .id
 Position in sky   | RA  {self.ra:.2f}        |    .ra

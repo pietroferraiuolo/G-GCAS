@@ -6,29 +6,58 @@ Author(s)
 Description
 -----------
 Thi module contains the GaiaQuery class, which handles the ADQL language to mak
-e queries for globular clusters data retrievement fast and easy. 
+e queries for globular clusters data retrievement fast and easy.
 
 How to Use it
 -------------
-After importing the module, initialize the class with a table (default is the 
+After importing the module, initialize the class with a table (default is the
 Gaia data release 3 table)
-    
-    >>> from ggcas.query import GaiaQuery
-    >>> gq = GaiaQuery()
+
+    >>> from ggcas import query
+    >>> gq = query.GaiaQuery()
     Initialized with Gaia table: 'gaiadr3.gaia_source'
-    
+
 To check all the available Gaia mission tables
 
-    >>> gq.available_tables()
+    >>> query.available_tables()
     INFO: Retrieving tables... [astroquery.utils.tap.core]
     INFO: Parsing tables... [astroquery.utils.tap.core]
     INFO: Done. [astroquery.utils.tap.core]
     external.apassdr9
     external.catwise2020
     ...
+
+To show information about the loaded table(s), one can get the table description
+with the '__repr__' method, that is:
+
+    >>> gq
+    GAIADR3.GAIA_SOURCE
+    -------------------
+    This table has an entry for every Gaia observed source as published with this
+    data release. It contains the basic source parameters, in their final state
+    as processed by the Gaia Data Processing and Analysis Consortium from the raw
+    data coming from the spacecraft. The table is complemented with others containing
+    information specific to certain kinds of objects
+    (e.g.~Solar--system objects, non--single stars, variables etc.) and value--added
+    processing (e.g.~astrophysical parameters etc.). Further array data types
+    (spectra, epoch measurements) are presented separately via Datalink resources.
+
+While for a complete list of parameters within the table, print out the query
+object:
+
+    >>> print(gq)
+    0 solution_id
+    1 designation
+    2 source_id
+    3 random_index
+    4 ref_epoch
+    .
+    .
+    .
+    150 ebpminrp_gspphot_upper
+    151 libname_gspphot
 """
-import os
-import configparser
+import os, configparser, numpy as np
 from typing import Optional, Union
 from astropy.table import Table
 from astropy import units as u
@@ -45,7 +74,7 @@ def available_tables(key:str=None):
     Parameters
     ----------
     key : str, optional
-        A key used to restrict the printed tables. As example, if 
+        A key used to restrict the printed tables. As example, if
         >>> key = 'gaiadr3'
         then only tables relative to the complete 3th data release will be printed
         out. Default is None, meaning all the tables will be printed.
@@ -62,20 +91,20 @@ def available_tables(key:str=None):
 
 class GaiaQuery:
     """
-    Classs for the Gaia Query language execution. 
-    
+    Classs for the Gaia Query language execution.
+
     Description
     -----------
     With this class, it is possible to easily perform async queries and retriev
     e data from the ESA/GAIA catalogue. It is possible to use different data re
     leases by loading different data tables in the initialization of the class.
-    
+
     Methods
     -------
     print_table:
         Print the loaded data table information.
     free_query:
-        Perform an ADQL search into the Gaia catalogue with full personalized 
+        Perform an ADQL search into the Gaia catalogue with full personalized
         parameters.
     get_atrometry:
         D
@@ -87,13 +116,13 @@ class GaiaQuery:
     How to Use it
     -------------
     Import the class and initialize it
-    
+
     >>> from ggcas.query import GaiaQuery
     >>> gq = GaiaQuery()
     'Initialized with Gaia table: gaiadr3.gaia_source'
-    
+
     To use a different Gaia catalogue simply initialize the class to it:
-        
+
     >>> table = 'gaiadr2.gaia_source'
     >>> gq = GaiaQuery(gaia_table=table)
     'Initialized with Gaia table: gaiadr2.gaia_source'
@@ -105,7 +134,7 @@ class GaiaQuery:
         Parameters
         ----------
         gaia_table : str or list of str, optional
-            Gaia table(s) to initialize the class with. The default is the 3th 
+            Gaia table(s) to initialize the class with. The default is the 3th
             Gaia data release "gaiadr3.gaia_source".
         """
         Gaia.MAIN_GAIA_TABLE = gaia_table
@@ -115,43 +144,24 @@ class GaiaQuery:
         self._fold      = None
         self._queryInfo = {}
         self._baseQ     = """SELECT {data}
-                FROM {table} 
+                FROM {table}
                 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
                   {cond}
                 """
         self._joinQ     = """SELECT {data}
-                FROM {table} 
+                FROM {table}
                 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
                   {cond}
                 """
         print(f"Initialized with Gaia table: '{gaia_table}'")
 
-    def print_table(self, dump:bool = False):
-        """
-        Print the loaded data table information. If dump is false, each column
-        name is printed too, with its index number.
+    def __repr__(self):
+        """The representation"""
+        return self.__get_repr()
 
-        Parameters
-        ----------
-        dump : bool, optional
-            Option for storing the table's cloumns into a variable. The default
-            is False, and the columns will be printed with a numbered index.
-
-        Returns
-        -------
-        table : list of astroquery TapColumn
-            A list in which each element is a column of the loaded Gaia data table.
-            Printing and entry will display all its information.
-        """
-        table = Gaia.load_table(self._table)
-        print(table.description)
-        print('')
-        i=0
-        for columns in table.columns:
-            print(i, columns.name)
-            i+=1
-        if dump:
-            return table.columns
+    def __str__(self):
+        """The string representation"""
+        return self.__get_str()
 
     def free_query(self, ra, dec, radius, save: str = False, **kwargs):
         """
@@ -167,7 +177,7 @@ class GaiaQuery:
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
         save : str, optional
-            Whether to save the file or not. If the quesry is to be saved, the 
+            Whether to save the file or not. If the quesry is to be saved, the
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
@@ -196,7 +206,8 @@ class GaiaQuery:
                 'RA': ra,
                 'DEC': dec,
                 'Scan Radius': radius
-                }
+                },
+            'Quey Flag' : 'free'
             }
         if 'data' in kwargs :
             dat = kwargs['data']
@@ -229,7 +240,7 @@ class GaiaQuery:
 
     def get_astrometry(self, ra, dec, radius, save:str=False, **kwargs):
         """
-        
+
 
         Parameters
         ----------
@@ -240,7 +251,7 @@ class GaiaQuery:
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
         save : str, optional
-            Whether to save the file or not. If the quesry is to be saved, the 
+            Whether to save the file or not. If the quesry is to be saved, the
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
@@ -267,7 +278,8 @@ class GaiaQuery:
                 'DEC': dec,
                 'Scan Radius': radius,
                 'Data Acquired': astrometry.split(',')
-                }
+                },
+            'Quey Flag' : 'astrometry'
             }
         if 'conditions' in kwargs:
             cond = kwargs['conditions']
@@ -293,7 +305,7 @@ class GaiaQuery:
 
     def get_photometry(self, ra, dec, radius, save: str = True, **kwargs):
         """
-        
+
 
         Parameters
         ----------
@@ -304,7 +316,7 @@ class GaiaQuery:
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
         save : str, optional
-            Whether to save the file or not. If the quesry is to be saved, the 
+            Whether to save the file or not. If the quesry is to be saved, the
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
@@ -330,7 +342,8 @@ class GaiaQuery:
                 'DEC': dec,
                 'Scan Radius': radius,
                 'Data Acquired': photometry.split(',')
-                }
+                },
+            'Quey Flag' : 'photometry'
             }
         if 'conditions' in kwargs:
             cond = kwargs['conditions']
@@ -356,7 +369,7 @@ class GaiaQuery:
 
     def get_rv(self, ra, dec, radius, save: str = True, **kwargs):
         """
-        
+
 
         Parameters
         ----------
@@ -367,7 +380,7 @@ class GaiaQuery:
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
         save : str, optional
-            Whether to save the file or not. If the quesry is to be saved, the 
+            Whether to save the file or not. If the quesry is to be saved, the
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
@@ -391,7 +404,8 @@ class GaiaQuery:
                 'DEC': dec,
                 'Scan Radius': radius,
                 'Data Acquired': rv.split(',')
-                }
+                },
+            'Quey Flag' : 'radvel'
             }
         if 'conditions' in kwargs:
             cond = kwargs['conditions']
@@ -416,7 +430,7 @@ class GaiaQuery:
 
     def _saveQuery(self, dat, name: str):
         """
-        
+
 
         Parameters
         ----------
@@ -445,7 +459,7 @@ class GaiaQuery:
 
     def _checkPathExist(self, dest: str):
         """
-        
+
 
         Parameters
         ----------
@@ -466,7 +480,7 @@ class GaiaQuery:
 
     def _formatCheck(self, data: Optional[Union[str,list]], conditions: Optional[Union[str,list]]):
         """
-        
+
 
         Parameters
         ----------
@@ -504,7 +518,7 @@ class GaiaQuery:
 
     def _adqlWriter(self, ra, dec, radius, data, conditions):
         """
-        
+
 
         Parameters
         ----------
@@ -541,6 +555,58 @@ class GaiaQuery:
         return query
 
     def __check_query_exists(self):
-        
+
         return
-    
+
+    def __load_table(self):
+        """Load The table instanced table(s)"""
+        if isinstance(self._table, list):
+            table = np.zeros(len(self._table), dtype=object)
+            for i, t in enumerate(self._table):
+                table[i] = Gaia.load_table(t)
+        else:
+            table = Gaia.load_table(self._table)
+        return table
+
+    def __get_repr(self):
+        """Get text for '__repr__' method"""
+        table = self.__load_table()
+        text = ''
+        if isinstance(table, np.ndarray):
+            for t in table:
+                text += f"\n{t.name.upper()}\n"+'-'*len(t.name)+f"\n{t.description}\n"
+        else :
+            text = f"{table.name.upper()}\n"+'-'*len(table.name)+f"\n{table.description}"
+        text += '\n \n<ggcas.query.GaiaQuery class>'
+        return text
+
+    def __get_str(self):
+        """Get text for '__str__' method"""
+        tables = self.__load_table()
+        if isinstance(tables, np.ndarray):
+            cols = np.zeros(tables.shape[0], dtype=list)
+            text = ''
+            for t in tables:
+                text += f"{t.name.upper()}"+' '*10
+            for i,table in enumerate(tables):
+                cols[i] = []
+                for columns in table.columns:
+                    cols[i].append(f"{columns.name}")
+            line=''
+            for i in range(len(cols[0])):
+                for t, n in enumerate(cols):
+                    try:
+                        tab = " "*(max([len(c) for c in (n)]) - len(n[i]) +2)
+                        line += f"{n[i]}"+tab
+                    except IndexError:
+                        tab = " "*(len(tables[t].name)+10)
+                        line += "--"+tab
+                line += '\n'
+            text += ('\n'+line)
+        else:
+            text = ""
+            i=0
+            for column in tables.columns:
+                text += f"{i} {column.name}\n"
+                i+=1
+        return text

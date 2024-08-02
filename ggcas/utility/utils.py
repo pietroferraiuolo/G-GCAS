@@ -26,7 +26,7 @@ def load_query(file):
     Parameters
     ----------
     file : str
-        Complete file path of the data, obtainable through the ''get_file_list''
+        Complete file path of the data, obtainable through the 'get_file_list'
         function.
 
     Returns
@@ -55,8 +55,8 @@ def get_file_list(gc_name, tn:str=None, key:str=None):
 
     Examples
     --------
-    Here are some examples regarding the use of the 'key' argument. Let's say w
-    e need a list of files inside ''tn = '20160516_114916' '' for GC 'ngc104'
+    Here are some examples regarding the use of the 'key' argument. Let's say
+    we need a list of files inside ''tn = '20160516_114916' '' for GC 'ngc104'
 
         >>> gc_name = 'ngc104'
         >>> tn = '20160516_114916'
