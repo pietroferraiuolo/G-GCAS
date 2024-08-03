@@ -155,9 +155,13 @@ Half-Light radius | {self.rh:.2f}              |    .rh
                 potential.
                 'rho': the noralized density profile of the clusted.
         """
-        model = Table()
-        file = os.path.join(fn.CLUSTER_MODEL_FOLDER(self.id),'SM_king.txt')
-        model['xi']     = np.loadtxt(file, skiprows=1, usecols=1)
-        model['w']      = np.loadtxt(file, skiprows=1, usecols=2)
-        model['rho']    = np.loadtxt(file, skiprows=1, usecols=3)
+        try:
+            model = Table()
+            file = os.path.join(fn.CLUSTER_MODEL_FOLDER(self.id),'SM_king.txt')
+            model['xi']     = np.loadtxt(file, skiprows=1, usecols=1)
+            model['w']      = np.loadtxt(file, skiprows=1, usecols=2)
+            model['rho']    = np.loadtxt(file, skiprows=1, usecols=3)
+        except FileNotFoundError:
+            print(f"WARNING: no king model file found for '{self.id}'. No model loaded")
+            model = None
         return model
