@@ -10,10 +10,10 @@ Description
 How to Use it
 -------------
 """
-import subprocess, os, shutil
+import subprocess, os
 import numpy as np
 from typing import Dict, Any
-from . import __glpoints
+from . import _glpoints
 import sympy as sp
 from ggcas import functions as gfunc
 from ggcas.utility import folder_paths as fn, osutils as osu
@@ -47,17 +47,17 @@ def gaus_legendre_integrator(fnc, a, b, points):
     functions, as it is not implemented yet.
     """
     if points == 20:
-        x = np.array(__glpoints.x20)
-        w = np.array(__glpoints.w20)
+        x = np.array(_glpoints.x20)
+        w = np.array(_glpoints.w20)
     elif points == 40:
-        x = np.array(__glpoints.x40)
-        w = np.array(__glpoints.w40)
+        x = np.array(_glpoints.x40)
+        w = np.array(_glpoints.w40)
     elif points == 80:
-        x = np.array(__glpoints.x80)
-        w = np.array(__glpoints.w80)
+        x = np.array(_glpoints.x80)
+        w = np.array(_glpoints.w80)
     elif points == 96:
-        x = np.array(__glpoints.x96)
-        w = np.array(__glpoints.w96)
+        x = np.array(_glpoints.x96)
+        w = np.array(_glpoints.w96)
     else:
         raise ValueError("Supported point values are 20, 40, 80, and 96.")
     area = 0.0
@@ -221,12 +221,15 @@ def king_integrator(w0, output='profile'):
 
     Parameters
     ----------
-    w0 : str or float
+    w0 : float
         DESCRIPTION.
+    output : str, optional
+        DESCRIPTION. The default is 'profile'.
 
     Returns
     -------
-    None.
+    result : str or list
+        DESCRIPTION.
 
     """
     if isinstance(w0, float) or isinstance(w0, int):
@@ -236,21 +239,21 @@ def king_integrator(w0, output='profile'):
         print("Error during trhe Fortran90 code execution:")
         print(result.stderr)
     else:
-        print("Fortran90 code executed:")
+        print("Calling Fortran90 code executor...\n")
         print(result.stdout)
     filelist = osu.get_file_list(fold=king_dir, key='.dat')
     result = []
     if isinstance(output, list):
         for entry in output:
-            for file in filelist:
+            for i,file in enumerate(filelist):
                 if entry in filelist:
                     result.append(file)
-                    filelist.pop(file)
+                    filelist.pop(i)
     else:
-        for file in filelist:
+        for i,file in enumerate(filelist):
             if output in file:
                 result = file
-                filelist.pop(file)
+                filelist.pop(i)
     for file in filelist:
         os.remove(file)
     return result
