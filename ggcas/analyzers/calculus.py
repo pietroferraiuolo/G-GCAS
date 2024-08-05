@@ -16,8 +16,9 @@ from typing import Dict, Any
 from . import __glpoints
 import sympy as sp
 from ggcas import functions as gfunc
+from ggcas.utility import folder_paths as fn, osutils as osu
 
-king_dir = '/home/pietrof/git/G-GCAS/ggcas/analyzers/_king/'
+king_dir = fn.KING_INTEGRATOR_FOLDER
 king_exe = os.path.join(king_dir, 'king_integrator')
 
 def gaus_legendre_integrator(fnc, a, b, points):
@@ -214,7 +215,7 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
         returns["correlations"] = corr
     return returns
 
-def king_integrator(w0):
+def king_integrator(w0, output='profile'):
     """
 
 
@@ -237,3 +238,19 @@ def king_integrator(w0):
     else:
         print("Fortran90 code executed:")
         print(result.stdout)
+    filelist = osu.get_file_list(fold=king_dir, key='.dat')
+    result = []
+    if isinstance(output, list):
+        for entry in output:
+            for file in filelist:
+                if entry in filelist:
+                    result.append(file)
+                    filelist.pop(file)
+    else:
+        for file in filelist:
+            if output in file:
+                result = file
+                filelist.pop(file)
+    for file in filelist:
+        os.remove(file)
+    return result

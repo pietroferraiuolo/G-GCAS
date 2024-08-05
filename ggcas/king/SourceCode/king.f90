@@ -186,8 +186,8 @@
    temp2=0.0d0
    call second(temp1)
 
-
-   PRINT*,'IW1,IW2,IWSTEP  1,200,1  W0 = PARW0(IW)'
+   PRINT*, 'Executing Single-Mass King model integration routine.'
+   !PRINT*,'IW1,IW2,IWSTEP  1,200,1  W0 = PARW0(IW)'
 !     READ*, IW1,IW2,IWSTEP
    IW1=1
    IW2=6!135!160    !221
@@ -221,9 +221,8 @@
       dw(1) = 0.d0
       wwww = w0
       estr2= w0
-      call prova(funzione, "PROVA", 2.0D0)
+      !call prova(funzione, "PROVA", 2.0D0)
       call intgau(fcnqd,qd)
-      print*,"PROVA"
       !print*,qd
       rho0 = qd
    !        PRINT*,rho0,IW
@@ -534,9 +533,9 @@
       CALL SECOND(TEMP2)
       T_imp=0.0d0
       T_imp=(temp2-temp1)
-      PRINT*,'Tempo programma(s)=',T_imp,'T(min)=',T_imp/60.0
+      PRINT*,'Execution time(s)=',T_imp
       DO j=1,2
-         print *, char(7)
+         !print *, char(7)
          call sleep(1)
       ENDDO
       STOP

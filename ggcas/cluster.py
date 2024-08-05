@@ -22,13 +22,14 @@ Now we can call methods to read the parameters
 >>> ngc104.w0
 8.82
 """
-import os
+import os, shutil
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.table import Table
 from ggcas.utility import folder_paths as fn
+from ggcas.analyzers.calculus import king_integrator
 
 class Cluster:
     """
@@ -53,6 +54,7 @@ class Cluster:
         """The constructor"""
         self.id     = name.upper()
         self.data_path = fn.CLUSTER_DATA_FOLDER(self.id)
+        self.model_path= fn.CLUSTER_MODEL_FOLDER(self.id)
         parms       = self._load_cluster_parameters(self.id)
         self.model  = self._load_king_model()
         self.ra     = parms.loc['ra']*u.deg
@@ -158,10 +160,17 @@ Half-Light radius | {self.rh:.2f}              |    .rh
         try:
             model = Table()
             file = os.path.join(fn.CLUSTER_MODEL_FOLDER(self.id),'SM_king.txt')
-            model['xi']     = np.loadtxt(file, skiprows=1, usecols=1)
-            model['w']      = np.loadtxt(file, skiprows=1, usecols=2)
-            model['rho']    = np.loadtxt(file, skiprows=1, usecols=3)
+            model['xi']  = np.loadtxt(file, skiprows=1, usecols=1)
+            model['w']   = np.loadtxt(file, skiprows=1, usecols=2)
+            model['rho'] = np.loadtxt(file, skiprows=1, usecols=3)
         except FileNotFoundError:
-            print(f"WARNING: no king model file found for '{self.id}'. No model loaded")
-            model = None
+            print(f"WARNING: no king model file found for '{self.id}'. Performing the Single-Mass King model integration.")
+            os.mkdir(self.model_path)
+            result = king_integrator(self.w0)
+            model = Table()
+            mod = pd.read_csv(result, delim_whitespace=True)
+            model['xi']  = mod.xi
+            model['w']   = mod.w
+            model['rho'] = mod.rho
+            shutil.move(result, os.path.join(self.model_path, 'SM_king.txt'))
         return model

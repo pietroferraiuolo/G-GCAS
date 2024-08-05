@@ -16,8 +16,9 @@ Examples
 import os
 from astropy.table import QTable
 import datetime as dt
-datapath    = os.environ['GCASDATA']
-querypath   = os.path.join(datapath, 'query')
+from ggcas.utility import folder_paths as fn
+datapath    = fn.BASE_DATA_PATH
+querypath   = fn.QUERY_DATA_FOLDER
 
 def load_query(file):
     """
@@ -37,7 +38,7 @@ def load_query(file):
     data = QTable.read(file, format='ascii.tab')
     return data
 
-def get_file_list(gc_name, tn:str=None, key:str=None):
+def get_file_list(tn=None, fold=None, key:str=None):
     """
     Returns the file list of a given globular cluster datapath.
 
@@ -75,22 +76,35 @@ def get_file_list(gc_name, tn:str=None, key:str=None):
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/dynamical_data.txt']
     """
-    fold = os.path.join(querypath, gc_name)
-    if tn is None:
-        fl = []
-        for item in os.listdir(fold):
-            tn = os.path.join(fold, item)
-            fl.append(sorted(os.listdir(tn)))
+    if tn is None and fold is not None:
+        fl = sorted([os.path.join(fold, file) \
+                     for file in os.listdir(fold)])
     else:
-        fl = sorted(os.listdir(os.pathj.join(fold, tn)))
+        if fold is None:
+            fold = _findTracknum(tn, complete_path=True)
+            fl = sorted([os.path.join(fold, tn, file) \
+                         for file in os.listdir(os.path.join(fold, tn))])
+        else:
+            try:
+                paths = _findTracknum(tn, complete_path=True)
+                if isinstance(paths, str):
+                    paths = [paths]
+                for path in paths:
+                    if fold in path.split('/')[-2]:
+                        fl = sorted([os.path.join(path, file) \
+                                                 for file in os.listdir(path)])
+                    else: 
+                        raise Exception
+            except Exception as exc:
+                raise FileNotFoundError(f"Invalid Path: no data found for '.../{fold}/{tn}'") from exc
     if key is not None:
         try:
             selected_list = []
             for file in fl:
-                if key in file:
+                if key in file.split('/')[-1]:
                     selected_list.append(file)
-        except TypeError:
-            raise TypeError("'key' argument must be a string")
+        except TypeError as err:
+            raise TypeError("'key' argument must be a string") from err
         fl = selected_list
     return fl
 
@@ -106,3 +120,36 @@ def _timestamp():
     """
     tn = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
     return tn
+
+def _findTracknum(tn, complete_path:bool=False):
+
+    """
+    Search for the tracking number given in input within all the data path subfolders.
+
+    Parameters
+    ----------
+    tn : str
+        Tracking number to be searched.
+    complete_path : bool, optional
+        Option for wheter to return the list of full paths to the folders which
+        contain the tracking number or only their names.
+
+    Returns
+    -------
+    tn_path : list of str
+        List containing all the folders (within the OPTData path) in which the
+        tracking number is present, sorted in alphabetical order.
+
+    """
+    tn_path = []
+    for fold in os.listdir(querypath):
+        search_fold = os.path.join(querypath, fold)
+        if tn in os.listdir(search_fold):
+            if complete_path:
+                tn_path.append(os.path.join(search_fold, tn))
+            else:
+                tn_path.append(fold)
+    path_list = sorted(tn_path)
+    if len(path_list)==1:
+        path_list = path_list[0]
+    return path_list
