@@ -10,11 +10,15 @@ Description
 How to Use it
 -------------
 """
+import subprocess, os, shutil
 import numpy as np
 from typing import Dict, Any
 from . import __glpoints
 import sympy as sp
 from ggcas import functions as gfunc
+
+king_dir = '/home/pietrof/git/G-GCAS/ggcas/analyzers/_king/'
+king_exe = os.path.join(king_dir, 'king_integrator')
 
 def gaus_legendre_integrator(fnc, a, b, points):
     """
@@ -209,3 +213,27 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
     if correlation:
         returns["correlations"] = corr
     return returns
+
+def king_integrator(w0):
+    """
+
+
+    Parameters
+    ----------
+    w0 : str or float
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    if isinstance(w0, float) or isinstance(w0, int):
+        w0 = str(w0)
+    result = subprocess.run([king_exe, w0], capture_output=True, text=True, cwd=king_dir)
+    if result.returncode != 0:
+        print("Error during trhe Fortran90 code execution:")
+        print(result.stderr)
+    else:
+        print("Fortran90 code executed:")
+        print(result.stdout)

@@ -1,11 +1,11 @@
-!c	Questo è un esempio di programma completo (King isotropo)
-!c	Leggilo bene e poi fallo girare e confronta i risultati in letteratura.
-!c	Infine trasforma il programma per la funzione di Boltzmann anisotropa
-!c	e confronta i risultati con l'articolo
+!c    Questo � un esempio di programma completo (King isotropo)
+!c    Leggilo bene e poi fallo girare e confronta i risultati in letteratura.
+!c    Infine trasforma il programma per la funzione di Boltzmann anisotropa
+!c    e confronta i risultati con l'articolo
 
-!C	CALCOLA COL FORMALISMO NEWTONIANO LE CONFIGURAZIONI DI EQUILIBRIO 
-!C	GRAVITAZIONALE DI UN GAS. LA FUNZIONE DI DISTRIBUZIONE DI KING E' 
-!C!	TRATTATA COME NELL'ARTICOLO DEL 1966
+!C    CALCOLA COL FORMALISMO NEWTONIANO LE CONFIGURAZIONI DI EQUILIBRIO
+!C    GRAVITAZIONALE DI UN GAS. LA FUNZIONE DI DISTRIBUZIONE DI KING E'
+!C!    TRATTATA COME NELL'ARTICOLO DEL 1966
 !C
 !C
       PROGRAM MAIN
@@ -25,6 +25,8 @@
 !   real*8 fcnqd
         external :: fcnqd, fcnqd1, fcnqd2
         external :: fu1, fu2, fu3, fu4, funzerr, funzione
+        real :: w0
+        character(len=10) :: arg
        ! external :: FU1,FU2,FU3,FU4,FCNQD1,funzerr, funzione
         COMMON/SURF/t(8000),phi(8000),sigma(8000),psi(8000),S_S0(8000)
         COMMON/SURF2/csi(8000)
@@ -41,8 +43,8 @@
         COMMON/SURFEKIN/uk(8000),sigekin(8000),Sk_Sk0(8000)
         DIMENSION parw0(6)!135)
         CHARACTER(LEN=10), DIMENSION(6) :: NAMESID !dimension must be 135
-!c	per decidere in anticipo quali valori iniziali si vuole considerare
-!c	ci possono essere pi� parametri iniziali e quindi pi� DATA
+!c    per decidere in anticipo quali valori iniziali si vuole considerare
+!c    ci possono essere pi� parametri iniziali e quindi pi� DATA
 
 !        DATA PARW0/1.00d-2,3.00d-2,5.00d-2,7.00d-2,9.00d-2,
 !     1             1.00d-1,2.00d-1,3.00d-1,4.00d-1,5.00d-1,
@@ -116,7 +118,7 @@
 !     1     4.49d0,2.44d0,4.22d0,4.49d0,2.56d0,
 !     1     2.38d0,5.56d0,7.89d0,7.01d0,5.82d0,
 !     1     6.59d0,7.21d0,13.22d0,2.93d0,3.29d0/
-      
+
 !     Names of GCs
 !      DATA NAMESID/"NGC 104","NGC 288","NGC 362","Whiting 1","NGC 1261",
 !     1     "Pal 1","AM1","Eridanus","Pal 2","NGC 1851",
@@ -145,15 +147,15 @@
 !     1     "Terzan 7","Pal 10","Arp 2","NGC 6809","Terzan 8",
 !     1     "Pal 11","NGC 6838","NGC 6864","NGC 6934","NGC 6981",
 !     1     "NGC 7006","NGC 7089","Pal 12","Pal 13","NGC 7492"/
-      
+
 !     Analyze only a subset of known GCs
    DATA PARW0/6.18d0,6.22d0,7.41d0,6.48d0,&
-   2.09d0,6.29d0/     
+   2.09d0,6.29d0/
 
    DATA NAMESID/"NGC 4372","NGC 5139","NGC 6121","NGC 6656",&
    "Pal 5","GLIMPSE02"/
 
-      
+
    !PRINT*,"Analyzed the following GCs: ",NAMESID
    OPEN(UNIT=1,FILE='params.dat',STATUS='replace') !,ACCESS='append')
    CLOSE(UNIT=1,STATUS='keep')
@@ -179,14 +181,12 @@
    OPEN(UNIT=1,FILE='Skin.dat',STATUS='replace')
    ! WRITE(1,303)'x xi w Sk'
    CLOSE(UNIT=1,STATUS='keep')
-         
-      
 
    temp1=0.0d0
    temp2=0.0d0
    call second(temp1)
 
-      
+
    PRINT*,'IW1,IW2,IWSTEP  1,200,1  W0 = PARW0(IW)'
 !     READ*, IW1,IW2,IWSTEP
    IW1=1
@@ -197,22 +197,26 @@
 !        DO i=2,IW2
 !           PARW0(i)=PARW0(i-1)+0.1d0
 !        ENDDO
-        
-!	l'indice che precisa che subroutine per gli integrali si vuole usare
-!	il valore 3 corrisponde a 80 punti
+
+!    l'indice che precisa che subroutine per gli integrali si vuole usare
+!    il valore 3 corrisponde a 80 punti
 
    indgau = 4
 
-!	l'errore relativo si decide a priori e ci d� la precisione voluta	
+!    l'errore relativo si decide a priori e ci d� la precisione voluta
    relerr = 1.d-9
 
 
    estr1  = 0.d0
    pai    = 3.141592654d0
 
-   !DO 3333 !IW=IW1,IW2,IWSTEP
-      w0 = 6.19d0 !! parw0(iw)
-      
+      ! Leggi l'argomento dalla riga di comando
+    call get_command_argument(1, arg)
+    read(arg, *) w0
+
+    ! Stampa il valore letto
+    print *, 'W0 =', w0
+
       w(1) = w0
       dw(1) = 0.d0
       wwww = w0
@@ -241,14 +245,14 @@
 
       call intgau(fcnqd,qd)
       rapp(2) = qd/rho0
-      
+
 !       FINE INIZIALIZZAZIONE
 !
       nfn   = 2
       passo = x(nfn)/10.0d0!10!2
       xmax  = x(nfn)*10.0d0!10!2
 
- 1111	CONTINUE
+ 1111    CONTINUE
 
       ABSERR  = relerr * w(nfn)
       if(abserr.lt.1.d-12) abserr=1.d-12
@@ -262,7 +266,7 @@
       y(2)     = dw(nfn)
       dery(1)  = 0.5d0
       dery(2)  = 0.5d0
-   
+
       CALL DHPCG(PRMT,Y,DERY,2,IHLF,FCT,OUTP,AUX,FCNQD)
 
       if(ihlf.lt.11) goto 1122
@@ -284,8 +288,8 @@
 
  1234   continue
       xtest = (dw(nfn-1)*x(nfn-1)-w(nfn-1))/dw(nfn-1)
-            
-   !	controllo precisione sulla routine di uscita per determinare il raggio
+
+   !    controllo precisione sulla routine di uscita per determinare il raggio
 
       if(dabs((xtest-x(nfn))/xtest).lt.1.d-9) goto 2222
 
@@ -294,7 +298,7 @@
       nfn = nfn - 1
       goto 1111
 
- 2222	continue
+ 2222    continue
 
    !        print*,nfn
       ! Calculate concentration in king units /r_t/r_k and scale positions to than value to have xi = r/r_t
@@ -303,8 +307,8 @@
          csi(kk)=x(kk)/conc
          IF(kk==nfn) csi(kk)=conc/conc
       END DO
-      
-         
+
+
       xlogc =   dlog10(conc)
       xmu1  = -(4.d0*pai/9.d0)*(x(nfn-1)**2.d0)*dw(nfn-1)
       xmu2  = -(4.d0*pai/9.d0)*(x(nfn)**2.d0)*dw(nfn)
@@ -321,7 +325,7 @@
       call v2mean(fcnqd,fcnqd2)
 
    !  Evaluate heat capacity profile and total value
-      call calorespecifico(fcnqd1,fu1,fu2,fu3,fu4)!,funzerr)  
+      call calorespecifico(fcnqd1,fu1,fu2,fu3,fu4)!,funzerr)
 
    !  xKb=1.380649d-23 !J/K
    !  xKb=1.380649d-16  !erg/K
@@ -331,20 +335,20 @@
       Ct1_NtK=xKb*Ctot1!/xmu
       Ct2_NtK=xKb*Ctot2       !/xmu
 
-   !  Evaluate energies        
+   !  Evaluate energies
       call energie(fu1,fu3,fcnqd1)
-         
+
    !        PRINT*,Ct0_NtK,Ct1_Ntk,Ct2_Ntk!,Ctot1,Ctot2
-         
+
       IF(w0.eq.8.20d0)THEN
    !           xm_k= 0.5295d0       !w0=8.0
          xm_k=0.54274d0
-         DO k=1,nfn 
+         DO k=1,nfn
             phi_g(k)=(-C-w(k))!/xm_k !=phi(r)/k\theta
    !              PRINT*,xm_k*phi_g(k)+potch(k),potch(k),xm_k*phi_g(k)
          ENDDO
       ENDIF
-         
+
    !     Uso metodi diversi per calcolare Egr
    !     3: confronto il profilo di phi_gr(r) ottenuto prima con quello generico
       xmu_r(1)=0.d0
@@ -370,18 +374,18 @@
             sum2=sum2+b2*h2*0.5d0
          ENDDO
          secpezz(l)=sum2
-      
+
       phi_g2(l)=-(9.d0/xm_k)*((sum1/x(l))+sum2)
-      
+
    !     phi_g2(l)=-(9.d0)*(mu_r(l)/x(l)+secpezz(l))
    !     PRINT*,phi_g(l),phi_g2(l),phi_g(l)-phi_g2(l),sum1, sum2
    !           PRINT*,xmu_r(l),secpezz(l)
       ENDDO
-         
-         
-         
 
-         
+
+
+
+
    !     2: Egr=(1/2)int_0^R rho*phi_g dV
       DO k=2,nfn-1
          eg2(k)=xnhat(k)*(-9.d0)*((xmu_r(k)/x(k)))!+secpezz(k))!*(-C-w(k))
@@ -399,25 +403,25 @@
       egt2=sum*4.d0*pai
    !        egt3=2.d0*egt2
    !        PRINT*,egt,egt2,egt-egt2
-      
+
       Shat=IW*0.01d0
-      
-         
-   !	scrive i parametri principali delle configurazioni in un unico file
-   !	w0, concentrazione, log10 concentrazione, mu (massa adimensionale)
+
+
+   !    scrive i parametri principali delle configurazioni in un unico file
+   !    w0, concentrazione, log10 concentrazione, mu (massa adimensionale)
 
       OPEN(UNIT=1,FILE='params.dat',STATUS='old',ACCESS='append')
       WRITE(1,301) w0,conc,xlogc,xmu
       CLOSE(UNIT=1,STATUS='keep')
-      
-        
+
+
 !     scrive i profili di ogni configurazione (uno di seguito all'altro)
 !     IF(w0==1..OR.w0==3..OR.w0==5..OR.w0==7..OR.w0==9..OR.w0==12.)THEN
 !      IF((abs(xlogc-1.28).le.0.01).OR.(abs(xlogc-1.48).le.0.01)
 !     1  .OR.(abs(xlogc-1.68).le.0.01).OR.(abs(xlogc-1.88).le.0.01))THEN
 !     IF(w0==8.d0.OR.w0==8.1d0)THEN
 !     IF(w0==6.15d0.OR.w0==7.58d0.OR.w0==8.50d0)THEN
-        
+
 !        IF(IW==1.OR.IW==25.OR.IW==50.OR.IW==75.OR.IW==100.OR.IW==125
 !     1       .OR.IW==150.OR.IW==175.OR.IW==200)THEN
 !      IF((abs(xlogc-0.5).le.0.015).OR.(abs(xlogc-1.0).le.0.015).OR.
@@ -445,7 +449,7 @@
          ENDDO
          CLOSE(UNIT=1,STATUS='keep')
       ENDIF
-         
+
       OPEN(UNIT=1,FILE='CvNtK.dat',status='old',access='append')
       WRITE(1,302) w0,Ct0_NtK,Ct1_NtK,Ct2_NtK,conc,x0Cv,xi0Cv
       CLOSE(UNIT=1,STATUS='keep')
@@ -471,7 +475,7 @@
    !      Et_Mv02=((4.d0*pai/9.d0)**(2.d0))*2.d0*((2.d0*pai)**(2.5d0))*
    !     1     (xnhat0**(-1.d0/3.d0))*(xmu**(-7.d0/3.d0))*4.d0*
    !     2     pai*(conc**(3.d0))*Etot
-         
+
    !      Et_Mv02=s2_v02*((4.d0*pai*(conc**3.d0)*Etot)/(rho0hat*xmu))*
    !     1     (4.d0*pai*dsqrt(2.d0))
    !      Et_Mv02=(4.d0*pai*sqrt(2.d0))*((4.d0*pai/(9.d0*xmu))**(3.d0))*
@@ -481,7 +485,7 @@
       xkt=s2_v02*(xkt/xMcap)
       egt=s2_v02*(egt/xMcap)
       ephit=s2_v02*(ephit/xMcap)
-         
+
       OPEN(UNIT=1,FILE='Er.dat',status='old',access='append')
       OPEN(UNIT=2,FILE='Etot.dat',status='old',access='append')
       IF((w0==0.8d0).OR.(w0==1.35d0).OR.(w0==2.0d0).OR.&
@@ -494,11 +498,11 @@
 
       WRITE(2,302)w0,xkt,egt,ephit,Etot,s2_v02,Et_Mv02,xMcap,& !hat,!(shat*Etot/(4.d0*pai*xMhat))
       Vir2,conc, Etot1
-         
+
       CLOSE(UNIT=1,STATUS='keep')
       CLOSE(UNIT=2,STATUS='keep')
-      
-   !  Evaluate projected kinetic energy density  
+
+   !  Evaluate projected kinetic energy density
       call surf_dens_ekin(fu1)
 
       OPEN(UNIT=1,FILE='Skin.dat',status='old',access='append')
@@ -509,18 +513,18 @@
          WRITE(1,302) x(jj),csi(jj),w(jj),Sk_Sk0(jj),sigekin(jj)
       ENDDO
       CLOSE(UNIT=1,STATUS='keep') !,dispose='keep')
-   
 
-      
+
+
 !      call caloric_curve()
 !     PRINT*,'stampo su file CC,w0=',w0
 !      PRINT*,xsave,ysave,w0save,w0
 !      OPEN(UNIT=1,FILE='CalCurve.dat',status='old',access='append')
 !      WRITE(1,302)w0,xsave,ysave,w0save,fw0
 !      CLOSE(UNIT=1,STATUS='keep')
-   
+
 301   FORMAT(1pd9.2,1pd10.3,1x,1p2d15.8)
-302   FORMAT(1p11d16.8)
+302    FORMAT(1p11d16.8)
 303   FORMAT(A70,1p3d15.8)
 304   FORMAT(1p5d16.8)
 305   FORMAT(A30,A30)
@@ -574,7 +578,7 @@ END PROGRAM
 !     ENDIF
       call intgau(fcn,u1)
       uk(l)=dexp(wwww)*u1
-   ENDDO      
+   ENDDO
    sum=0.0d0
    b=0.0d0
    h=0.0d0
@@ -597,15 +601,15 @@ END PROGRAM
          IF(sum==0)THEN
             PRINT*,'zero central Skin'
          ENDIF
-         
+
       ENDIF
       sigekin(i)=sum!!*(1.0d0/(1.0d0+R*R))
-      
+
       Sk_Sk0(i)=sigekin(i)/sigekin0
    END DO
    return
    end
-      
+
 !     subroutine per il calcolo della curva calorica
    SUBROUTINE caloric_curve()
    IMPLICIT REAL*8(A-H,O-Z)
@@ -624,7 +628,7 @@ END PROGRAM
 !      PRINT*,'calcolo curva calorica'
 !     y=x*f(w0)
    fw0=Etot/xMhat
-   
+
 !      PRINT*,fw0,w0
    xincr=7.0d0/1.d+4
    yEt_Mv02(1)=-2.0d0
@@ -654,7 +658,7 @@ END PROGRAM
 !         w0save=0.0d0
       yyy=0.0d0
       xxxx=0.0d0
-      
+
       DO j=1,10000
          yyy=yEt_Mv02(j)
          fw0=Etot/xMhat
@@ -668,7 +672,7 @@ END PROGRAM
             xs(k)=xxxx
             ys(k)=yyy
             XRE(k)=abs((xs(k)-xxx)/xxx)
-            
+
 !               w0save=w0
             ex2=1.0d0
 !     PRINT*,'x=',xsave,'y=',ysave,'w0=',w0save
@@ -707,15 +711,15 @@ END PROGRAM
 !            xsave=xs(i)
 !            ysave=ys(i)
 !            w0save=w0
-!          
+!
 !         ENDIF
-                  
+
 !      ENDDO
 
-   
-   
+
+
 !     k=MINLOC(xs)
-   
+
    allocate (xre2(1:k))
    allocate (xsv(1:k))
    allocate (ysv(1:k))
@@ -724,7 +728,7 @@ END PROGRAM
       xsv(i)=xs(i)
       ysv(i)=ys(i)
    ENDDO
-   
+
    xresave=MINVAL(xre2)          !xs(k)
 !      PRINT*,'xsave=',xsave
    DO i=1,k
@@ -734,25 +738,25 @@ END PROGRAM
          w0save=w0
          PRINT*,'x=',xsave,'y=',ysave
       ENDIF
-      
+
    ENDDO
-   
+
 !!      DO i=1,10000
 !         xxx=xs2_v02(i)
-      
-   
-   
+
+
+
    RETURN
    END
-      
+
 !     Funzione per il calcolo della velocit� quadratica media
    function fcnqd2(t)
    IMPLICIT REAL*8 (A-H,O-Z)
    COMMON/PARFCN/WWWW
-   fcnqd2 = (dexp(wwww-t))*(t**2.5d0) 
+   fcnqd2 = (dexp(wwww-t))*(t**2.5d0)
    return
    end
-      
+
 !     subroutine per il calcolo della velocit� quadratica media
    SUBROUTINE v2mean(fcn1,fcn2)
    IMPLICIT REAL*8(A-H,O-Z)
@@ -778,7 +782,7 @@ END PROGRAM
       return
       end
 
-      
+
 !     subroutine per il calcolo della densit� superficiale
    SUBROUTINE surfdens(fcn)
    IMPLICIT REAL*8(A-H,O-Z)
@@ -793,7 +797,7 @@ END PROGRAM
    DO l=1,nfn-1
       wwww=w(l)
       estr2=wwww
-      call intgau(fcn,qd)  
+      call intgau(fcn,qd)
       psi(l)=qd              !anche psi(l)=rpp*sigma0
    END DO
 
@@ -819,12 +823,12 @@ END PROGRAM
          sigma0=sum
       ENDIF
       sigma(i)=sum!*(1.0d0/(1.0d0+R*R))
-      
+
       s_s0(i)=sigma(i)/sigma0
    END DO
 
 
-   
+
 !      sum=0.0d+0
 !      DO k=1, nfn-1           !nfn-1
 !         R=csi(k)
@@ -847,15 +851,15 @@ END PROGRAM
 !            ELSE
 !            b=phi(l)*(1.0d0/dsqrt(t(l)))+phi(l-1)*(1.0d0/dsqrt(t(l-1)))
 !               h=t(l)-t(l-1)
-!               sum=sum+b*h*0.5d+0                             
+!               sum=sum+b*h*0.5d+0
 !            ENDIF
 !         END DO
 !         IF(k==1)sigma0=sum
 !         sigma(k)=sum*(1.0d0/(1.0d0+R*R))
-!         
+!
 !         s_s0(k)=sigma(k)/sigma0
 !      END DO
-   
+
    return
    end
 
@@ -913,8 +917,8 @@ END PROGRAM
    DO i=1,nfn
       rhat(i)=dsqrt(9.0d0/(4.d0*PAI))*(1.d0/dsqrt(rho0hat))*x(i)
    ENDDO
-   
-   
+
+
    sum1=0.0d0
    sum2=0.0d0
    sum3=0.0d0
@@ -955,12 +959,12 @@ END PROGRAM
 !      PRINT*,Etot,sum1,sum2,sum3
 
 
-   
+
    return
    end
-      
+
 !     Subroutine per il calcolo del calore specifico adimensionale
-      
+
    SUBROUTINE calorespecifico(fcn1,f1,f2,f3,f4)!,funzerr)
    IMPLICIT REAL*8(A-H,O-Z)
    COMMON/ESTREMI/ESTR1,ESTR2
@@ -982,15 +986,15 @@ END PROGRAM
       Cvqt(k)=0.0d0
       xnhat(k)=0.0d0
    ENDDO
-   
-   
+
+
    DO m=1,nfn-1
       z=0.0d0
       zz=0.0d0
       wwww=w(m)
       estr2=wwww
       z=w(m)
-      
+
       qd=0.0d0
       u1=0.0d0
       u21=0.0d0
@@ -1010,19 +1014,19 @@ END PROGRAM
 
 !         u21=u1-(4.d0/15.d0)*dexp(-z)*(z**(2.5d0))
 !         u23=2.5d0*u1-0.4d0*dexp(-z)*(z**(3.5d0))
-!         call intgau(fcnqd1,qd) 
+!         call intgau(fcnqd1,qd)
 !     PRINT*,qd,qd1,qd2,qd-qd1
       xnhat(m)=qd!*2.0d0*pai
       wwww=w(m)
       estr2=wwww
       call intgau(f1,u1)
-!       
+!
 !     qq=1/2 oppure 3/2 a seconda di cosa compare in fu2
       wwww=w(m)
       estr2=wwww
       qq=0.5d0
       call intgau(f2,u21)
-      
+
       qq=1.5d0
       wwww=w(m)
       estr2=wwww
@@ -1030,14 +1034,14 @@ END PROGRAM
 !     PRINT*,u2_3,u2_33,u2_3-u2_33
 
       potch(m)=u21*dexp(z)/qd
-      
+
       wwww=w(m)
       estr2=wwww
       call intgau(f3,u3)
-      
+
 !         test=wwww*(0.9d0)
 !         estr1=0.0d0
-!         estr2=test         
+!         estr2=test
 !         call intgau(fu3,u3_)
 !         PRINT*,u3,u3_,u3-u3_
       wwww=w(m)
@@ -1045,13 +1049,13 @@ END PROGRAM
       estr2=wwww
       call intgau(f4,u4)
 
-      
+
 !      Cv0(m)=dexp(wwww)*(u3*(1.5d0-((2.0d0/3.0d0)*(wwww**(2.5d0))/qd))
 !     1        -u4)
       Cv0(m)=(((u3*u21*dexp(2.0d0*z))/qd)-u4*dexp(z))
 !         PRINT*,u3
 
-   
+
       Cv(m)=(Cv0(m)+x(m)*dw(m)*(qd+(2.0d0/3.0d0)*&
       (z**(1.5d0))*(2.5d0-1.4d0*z)+((4.0d0/9.0d0)*(z**(4.0d0))*&
       (0.4d0*z-2.0d0)/qd)+ ((16.d0/135.d0)*(z**(6.5d0))/(qd*qd))))
@@ -1059,27 +1063,27 @@ END PROGRAM
 !      Cvqt(m)=2*PAI*(Cv0(m)-3.0d0*qd-2.0d0*(wwww**(1.5d0))+
 !     1     +4.0d0*(wwww**(3.5d0))/5.0d0
 !     1     +8.0d0*(wwww**(4.0d0))/(9.0d0*qd))
-      
+
 !     Cvqt(m)=(Cv0(m)-2.d0*dexp(z)*u23+(2.d0*dexp(2.d0*z)*u1*u21/qd))
 
       gw=dexp(z)*erf(zz)*(-z+(dsqrt(2.d0)-1.d0)/2.d0)-&
       (z+dsqrt(2.d0*z))/dsqrt(pai)
       hw=(zz/4.d0+dsqrt(pai)*gw/4.d0+(z**(1.5d0))/2.d0)/&
       ( -zz/2.d0+dexp(z)*dsqrt(pai)*erf(zz)/4.d0-(z**(1.5d0))/3.d0)
-      
+
 !         Cvqt(m)=(Cv0(m)+0.5d0*(1.5d0-C+(dsqrt(z)/4.d0
 !     1        -dsqrt(pai)*dexp(z)*z*erf(dsqrt(z))/4.d0-z/2.d0+
 !     1        (z**(1.5d0))/2.d0)/(-dsqrt(z)/4.d0+dsqrt(pai)*dexp(z)*
 !     1 derf(dsqrt(z))/4.d0-(z**(1.5d0))/3.d0 ))*(-C-z)*xnhat(m))
       Cvqt(m)=(Cv0(m)+0.5d0*(1.5d0-C+hw)*(-C-z)*xnhat(m))
-      
+
 !      PRINT*,Cv0(m),Cv(m),Cvqt(m),xnhat(m),wwww
 
 !      IF(w(1).eq.0.7d0)THEN
 !         PRINT*,'problema strano'
 !         PRINT*,w(m),qd,u1,u2_1,u2_3,u3,u4
 !      ENDIF
-   
+
    ENDDO
    wwww=w0
    estr2=w0
@@ -1088,7 +1092,7 @@ END PROGRAM
    xnhat0=qd
    rho0hat=(4.d0*dsqrt(2.d0)*PAI)*qd!xnhat(1) !xnhat(1)=xnhat(w0)
    xMcap=((9.d0/(4.d0*PAI))**(1.5d0))*(1.d0/dsqrt(rho0hat))*xmu
-   
+
 !      PRINT*,xMcap
    qd=0.0d0
    xnhat(nfn)=0.0d0
@@ -1100,7 +1104,7 @@ END PROGRAM
    Cv0(nfn)=0.0d0
    Cv(nfn)=0.0d0
    Cvqt(nfn)=0.0d0
-   
+
    sum0=0.0d0
    sum1=0.0d0
    sum2=0.0d0
@@ -1109,7 +1113,7 @@ END PROGRAM
    b1=0.0d0
    b2=0.0d0
    b3=0.0d0
-   h=0.0d0      
+   h=0.0d0
    DO k=1,nfn-1
       b0=(Cv0(k+1)*csi(k+1)*csi(k+1)+Cv0(k)*csi(k)*csi(k))
       b1=(Cv(k+1)*csi(k+1)*csi(k+1)+Cv(k)*csi(k)*csi(k))
@@ -1127,13 +1131,13 @@ END PROGRAM
    Ctot0=sum0/sum3
    Ctot1=sum1/sum3
    Ctot2=sum2/sum3
-   
+
    xMhat=sum3
    DO i=1,10
       x0Cv(i)=0.0d0
       xi0Cv(i)=0.0d0
    ENDDO
-   
+
    ex=0.0d0
    ex2=0.0d0
    ex3=0.0d0
@@ -1163,24 +1167,24 @@ END PROGRAM
       ENDIF
    ENDDO
  9999 CONTINUE
-         
+
    RETURN
    END
 
    function funzerr(x)
    IMPLICIT REAL*8 (A-H,O-Z)
 !      COMMON/PARFCN/WWWW
-   funzerr= dexp(-(x**2.0d0)) 
+   funzerr= dexp(-(x**2.0d0))
    return
    end
-!	la funzione da integrare (ce ne possono essere pi� di una)
+!    la funzione da integrare (ce ne possono essere pi� di una)
 !
 !
    function fcnqd(x)! result(f)
    IMPLICIT REAL*8 (A-H,O-Z)
 !   real*8 :: f,x
    COMMON/PARFCN/WWWW
-   fcnqd = (dexp(wwww-x))*(x**1.5d0) 
+   fcnqd = (dexp(wwww-x))*(x**1.5d0)
    return
    end
 
@@ -1190,11 +1194,11 @@ END PROGRAM
    fcnqd1=(dexp(wwww-x)-1.0d0)*(x**(0.5d0))
    return
    end
-      
+
    function fu1(x)
    IMPLICIT REAL*8 (A-H,O-Z)
    COMMON/PARFCN/WWWW
-   fu1 = (dexp(-x)-dexp(-wwww))*(x**1.5d0) 
+   fu1 = (dexp(-x)-dexp(-wwww))*(x**1.5d0)
    return
    end
 
@@ -1202,10 +1206,10 @@ END PROGRAM
    IMPLICIT REAL*8 (A-H,O-Z)
    COMMON/PARFCN/WWWW
    COMMON/PARFU2/qq
-   fu2 = (x*dexp(-x)-wwww*dexp(-wwww))*(x**(qq)) 
+   fu2 = (x*dexp(-x)-wwww*dexp(-wwww))*(x**(qq))
    return
    end
-      
+
    function fu3(x)
    IMPLICIT REAL*8(A-H,O-Z)
    COMMON/PARFCN/WWWW
@@ -1220,17 +1224,17 @@ END PROGRAM
    (x**(0.5d0))
    return
    end
-!      
-!	la subroutine con la equazione differenziale
 !
-   SUBROUTINE FCT (X,Y,DERY, FCN)
-   IMPLICIT REAL*8 (A-H,O-Z)
+!    la subroutine con la equazione differenziale
+!
+    SUBROUTINE FCT (X,Y,DERY, FCN)
+    IMPLICIT REAL*8 (A-H,O-Z)
    COMMON/PARFCN/WWWW
    COMMON/ESTREMI/ESTR1,ESTR2
    COMMON/VALINI/W0,RHO0
    COMMON/COSTANTI/PAI
-   COMMON/FCTOUTP/RPP
-   DIMENSION Y(2),DERY(2)
+    COMMON/FCTOUTP/RPP
+    DIMENSION Y(2),DERY(2)
    EXTERNAL :: fcn
    wwww = y(1)
    estr2= y(1)
@@ -1243,69 +1247,69 @@ END PROGRAM
    rpp = qd/rho0
 2      continue
 
-   dery(1) = y(2)
-   dery(2) = -(2.d0/x)*y(2)-9.d0*rpp
+    dery(1) = y(2)
+    dery(2) = -(2.d0/x)*y(2)-9.d0*rpp
 
-   return
-   end
+    return
+    end
 
 
-!	la subroutine dei valori di output per l'integrazione
+!    la subroutine dei valori di output per l'integrazione
 !
-	SUBROUTINE OUTP (XX,Y,DERY,IHLF,NDIM,PRMT)
-	IMPLICIT REAL*8(A-H,O-Z)
-	DIMENSION Y(2),DERY(2),PRMT(5)
+    SUBROUTINE OUTP (XX,Y,DERY,IHLF,NDIM,PRMT)
+    IMPLICIT REAL*8(A-H,O-Z)
+    DIMENSION Y(2),DERY(2),PRMT(5)
    COMMON/RESULTS/X(8000),W(8000),DW(8000),RAPP(8000),NFN
-	COMMON/FCTOUTP/RPP
+    COMMON/FCTOUTP/RPP
 
-	if (y(1).gt.0.d0) goto 2
+    if (y(1).gt.0.d0) goto 2
 
  1      PRMT(5)=1.d0
         goto 3
 
  2      xrif = x(nfn) + prmt(3)
         if(xx.lt.xrif) return
- 
+
  3      nfn=nfn+1
-	if (nfn.eq.8000) PRINT*,'TROPPI PASSI'
-	if (nfn.eq.8000) PRMT(5)=1.00
+    if (nfn.eq.8000) PRINT*,'TROPPI PASSI'
+    if (nfn.eq.8000) PRMT(5)=1.00
 
-	x(nfn)  = xx
-	    w(nfn)  = y(1)
+    x(nfn)  = xx
+        w(nfn)  = y(1)
       dw(nfn)  = y(2)
-	 rapp(nfn)  = rpp
+     rapp(nfn)  = rpp
 
-	return
-	end
+    return
+    end
 
-!	la subroutine per il calcolo degli integrali
-!	
-   subroutine INTGAU(fcn,area) 
+!    la subroutine per il calcolo degli integrali
+!
+   subroutine INTGAU(fcn,area)
 !
 !       INTEGRA CON IL METODO DI GAUSS-LEGENDRE LA FUNZIONE FCN TRA A E B
-!       I PARAMETRI DELLA FCN SONO PASSATI CON UN COMMON TRA PROGRAMMA 
-!       CHIAMANTE LA SUBROUTINE INTGAU E LA FUNCTION FCN(X). 
-!       I LIMITI DI INTEGRAZIONE CON UN COMMON TRA PROGRAMMA CHIAMANTE E 
+!       I PARAMETRI DELLA FCN SONO PASSATI CON UN COMMON TRA PROGRAMMA
+!       CHIAMANTE LA SUBROUTINE INTGAU E LA FUNCTION FCN(X).
+!       I LIMITI DI INTEGRAZIONE CON UN COMMON TRA PROGRAMMA CHIAMANTE E
 !       LE SUBROUTINES GAUS10.FOR, GAUS20.FOR, GAUS40.FOR, GAUS80.FOR.
-!       
 !
-	IMPLICIT REAL*8 (A-H,O-Z)
+!
+    IMPLICIT REAL*8 (A-H,O-Z)
    real*8, external :: fcn
    common/gauss/indgau
    goto (1,2,3,4) ,indgau
- 1	call GAUS20 (fcn,area)
-   return 
- 2	call GAUS40 (fcn,area)
-   return 
- 3	call GAUS80 (fcn,area)
-   return 
-4 	call GAUS96 (fcn,area)
-   return 
+ 1    call GAUS20 (fcn,area)
+   return
+ 2    call GAUS40 (fcn,area)
+   return
+ 3    call GAUS80 (fcn,area)
+   return
+4     call GAUS96 (fcn,area)
+   return
 
-	end 
+    end
 
 !
-!	la subroutine dhpcg che � il cuore del programma
+!    la subroutine dhpcg che � il cuore del programma
 
 
       SUBROUTINE DHPCG(PRMT,Y,DERY,NDIM,IHLF,FCT,OUTP,AUX,FCN)
@@ -1340,7 +1344,7 @@ END PROGRAM
       ELSE
          GOTO 5
       ENDIF
-      
+
  5    IF(IHLF.le.0.0d0)THEN
         GOTO 7
       ELSE
@@ -1384,13 +1388,13 @@ END PROGRAM
       ELSE
          GOTO 17
       ENDIF
-      
+
  17   IF((IHLF-10).lt.0.0d0)THEN
          GOTO 11
       ELSE
          GOTO 18
       ENDIF
-      
+
  18   IHLF=11
       X=X+H
       GOTO 4
@@ -1408,8 +1412,8 @@ END PROGRAM
       CALL FCT(X,Y,DERY,fcn)
       X=PRMT(1)
       DO 22 I=1,NDIM
-	AUX(11,I)=DERY(I)
-	Y(I)=AUX(1,I)+H*(.375D0*AUX(8,I)+.7916666666666667D0*AUX(9,I)&
+    AUX(11,I)=DERY(I)
+    Y(I)=AUX(1,I)+H*(.375D0*AUX(8,I)+.7916666666666667D0*AUX(9,I)&
       -.20833333333333333D0*AUX(10,I)+.041666666666666667D0*DERY(I))
  22   CONTINUE
  23   X=X+H
@@ -1421,13 +1425,13 @@ END PROGRAM
       ELSE
          GOTO 24
       ENDIF
-      
+
  24   IF((N-4).lt.0.0d0)THEN
          GOTO 25
       ELSE
          GOTO 200
       ENDIF
-      
+
  25   DO 26 I=1,NDIM
          AUX(N,I)=Y(I)
          AUX(N+7,I)=DERY(I)
@@ -1440,8 +1444,8 @@ END PROGRAM
          GOTO 200
       ENDIF
  27   DO 28 I=1,NDIM
-	DELT=AUX(9,I)+AUX(9,I)
-	DELT=DELT+DELT
+    DELT=AUX(9,I)+AUX(9,I)
+    DELT=DELT+DELT
         Y(I)=AUX(1,I)+.33333333333333333D0*H*(AUX(8,I)+DELT+AUX(10,I))
  28   CONTINUE
       GOTO 23
@@ -1463,20 +1467,20 @@ END PROGRAM
          AUX(6,I)=Z
       Y(I)=AUX(N,I)+.29697760924775360D0*AUX(5,I)+.15875964497103583D0*Z
  102  CONTINUE
-	Z=X+.45573725421878943D0*H
-	CALL FCT(Z,Y,DERY,fcn)
-	DO 103 I=1,NDIM
-	Z=H*DERY(I)
-	AUX(7,I)=Z
-	Y(I)=AUX(N,I)+.21810038822592047D0*AUX(5,I)-3.0509651486929308D0*&
+    Z=X+.45573725421878943D0*H
+    CALL FCT(Z,Y,DERY,fcn)
+    DO 103 I=1,NDIM
+    Z=H*DERY(I)
+    AUX(7,I)=Z
+    Y(I)=AUX(N,I)+.21810038822592047D0*AUX(5,I)-3.0509651486929308D0*&
             AUX(6,I)+3.8328647604670103D0*Z
  103  CONTINUE
       Z=X+H
       CALL FCT(Z,Y,DERY,fcn)
       DO 104 I=1,NDIM
        Y(I)=AUX(N,I)+.17476028226269037D0*AUX(5,I)-.55148066287873294D0*&
-	   AUX(6,I)+1.2055355993965235D0*AUX(7,I)+.17118478121951903D0*&
-	   H*DERY(I)
+       AUX(6,I)+1.2055355993965235D0*AUX(7,I)+.17118478121951903D0*&
+       H*DERY(I)
  104  CONTINUE
       GOTO(9,13,15,21),ISW
  200  ISTEP=3
@@ -1485,7 +1489,7 @@ END PROGRAM
       ELSE
          GOTO 202
       ENDIF
-      
+
  202  DO 203 N=2,7
          DO  I=1,NDIM
             AUX(N-1,I)=AUX(N,I)
@@ -1501,20 +1505,20 @@ END PROGRAM
          X=X+H
  206     ISTEP=ISTEP+1
          DO 207 I=1,NDIM
-	DELT=AUX(N-4,I)+1.3333333333333333D0*H*(AUX(N+6,I)+AUX(N+6,I)-&
-	AUX(N+5,I)+AUX(N+4,I)+AUX(N+4,I))
-	Y(I)=DELT-.9256198347107438D0*AUX(16,I)
+    DELT=AUX(N-4,I)+1.3333333333333333D0*H*(AUX(N+6,I)+AUX(N+6,I)-&
+    AUX(N+5,I)+AUX(N+4,I)+AUX(N+4,I))
+    Y(I)=DELT-.9256198347107438D0*AUX(16,I)
         AUX(16,I)=DELT
  207    CONTINUE
-	CALL FCT(X,Y,DERY,fcn)
-	DO 208 I=1,NDIM
-	DELT=.125D0*(9.D0*AUX(N-1,I)-AUX(N-3,I)+3.D0*H*(DERY(I)+AUX(N+6,I)&
-	+AUX(N+6,I)-AUX(N+5,I)))
-	AUX(16,I)=AUX(16,I)-DELT
+    CALL FCT(X,Y,DERY,fcn)
+    DO 208 I=1,NDIM
+    DELT=.125D0*(9.D0*AUX(N-1,I)-AUX(N-3,I)+3.D0*H*(DERY(I)+AUX(N+6,I)&
+    +AUX(N+6,I)-AUX(N+5,I)))
+    AUX(16,I)=AUX(16,I)-DELT
         Y(I)=DELT+.07438016528925620D0*AUX(16,I)
  208    CONTINUE
-	DELT=0.D0
-	DO 209 I=1,NDIM
+    DELT=0.D0
+    DO 209 I=1,NDIM
            DELT=DELT+AUX(15,I)*DABS(AUX(16,I))
  209    CONTINUE
         IF((DELT-PRMT(4)).lt.0.0d0)THEN
@@ -1522,11 +1526,11 @@ END PROGRAM
         ELSE
            GOTO 222
         ENDIF
-        
-210	CONTINUE
+
+210    CONTINUE
         CALL FCT(X,Y,DERY,fcn)
         CALL OUTP (X,Y,DERY,IHLF,NDIM,PRMT)
-	IF((PRMT(5).lt.0.0d0).OR.(PRMT(5).gt.0.0d0))THEN
+    IF((PRMT(5).lt.0.0d0).OR.(PRMT(5).gt.0.0d0))THEN
            GOTO 212
         ELSE
            GOTO 211
@@ -1568,65 +1572,60 @@ END PROGRAM
            GOTO 219
         ENDIF
  219    IMOD=ISTEP/2
-	IF(ISTEP-IMOD-IMOD.ne.0.0d0)THEN
+    IF(ISTEP-IMOD-IMOD.ne.0.0d0)THEN
            GOTO 201
         ELSE
            GOTO 220
         ENDIF
-220	H=H+H
-	IHLF=IHLF-1
-	ISTEP=0
-	DO 221 I=1,NDIM
-	AUX(N-1,I)=AUX(N-2,I)
-	AUX(N-2,I)=AUX(N-4,I)
-	AUX(N-3,I)=AUX(N-6,I)
-	AUX(N+6,I)=AUX(N+5,I)
-	AUX(N+5,I)=AUX(N+3,I)
-	AUX(N+4,I)=AUX(N+1,I)
-	DELT=AUX(N+6,I)+AUX(N+5,I)
-	DELT=DELT+DELT+DELT
-	AUX(16,I)=8.962962962962963D0*(Y(I)-AUX(N-3,I))&
-	-3.3611111111111111D0*H*(DERY(I)+DELT+AUX(N+4,I))
+220    H=H+H
+    IHLF=IHLF-1
+    ISTEP=0
+    DO 221 I=1,NDIM
+    AUX(N-1,I)=AUX(N-2,I)
+    AUX(N-2,I)=AUX(N-4,I)
+    AUX(N-3,I)=AUX(N-6,I)
+    AUX(N+6,I)=AUX(N+5,I)
+    AUX(N+5,I)=AUX(N+3,I)
+    AUX(N+4,I)=AUX(N+1,I)
+    DELT=AUX(N+6,I)+AUX(N+5,I)
+    DELT=DELT+DELT+DELT
+    AUX(16,I)=8.962962962962963D0*(Y(I)-AUX(N-3,I))&
+    -3.3611111111111111D0*H*(DERY(I)+DELT+AUX(N+4,I))
  221    CONTINUE
         GOTO 201
-222	IHLF=IHLF+1
-	IF(IHLF-10.le.0.0d0)THEN
+222    IHLF=IHLF+1
+    IF(IHLF-10.le.0.0d0)THEN
            GOTO 223
         ELSE
            GOTO 210
         ENDIF
  223    H=.5D0*H
-	ISTEP=0
-	DO 224 I=1,NDIM
-	Y(I)=.390625D-2*(8.D1*AUX(N-1,I)+135.D0*AUX(N-2,I)+4.D1*AUX(N-3,I)&
-	+AUX(N-4,I))-.1171875D0*(AUX(N+6,I)-6.D0*AUX(N+5,I)-AUX(N+4,I))*H
-	AUX(N-4,I)=.390625D-2*(12.D0*AUX(N-1,I)+135.D0*AUX(N-2,I)+&
-	108.D0*AUX(N-3,I)+AUX(N-4,I))-.0234375D0*(AUX(N+6,I)+&
-	18.D0*AUX(N+5,I)-9.D0*AUX(N+4,I))*H
-	AUX(N-3,I)=AUX(N-2,I)
+    ISTEP=0
+    DO 224 I=1,NDIM
+    Y(I)=.390625D-2*(8.D1*AUX(N-1,I)+135.D0*AUX(N-2,I)+4.D1*AUX(N-3,I)&
+    +AUX(N-4,I))-.1171875D0*(AUX(N+6,I)-6.D0*AUX(N+5,I)-AUX(N+4,I))*H
+    AUX(N-4,I)=.390625D-2*(12.D0*AUX(N-1,I)+135.D0*AUX(N-2,I)+&
+    108.D0*AUX(N-3,I)+AUX(N-4,I))-.0234375D0*(AUX(N+6,I)+&
+    18.D0*AUX(N+5,I)-9.D0*AUX(N+4,I))*H
+    AUX(N-3,I)=AUX(N-2,I)
         AUX(N+4,I)=AUX(N+5,I)
  224    CONTINUE
-	X=X-H
-	DELT=X-(H+H)
-	CALL FCT(DELT,Y,DERY,fcn)
-	DO 225 I=1,NDIM
-	AUX(N-2,I)=Y(I)
-	AUX(N+5,I)=DERY(I)
+    X=X-H
+    DELT=X-(H+H)
+    CALL FCT(DELT,Y,DERY,fcn)
+    DO 225 I=1,NDIM
+    AUX(N-2,I)=Y(I)
+    AUX(N+5,I)=DERY(I)
         Y(I)=AUX(N-4,I)
  225    CONTINUE
-	DELT=DELT-(H+H)
-	CALL FCT(DELT,Y,DERY,fcn)
-	DO 226 I=1,NDIM
-	DELT=AUX(N+5,I)+AUX(N+4,I)
-	DELT=DELT+DELT+DELT
-	AUX(16,I)=8.962962962962963D0*(AUX(N-1,I)-Y(I))&
-	-3.3611111111111111D0*H*(AUX(N+6,I)+DELT+DERY(I))
+    DELT=DELT-(H+H)
+    CALL FCT(DELT,Y,DERY,fcn)
+    DO 226 I=1,NDIM
+    DELT=AUX(N+5,I)+AUX(N+4,I)
+    DELT=DELT+DELT+DELT
+    AUX(16,I)=8.962962962962963D0*(AUX(N-1,I)-Y(I))&
+    -3.3611111111111111D0*H*(AUX(N+6,I)+DELT+DERY(I))
         AUX(N+3,I)=DERY(I)
  226    CONTINUE
-	GOTO 206
-	END                                                              
-
-
-
-
-      
+    GOTO 206
+    END
