@@ -168,9 +168,9 @@ Half-Light radius | {self.rh:.2f}              |    .rh
             os.mkdir(self.model_path)
             result = king_integrator(self.w0)
             model = Table()
-            mod = pd.read_csv(result, delim_whitespace=True)
+            mod = pd.read_csv(result, delim_whitespace=True, skipfooter=1)
             model['xi']  = mod.xi
             model['w']   = mod.w
-            model['rho'] = mod.rho
+            model['rho'] = mod.rho_rho0
             shutil.move(result, os.path.join(self.model_path, 'SM_king.txt'))
         return model

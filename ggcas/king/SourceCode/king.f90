@@ -170,8 +170,7 @@
    OPEN(UNIT=1,FILE='Er.dat',STATUS='replace')
    CLOSE(UNIT=1,STATUS='keep')
    OPEN(UNIT=1,FILE='Etot.dat',STATUS='replace')
-   WRITE(1,303)'w0 K Egr Eeff Etot s2_v02 Et_Mv02 Mcap&
-   &Vir conc Etot1'
+   WRITE(1,303)'w0 K Egr Eeff Etot s2_v02 Et_Mv02 Mcap Vir conc Etot1'
    CLOSE(UNIT=1,STATUS='keep')
    OPEN(UNIT=1,FILE='CalCurve.dat',STATUS='replace')
    CLOSE(UNIT=1,STATUS='keep')
@@ -430,7 +429,7 @@
 !     IF(w0==8.0d0.OR.w0==8.2d0)THEN
 !        IF(abs(w0-40.0d0).lt.1.0d-2)THEN
       OPEN(UNIT=1,FILE='profiles.dat',STATUS='old',ACCESS='append')
-      WRITE(1,303)'x xi w rho/rho0 SD v2 logc=',xlogc
+      WRITE(1,303)'x xi w rho_rho0 SD v2 logc=',xlogc
          DO jj=1,nfn
             WRITE(1,306) x(jj),csi(jj),w(jj),rapp(jj),s_s0(jj),v2(jj)
          ENDDO

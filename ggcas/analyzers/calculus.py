@@ -216,21 +216,37 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
     return returns
 
 def king_integrator(w0, output='profile'):
-    """
+    r"""
+    This function calls a Fortran90 code for the Single-Mass King model integration
+    routine.
 
+    Taking as imput a value for the King $W_0$ parameter, it will perform the
+    integration of the model, producing a series of output data files, described
+    in the 'Returns' section.
 
     Parameters
     ----------
     w0 : float
-        DESCRIPTION.
+        King w0 parameter, which is the central potential well.
     output : str, optional
-        DESCRIPTION. The default is 'profile'.
+        Specifies which output file(s) to retain. The default is 'profile'.
+        Options :
+            - CalCurve: Caloric curve of the system
+            - Cv:
+            - CvNtK:
+            - Er:
+            - Etot: total energy of the system
+            - params:
+            - phi: information about the gravitational potential of the system
+            - profiles: (normalized) density and w0 profiles with respect to the dimentionless radial distance from the centre
+            - Skin: Surface kinetick energy distribution
+            - x0Cv:
 
     Returns
     -------
     result : str or list
-        DESCRIPTION.
-
+        The full path of the selected output file(s) as string (or list of strings
+        multiple output files have been selected).
     """
     if isinstance(w0, float) or isinstance(w0, int):
         w0 = str(w0)
