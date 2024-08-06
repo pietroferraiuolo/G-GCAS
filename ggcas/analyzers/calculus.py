@@ -11,11 +11,10 @@ How to Use it
 -------------
 """
 import subprocess, os
-import numpy as np
 from typing import Dict, Any
-from . import _glpoints
+import numpy as np
 import sympy as sp
-from ggcas import functions as gfunc
+from . import _glpoints
 from ggcas.utility import folder_paths as fn, osutils as osu
 
 king_dir = fn.KING_INTEGRATOR_FOLDER
@@ -98,7 +97,7 @@ def compute_error(func, variables, var_data, var_errors, corr:bool=False,
         DESCRIPTION.
 
     """
-    err_func = gfunc.error_propagation(func, variables, correlation=corr)
+    err_func = error_propagation(func, variables, correlation=corr)
     func = err_func['error_formula']
     errors = err_func['error_variables']['errors']
     vars_to_pass = []
@@ -249,9 +248,10 @@ def king_integrator(w0, output='profile'):
         The full path of the selected output file(s) as string (or list of strings
         multiple output files have been selected).
     """
-    if isinstance(w0, float) or isinstance(w0, int):
+    if isinstance(w0, (float, int)):
         w0 = str(w0)
-    result = subprocess.run([king_exe, w0], capture_output=True, text=True, cwd=king_dir)
+    result = subprocess.run([king_exe, w0], capture_output=True, text=True, 
+                            cwd=king_dir, check=False)
     if result.returncode != 0:
         print("Error during trhe Fortran90 code execution:")
         print(result.stderr)

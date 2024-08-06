@@ -22,8 +22,6 @@ ggcas/analyzers/calculus.py
 ggcas/analyzers/effective_potential.py
 ggcas/analyzers/kinematics.py
 ggcas/king/__init__.py
-ggcas/king/gaus.py
-ggcas/king/king.py
 test/test_analyzer.py
 test/test_cluster.py
 test/test_plots.py
