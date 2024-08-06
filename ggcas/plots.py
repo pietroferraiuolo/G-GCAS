@@ -278,7 +278,9 @@ $\sigma^2$  = {:.2e}"""
     if xlim is not None:
         plt.xlim(xlim)
     plt.show()
-    return bins, counts
+    hist = [bins, counts]
+    kdr = [mean, std]
+    return kdr, hist
 
 def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     """

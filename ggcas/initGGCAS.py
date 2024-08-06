@@ -43,12 +43,6 @@ GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE
 
 """)
 
-try:
-    print('Data path is {}'.format(os.environ['PYGCASCONF']))
-except KeyError as ect:
-    raise KeyError("Environment variable not found. Please set the PYGCASCONF env variable that points to the data folder: '.../G-Gcas/ggcas/data/'")\
-    from ect
-
 def help():
     TEXT="""
 G-GCAS PACKAGE DOCUMENTATION

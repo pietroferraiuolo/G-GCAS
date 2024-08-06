@@ -69,19 +69,20 @@ class Cluster:
     def __str__(self):
         """String representation"""
         text = \
-f"""Harris Catalog 2010 edition Parameters
+f"""
+Harris Catalog 2010 edition Parameters
 
-       Key        |         Value         |   Method
-------------------|-----------------------|---------------
-Cluster Name      | {self.id}               |    .id
-Position in sky   | RA  {self.ra:.2f}        |    .ra
-                  | DEC {self.dec:.2f}        |    .dec
-Distance          | {self.dist:.2f}              |    .dist
-W0 Parameter      | {self.w0}                  |    .w0
-Concentration     | logc={self.logc:.2f}             |    .logc
-                  | Collapsed -> {self.cflag}    |    .cflag
-Core radius       | {self.rc:.2f}              |    .rc
-Half-Light radius | {self.rh:.2f}              |    .rh
+       Key                  Value
+----------------------------------------
+.id      Cluster Name       {self.id}
+.ra      Position in sky    RA  {self.ra:.2f}
+.dec                        DEC {self.dec:.2f}
+.dist    Distance           {self.dist:.2f}
+.w0      W0 Parameter       {self.w0}
+.logc    Concentration      logc={self.logc:.2f}
+.cflag                      Collapsed -> {self.cflag}
+.rc      Core radius        {self.rc:.3f}
+.rh      Half-Light radius  {self.rh:.3f}
 """
         return text
 

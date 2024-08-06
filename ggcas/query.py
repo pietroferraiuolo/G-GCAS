@@ -63,7 +63,7 @@ from astropy.table import Table
 from astropy import units as u
 from astroquery.gaia import Gaia
 from ggcas.cluster import Cluster
-from ggcas.utility import folder_paths as fn
+from ggcas.utility import folder_paths as fn, osutils as osu
 from ggcas.utility.osutils import _timestamp
 QDATA = 'query_data.txt'
 QINFO = 'query_info.ini'
@@ -154,6 +154,7 @@ class GaiaQuery:
                 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
                   {cond}
                 """
+        self.last_result = None
         print(f"Initialized with Gaia table: '{gaia_table}'")
 
     def __repr__(self):
@@ -178,18 +179,18 @@ class GaiaQuery:
         save : bool, optional
             Whether to save the file for the qued data or not.
         **kwargs : additional optional arguments
-            ra: Right ascension coordinate for the centre of the scan (if no gc
+            ra : Right ascension coordinate for the centre of the scan (if no gc
                 is provided).
-            dec: Declination coordinate for the centre of the scan (if no gc is
+            dec : Declination coordinate for the centre of the scan (if no gc is
                  provided)
-            name: String which provides the folder name where to save the data.
+            name : String which provides the folder name where to save the data.
                   Needed if no 'gc' object is supplied: if it is not given, and
                   save was True, the data will be stored in the 'UntrackedData'
                   folder.
-            data: str or list of str
+            data : str or list of str
                 List of parameters to retrieve, from the ones printed by ''.print_table()''.
                 If this argument is missing, the only parameter retrieved is 'source_id'.
-            conditions: str or list of str
+            conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
 
@@ -197,11 +198,6 @@ class GaiaQuery:
         -------
         result : astropy table
             Result of the async query, stored into an astropy table.
-
-        Raises
-        ------
-        TypeError
-            Raised if save is not a string.
 
         Example
         -------
@@ -220,31 +216,33 @@ class GaiaQuery:
                 'DEC': dec,
                 'Scan Radius': radius
                 },
-            'Quey Flag' : 'free'
+            'Flag': {'Query': 'free'}
             }
         if 'data' in kwargs :
             dat = kwargs['data']
             dat, _= self._formatCheck(dat, None) #gives a string
-            self._queryInfo['Scan Info']['Data Acquired'] = dat.split(',')
+            self._queryInfo['Scan Info']['Data Acquired'] = dat
         else:
             dat='source_id'
             self._queryInfo['Scan Info']['Data Acquired'] = dat
         if 'conditions' in kwargs:
-            cond = kwargs['conditions']
-            if isinstance(cond, str):
-                self._queryInfo['Scan Info']['Conditions Applied'] = cond.split(',')
+            if isinstance(kwargs['conditions'], (str, list)):
+                cond = kwargs['conditions']
             else:
+                raise TypeError("'conditions' argument must be a string or a list of strings")
+            if isinstance(cond, str):
                 self._queryInfo['Scan Info']['Conditions Applied'] = cond
+            else:
+                ccond = ''
+                for c in range(len(cond)-1):
+                    ccond += c+', '
+                ccond += cond[-1]
+                self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
-            cond=None
-            self._queryInfo['Scan Info']['Conditions Applied'] = 'None'
-        query = self._adqlWriter(ra, dec, radius, dat, cond)
-        job = Gaia.launch_job_async(query)
-        result = job.get_results()
-        print(f"Sample number of sources: {(len(result)):d}")
-        if save:
-            self._saveQuery(result, savename)
-        return result
+            condition=None
+            self._queryInfo['Scan Info']['Conditions Applied'] = condition
+        sample = self._run_query(savename, ra, dec, radius, dat, condition, save)
+        return sample
 
     def get_astrometry(self, gc:Cluster, radius, save:bool=False, **kwargs):
         """
@@ -252,10 +250,8 @@ class GaiaQuery:
 
         Parameters
         ----------
-        ra : float | ArrayLike
-            Right ascension coordinate, in degrees, of the centre of the scan.
-        dec : float | ArrayLike
-            Declination coordinate, in degrees, of the centre of the scan..
+        gc : ggcas.cluster.Cluster
+            Globular Cluster object created with the G-GCAS module.
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
         save : bool, optional
@@ -263,28 +259,22 @@ class GaiaQuery:
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
-            ra: Right ascension coordinate for the centre of the scan (if no gc
+            ra : Right ascension coordinate for the centre of the scan (if no gc
                 is provided).
-            dec: Declination coordinate for the centre of the scan (if no gc is
+            dec : Declination coordinate for the centre of the scan (if no gc is
                  provided)
-            name: String which provides the folder name where to save the data.
+            name : String which provides the folder name where to save the data.
                   Needed if no 'gc' object is supplied: if it is not given, and
                   save was True, the data will be stored in the 'UntrackedData'
                   folder.
-            conditions: str or list of str
+            conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
 
         Returns
         -------
-        astro_cluster : TYPE
-            DESCRIPTION.
-
-        Raises
-        ------
-        TypeError
-            Raised if save is not a string.
-
+        astro_cluster : astropy.Table
+            Astropy table with pf the query results.
         """
         if gc is None:
             ra = kwargs.get('ra', None)
@@ -294,37 +284,33 @@ class GaiaQuery:
             ra = gc.ra
             dec = gc.dec
             savename = gc.id
-        astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, \
-            parallax_error, pmra, pmra_error, pmdec, pmdec_error'
+        astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
         self._queryInfo = {
             'Scan Info': {
                 'RA': ra,
                 'DEC': dec,
                 'Scan Radius': radius,
-                'Data Acquired': astrometry.split(',')
+                'Data Acquired': astrometry
                 },
-            'Quey Flag' : 'astrometry'
+            'Flag': {'Query': 'astrometry'}
             }
         if 'conditions' in kwargs:
-            cond = kwargs['conditions']
-            if isinstance(cond, str):
-                self._queryInfo['Scan Info']['Conditions Applied'] = cond.split(',')
+            if isinstance(kwargs['conditions'], (str, list)):
+                cond = kwargs['conditions']
             else:
+                raise TypeError("'conditions' argument must be a string or a list of strings")
+            if isinstance(cond, str):
                 self._queryInfo['Scan Info']['Conditions Applied'] = cond
+            else:
+                ccond = ''
+                for c in range(len(cond)-1):
+                    ccond += cond[c]+', '
+                ccond += cond[-1]
+                self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
             cond=None
-            self._queryInfo['Scan Info']['Conditions Applied'] = 'None'
-        query = self._adqlWriter(ra, dec, radius, data=astrometry, conditions=cond)
-        job = Gaia.launch_job_async(query)
-        astro_cluster = job.get_results()
-        print(f"Sample number of sources: {len(astro_cluster):d}")
-        if save is not False:
-            if isinstance(save, str):
-                self._saveQuery(astro_cluster, savename)
-            else:
-                raise TypeError(f"'save' was {save}, but must be a string. \
-                                Specify the name of the object or of \
-                                    the destination folder")
+            self._queryInfo['Scan Info']['Conditions Applied'] = cond
+        astro_cluster = self._run_query(savename, ra, dec, radius, astrometry, cond, save)
         return astro_cluster
 
     def get_photometry(self, gc:Cluster, radius, save:str=False, **kwargs):
@@ -333,10 +319,8 @@ class GaiaQuery:
 
         Parameters
         ----------
-        ra : float | ArrayLike
-            Right ascension coordinate, in degrees, of the centre of the scan.
-        dec : float | ArrayLike
-            Declination coordinate, in degrees, of the centre of the scan..
+        gc : ggcas.cluster.Cluster
+            Globular Cluster object created with the G-GCAS module.
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
         save : bool, optional
@@ -344,15 +328,15 @@ class GaiaQuery:
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
-            ra: Right ascension coordinate for the centre of the scan (if no gc
+            ra : Right ascension coordinate for the centre of the scan (if no gc
                 is provided).
-            dec: Declination coordinate for the centre of the scan (if no gc is
+            dec : Declination coordinate for the centre of the scan (if no gc is
                  provided)
-            name: String which provides the folder name where to save the data.
+            name : String which provides the folder name where to save the data.
                   Needed if no 'gc' object is supplied: if it is not given, and
                   save was True, the data will be stored in the 'UntrackedData'
                   folder.
-            conditions: str or list of str
+            conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
 
@@ -360,11 +344,6 @@ class GaiaQuery:
         -------
         photo_cluster : TYPE
             DESCRIPTION.
-
-        Raises
-        ------
-        TypeError
-            Raised if save is not a string.
         """
         if gc is None:
             ra = kwargs.get('ra', None)
@@ -374,37 +353,33 @@ class GaiaQuery:
             ra = gc.ra
             dec = gc.dec
             savename = gc.id
-        photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, \
-            phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
+        photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
         self._queryInfo = {
             'Scan Info': {
                 'RA': ra,
                 'DEC': dec,
                 'Scan Radius': radius,
-                'Data Acquired': photometry.split(',')
+                'Data Acquired': photometry
                 },
-            'Quey Flag' : 'photometry'
+            'Flag': {'Query': 'photometry'}
             }
         if 'conditions' in kwargs:
-            cond = kwargs['conditions']
-            if isinstance(cond, str):
-                self._queryInfo['Scan Info']['Conditions Applied'] = cond.split(',')
+            if isinstance(kwargs['conditions'], (str, list)):
+                cond = kwargs['conditions']
             else:
+                raise TypeError("'conditions' argument must be a string or a list of strings")
+            if isinstance(cond, str):
                 self._queryInfo['Scan Info']['Conditions Applied'] = cond
+            else:
+                ccond = ''
+                for c in range(len(cond)-1):
+                    ccond += c+', '
+                ccond += cond[-1]
+                self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
             cond=None
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
-        query = self._adqlWriter(ra, dec, radius, data=photometry, conditions=cond)
-        job = Gaia.launch_job_async(query)
-        photo_cluster = job.get_results()
-        print(f"Sample number of sources: {len(photo_cluster):d}")
-        if save is not False:
-            if isinstance(save, str):
-                self._saveQuery(photo_cluster, savename)
-            else:
-                raise TypeError(f"'save' was {save}, but must be a string. \
-                                Specify the name of the object or of \
-                                    the destination folder")
+        photo_cluster = self._run_query(savename, ra, dec, radius, photometry, cond, save)
         return photo_cluster
 
     def get_rv(self, gc:Cluster, radius, save:bool=False, **kwargs):
@@ -413,10 +388,8 @@ class GaiaQuery:
 
         Parameters
         ----------
-        ra : float | ArrayLike
-            Right ascension coordinate, in degrees, of the centre of the scan.
-        dec : float | ArrayLike
-            Declination coordinate, in degrees, of the centre of the scan..
+        gc : ggcas.cluster.Cluster
+            Globular Cluster object created with the G-GCAS module.
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
         save : bool, optional
@@ -424,26 +397,21 @@ class GaiaQuery:
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
-            ra: Right ascension coordinate for the centre of the scan (if no gc
+            ra : Right ascension coordinate for the centre of the scan (if no gc
                 is provided).
-            dec: Declination coordinate for the centre of the scan (if no gc is
+            dec : Declination coordinate for the centre of the scan (if no gc is
                  provided)
-            name: String which provides the folder name where to save the data.
+            name : String which provides the folder name where to save the data.
                   Needed if no 'gc' object is supplied: if it is not given, and
                   save was True, the data will be stored in the 'UntrackedData'
                   folder.
-            conditions: str or list of str
+            conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
         Returns
         -------
         rv_cluster : TYPE
             DESCRIPTION.
-
-        Raises
-        ------
-        TypeError
-            Raised if save is not a string.
         """
         if gc is None:
             ra = kwargs.get('ra', None)
@@ -459,32 +427,69 @@ class GaiaQuery:
                 'RA': ra,
                 'DEC': dec,
                 'Scan Radius': radius,
-                'Data Acquired': rv.split(',')
+                'Data Acquired': rv
                 },
-            'Quey Flag' : 'radvel'
+            'Flag': {'Query': 'radvel'}
             }
         if 'conditions' in kwargs:
-            cond = kwargs['conditions']
-            if isinstance(cond, str):
-                self._queryInfo['Scan Info']['Conditions Applied'] = cond.split(',')
+            if isinstance(kwargs['conditions'], (str, list)):
+                cond = kwargs['conditions']
             else:
+                raise TypeError("'conditions' argument must be a string or a list of strings")
+            if isinstance(cond, str):
                 self._queryInfo['Scan Info']['Conditions Applied'] = cond
+            else:
+                ccond = ''
+                for c in range(len(cond)-1):
+                    ccond += c+', '
+                ccond += cond[-1]
+                self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
             cond=None
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
-        query = self._adqlWriter(ra, dec, radius, data=rv, conditions=cond)
-        job = Gaia.launch_job_async(query)
-        rv_cluster = job.get_results()
-        print(f"Sample number of sources: {len(rv_cluster):d}")
-        if save is not False:
-            if isinstance(save, str):
-                self._saveQuery(rv_cluster, savename)
-            else:
-                raise TypeError(f"'save' was {save}, but must be a string. \
-                                Specify the name of the object or of the destination folder")
+        rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
         return rv_cluster
 
-    def _saveQuery(self, dat, name: str):
+    def _run_query(self, gc_id, ra, dec, radius, data, conditions, save):
+        """
+
+
+        Parameters
+        ----------
+        gc_id : TYPE
+            DESCRIPTION.
+        ra : TYPE
+            DESCRIPTION.
+        dec : TYPE
+            DESCRIPTION.
+        radius : TYPE
+            DESCRIPTION.
+        data : TYPE
+            DESCRIPTION.
+        conditions : TYPE
+            DESCRIPTION.
+        save : TYPE
+            DESCRIPTION.
+        """
+        check = self.__check_query_exists(gc_id)
+        if check is False:
+            query = self._adqlWriter(ra, dec, radius, data=data, conditions=conditions)
+            job = Gaia.launch_job_async(query)
+            sample = job.get_results()
+            print(f"Sample number of sources: {len(sample):d}")
+            self.last_result = sample
+            if save:
+                self._saveQuery(sample, gc_id)
+        else:
+            print(f"""Found data with the same conditions for object {gc_id} in
+{check[1]}.
+Loading it...""")
+            sample = osu.load_query(check[1])
+            self.last_result = check[1]
+            print(f"Sample number of sources: {len(sample):d}")
+        return sample
+
+    def _saveQuery(self, dat, name:str):
         """
 
 
@@ -610,9 +615,41 @@ class GaiaQuery:
         query = self._baseQ.format(data=dat, table=self._table, circle=circle, cond=cond)
         return query
 
-    def __check_query_exists(self):
+    def __check_query_exists(self, name):
+        """
 
-        return
+
+        Parameters
+        ----------
+        name : TYPE
+            DESCRIPTION.
+
+        Returns
+        -------
+        check : TYPE
+            DESCRIPTION.
+
+        """
+        config = configparser.ConfigParser()
+        tns = osu.tnlist(name)
+        check = False
+        for tn in tns:
+            file_path = os.path.join(tn, QINFO)
+            if os.path.exists(file_path):
+                config.read(file_path)
+                try:
+                    data_acquired = config['Scan Info']['Data Acquired']
+                    conditions_applied = config['Scan Info']['Conditions Applied']
+                    scan_radius = config['Scan Info']['Scan Radius']
+                except KeyError as e:
+                    print(f"Key error: {e}")
+                    continue
+                if (data_acquired == self._queryInfo['Scan Info']['Data Acquired'] and
+                    conditions_applied == self._queryInfo['Scan Info']['Conditions Applied'] and
+                    scan_radius == str(self._queryInfo['Scan Info']['Scan Radius'])):
+                    check = (True, os.path.join(tn, QDATA))
+                    break
+        return check
 
     def __load_table(self):
         """Load The table instanced table(s)"""

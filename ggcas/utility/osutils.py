@@ -93,7 +93,7 @@ def get_file_list(tn=None, fold=None, key:str=None):
                     if fold in path.split('/')[-2]:
                         fl = sorted([os.path.join(path, file) \
                                                  for file in os.listdir(path)])
-                    else: 
+                    else:
                         raise Exception
             except Exception as exc:
                 raise FileNotFoundError(f"Invalid Path: no data found for '.../{fold}/{tn}'") from exc
@@ -107,6 +107,25 @@ def get_file_list(tn=None, fold=None, key:str=None):
             raise TypeError("'key' argument must be a string") from err
         fl = selected_list
     return fl
+
+def tnlist(gc_name:str):
+    """
+
+
+    Parameters
+    ----------
+    gc_name : str
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    basepath = fn.CLUSTER_DATA_FOLDER(gc_name)
+    tn = os.listdir(basepath)
+    tns = sorted([os.path.join(basepath, tt) for tt in tn])
+    return tns
 
 def _timestamp():
     """
