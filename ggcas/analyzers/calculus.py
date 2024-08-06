@@ -231,6 +231,7 @@ def king_integrator(w0, output='profile'):
     output : str, optional
         Specifies which output file(s) to retain. The default is 'profile'.
         Options :
+            - all: All of the below produced files
             - CalCurve: Caloric curve of the system
             - Cv:
             - CvNtK:
@@ -259,7 +260,9 @@ def king_integrator(w0, output='profile'):
         print(result.stdout)
     filelist = osu.get_file_list(fold=king_dir, key='.dat')
     result = []
-    if isinstance(output, list):
+    if 'all' in output:
+        result = filelist
+    elif isinstance(output, list):
         for entry in output:
             for i,file in enumerate(filelist):
                 if entry in filelist:

@@ -137,14 +137,7 @@ Half-Light radius | {self.rh:.2f}              |    .rh
 
     def _load_king_model(self):
         """
-        Loads the integrated model of the cluster.
-
-        Parameters
-        ----------
-        kind : str, optional
-            Model to load. The default is 'SM', that stands for 'Single Mass'.
-            Values are:
-                SM: Single Mass King model.
+        Loads the integrated Single-Mass King model for the cluster.
 
         Returns
         -------
