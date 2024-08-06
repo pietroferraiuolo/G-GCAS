@@ -10,7 +10,8 @@ Description
 How to Use it
 -------------
 """
-import subprocess, os
+import os
+import subprocess
 from typing import Dict, Any
 import numpy as np
 import sympy as sp
@@ -250,7 +251,7 @@ def king_integrator(w0, output='profile'):
     """
     if isinstance(w0, (float, int)):
         w0 = str(w0)
-    result = subprocess.run([king_exe, w0], capture_output=True, text=True, 
+    result = subprocess.run([king_exe, w0], capture_output=True, text=True,
                             cwd=king_dir, check=False)
     if result.returncode != 0:
         print("Error during trhe Fortran90 code execution:")

@@ -62,6 +62,7 @@ from typing import Optional, Union
 from astropy.table import Table
 from astropy import units as u
 from astroquery.gaia import Gaia
+from ggcas.cluster import Cluster
 from ggcas.utility import folder_paths as fn
 from ggcas.utility.osutils import _timestamp
 QDATA = 'query_data.txt'
@@ -163,7 +164,7 @@ class GaiaQuery:
         """The string representation"""
         return self.__get_str()
 
-    def free_query(self, gc:object, radius, save = False, **kwargs):
+    def free_query(self, gc:Cluster, radius, save:bool=False, **kwargs):
         """
         This method allows to perform an ADQL search into the Gaia catalogue with
         personalized parameters, such as data to collect and conditions to apply.
@@ -245,7 +246,7 @@ class GaiaQuery:
             self._saveQuery(result, savename)
         return result
 
-    def get_astrometry(self, ra, dec, radius, save:str=False, **kwargs):
+    def get_astrometry(self, gc:Cluster, radius, save:bool=False, **kwargs):
         """
 
 
@@ -257,11 +258,19 @@ class GaiaQuery:
             Declination coordinate, in degrees, of the centre of the scan..
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
-        save : str, optional
+        save : bool, optional
             Whether to save the file or not. If the quesry is to be saved, the
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
+            ra: Right ascension coordinate for the centre of the scan (if no gc
+                is provided).
+            dec: Declination coordinate for the centre of the scan (if no gc is
+                 provided)
+            name: String which provides the folder name where to save the data.
+                  Needed if no 'gc' object is supplied: if it is not given, and
+                  save was True, the data will be stored in the 'UntrackedData'
+                  folder.
             conditions: str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
@@ -277,6 +286,14 @@ class GaiaQuery:
             Raised if save is not a string.
 
         """
+        if gc is None:
+            ra = kwargs.get('ra', None)
+            dec = kwargs.get('dec', None)
+            savename = kwargs.get('name', 'UntrackedData')
+        else:
+            ra = gc.ra
+            dec = gc.dec
+            savename = gc.id
         astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, \
             parallax_error, pmra, pmra_error, pmdec, pmdec_error'
         self._queryInfo = {
@@ -303,14 +320,14 @@ class GaiaQuery:
         print(f"Sample number of sources: {len(astro_cluster):d}")
         if save is not False:
             if isinstance(save, str):
-                self._saveQuery(astro_cluster, save)
+                self._saveQuery(astro_cluster, savename)
             else:
                 raise TypeError(f"'save' was {save}, but must be a string. \
                                 Specify the name of the object or of \
                                     the destination folder")
         return astro_cluster
 
-    def get_photometry(self, ra, dec, radius, save: str = True, **kwargs):
+    def get_photometry(self, gc:Cluster, radius, save:str=False, **kwargs):
         """
 
 
@@ -322,11 +339,19 @@ class GaiaQuery:
             Declination coordinate, in degrees, of the centre of the scan..
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
-        save : str, optional
+        save : bool, optional
             Whether to save the file or not. If the quesry is to be saved, the
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
+            ra: Right ascension coordinate for the centre of the scan (if no gc
+                is provided).
+            dec: Declination coordinate for the centre of the scan (if no gc is
+                 provided)
+            name: String which provides the folder name where to save the data.
+                  Needed if no 'gc' object is supplied: if it is not given, and
+                  save was True, the data will be stored in the 'UntrackedData'
+                  folder.
             conditions: str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
@@ -341,6 +366,14 @@ class GaiaQuery:
         TypeError
             Raised if save is not a string.
         """
+        if gc is None:
+            ra = kwargs.get('ra', None)
+            dec = kwargs.get('dec', None)
+            savename = kwargs.get('name', 'UntrackedData')
+        else:
+            ra = gc.ra
+            dec = gc.dec
+            savename = gc.id
         photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, \
             phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
         self._queryInfo = {
@@ -367,14 +400,14 @@ class GaiaQuery:
         print(f"Sample number of sources: {len(photo_cluster):d}")
         if save is not False:
             if isinstance(save, str):
-                self._saveQuery(photo_cluster, save)
+                self._saveQuery(photo_cluster, savename)
             else:
                 raise TypeError(f"'save' was {save}, but must be a string. \
                                 Specify the name of the object or of \
                                     the destination folder")
         return photo_cluster
 
-    def get_rv(self, ra, dec, radius, save: str = True, **kwargs):
+    def get_rv(self, gc:Cluster, radius, save:bool=False, **kwargs):
         """
 
 
@@ -386,11 +419,19 @@ class GaiaQuery:
             Declination coordinate, in degrees, of the centre of the scan..
         radius : float | ArrayLike
             Radius, in degrees, of the scan circle.
-        save : str, optional
+        save : bool, optional
             Whether to save the file or not. If the quesry is to be saved, the
             save argument must be the name of the globular cluster, so that the
             software knows the folder where to save, with a new tracking number.
         **kwargs : additional optional arguments
+            ra: Right ascension coordinate for the centre of the scan (if no gc
+                is provided).
+            dec: Declination coordinate for the centre of the scan (if no gc is
+                 provided)
+            name: String which provides the folder name where to save the data.
+                  Needed if no 'gc' object is supplied: if it is not given, and
+                  save was True, the data will be stored in the 'UntrackedData'
+                  folder.
             conditions: str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
@@ -404,6 +445,14 @@ class GaiaQuery:
         TypeError
             Raised if save is not a string.
         """
+        if gc is None:
+            ra = kwargs.get('ra', None)
+            dec = kwargs.get('dec', None)
+            savename = kwargs.get('name', 'UntrackedData')
+        else:
+            ra = gc.ra
+            dec = gc.dec
+            savename = gc.id
         rv = 'source_id, radial_velocity, radial_velocity_error'
         self._queryInfo = {
             'Scan Info': {
@@ -429,7 +478,7 @@ class GaiaQuery:
         print(f"Sample number of sources: {len(rv_cluster):d}")
         if save is not False:
             if isinstance(save, str):
-                self._saveQuery(rv_cluster, save)
+                self._saveQuery(rv_cluster, savename)
             else:
                 raise TypeError(f"'save' was {save}, but must be a string. \
                                 Specify the name of the object or of the destination folder")
@@ -504,8 +553,8 @@ class GaiaQuery:
             DESCRIPTION.
 
         """
-        dat     = ''
-        cond    = ''
+        dat  = ''
+        cond = ''
         if data is not None:
             if isinstance(data, list):
                 for i in range(len(data)-1):
