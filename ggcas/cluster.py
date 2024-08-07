@@ -100,7 +100,7 @@ Harris Catalog 2010 edition Parameters
         **kwargs :
             color : color of the main plot.
             scale : scale of the axes, default linear.
-            grid  : dotted grid on the plot
+            grid  : grid on the plot
         """
         scale = kwargs.get('scale', None)
         c = kwargs.get('color', 'black')

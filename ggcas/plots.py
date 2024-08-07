@@ -28,7 +28,8 @@ label_font = {'family': 'serif',
         'weight': 'normal',
         'size': 16,
         }
-title_font = {'family': 'sans-serif',
+title_font = {'family': 'coursive',
+        'style': 'italic',
         'color':  'black',
         'weight': 'semibold',
         'size': 20,
@@ -264,6 +265,9 @@ def histogram(data, kde=False, **kwargs):
     bins = h[1][:len(h[0])]
     binwidth = bins[1] - bins[0]
     counts = h[0]
+    res={
+        'h': [bins, counts],
+        }
     if kde:
         kde = gaussian_kde(data)
         xk = np.linspace(min(data), max(data), 10000)
@@ -275,12 +279,11 @@ $\mu$   = {:.2e}
 $\sigma^2$  = {:.2e}"""
         plt.plot(xk, kde_values, c=kcolor, label=label.format(mean, std))
         plt.legend(loc='best', fontsize='large')
+        res['kde'] = [mean, std]
     if xlim is not None:
         plt.xlim(xlim)
     plt.show()
-    hist = [bins, counts]
-    kdr = [mean, std]
-    return kdr, hist
+    return res
 
 def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     """

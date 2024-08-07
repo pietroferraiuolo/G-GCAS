@@ -247,30 +247,18 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'free'}
             }
-        if 'data' in kwargs :
-            dat = kwargs['data']
-            dat, _= self._formatCheck(dat, None) #gives a string
-            self._queryInfo['Scan Info']['Data Acquired'] = dat
+        dat = kwargs.get('data','source_id')
+        cond = kwargs.get(['cond', 'conditions', 'condition'], None)
+        self._queryInfo['Scan Info']['Data Acquired'],_ = self._formatCheck(dat, None)
+        if isinstance(cond, list):
+            ccond = ''
+            for c in range(len(cond)-1):
+                ccond += c+', '
+            ccond += cond[-1]
+            self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
-            dat='source_id'
-            self._queryInfo['Scan Info']['Data Acquired'] = dat
-        if 'conditions' in kwargs:
-            if isinstance(kwargs['conditions'], (str, list)):
-                cond = kwargs['conditions']
-            else:
-                raise TypeError("'conditions' argument must be a string or a list of strings")
-            if isinstance(cond, str):
-                self._queryInfo['Scan Info']['Conditions Applied'] = cond
-            else:
-                ccond = ''
-                for c in range(len(cond)-1):
-                    ccond += c+', '
-                ccond += cond[-1]
-                self._queryInfo['Scan Info']['Conditions Applied'] = ccond
-        else:
-            condition=None
-            self._queryInfo['Scan Info']['Conditions Applied'] = condition
-        sample = self._run_query(savename, ra, dec, radius, dat, condition, save)
+            self._queryInfo['Scan Info']['Conditions Applied'] = cond
+        sample = self._run_query(savename, ra, dec, radius, dat, cond, save)
         return sample
 
     def get_astrometry(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
@@ -674,7 +662,10 @@ Loading it...""")
             is the complete file path to the corresponding saved data.
         """
         config = configparser.ConfigParser()
-        tns = osu.tnlist(name)
+        try:
+            tns = osu.tnlist(name)
+        except FileNotFoundError:
+            return False
         check = False
         for tn in tns:
             file_path = os.path.join(tn, QINFO)
