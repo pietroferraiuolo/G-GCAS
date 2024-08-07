@@ -26,12 +26,12 @@ from scipy.stats import gaussian_kde
 label_font = {'family': 'serif',
         'color':  'black',
         'weight': 'normal',
-        'size': 18,
+        'size': 16,
         }
 title_font = {'family': 'sans-serif',
         'color':  'black',
         'weight': 'semibold',
-        'size': 21,
+        'size': 20,
         }
 
 def scatter_2hist(x, y, kde=False, **kwargs):

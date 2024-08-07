@@ -5,8 +5,8 @@ Author(s)
 
 Description
 -----------
-Thi module contains the GaiaQuery class, which handles the ADQL language to mak
-e queries for globular clusters data retrievement fast and easy.
+Thi module contains the GaiaQuery class, which handles the ADQL language to make
+queries for globular clusters data retrievement fast and easy.
 
 How to Use it
 -------------
@@ -102,31 +102,61 @@ class GaiaQuery:
 
     Methods
     -------
-    print_table:
-        Print the loaded data table information.
     free_query:
-        Perform an ADQL search into the Gaia catalogue with full personalized
-        parameters.
+        Perform an ADQL search into the Gaia catalogue with custom data to retrieve
+        and conditions to apply.
     get_atrometry:
-        D
+        A pre-constructed ADQL search into the Gaia catalogue with fixed data
+        retrieved, which is the principal astrometric parameters, with the possibility
+        to add personalized query conditions.
     get_photometry:
-        D
+        A pre-constructed ADQL search into the Gaia catalogue with fixed data
+        retrieved, which is the principal photometric parameters, with the possibility
+        to add personalized query conditions.
     get_rv:
-        D
+        A pre-constructed ADQL search into the Gaia catalogue with fixed data
+        retrieved, which is the radial velociti parameter with its error, with
+        the possibility to add personalized query conditions.
 
     How to Use it
     -------------
     Import the class and initialize it
 
     >>> from ggcas.query import GaiaQuery
-    >>> gq = GaiaQuery()
+    >>> dr3 = GaiaQuery()
     'Initialized with Gaia table: gaiadr3.gaia_source'
 
     To use a different Gaia catalogue simply initialize the class to it:
 
     >>> table = 'gaiadr2.gaia_source'
-    >>> gq = GaiaQuery(gaia_table=table)
+    >>> dr2 = GaiaQuery(gaia_table=table)
     'Initialized with Gaia table: gaiadr2.gaia_source'
+
+    The queries, to work efficiently, require a 'ggcas.cluster.Cluster' object: so,
+    let's take an example cluster, ngc104:
+
+        >>> from ggcas.cluster import Cluster
+        >>> gc = Cluster('ngc104')
+        >>> gc
+        <ggcas.cluster.Cluster object: NGC104>
+
+    At this point, simply passing as argument the gc object to the query function:
+
+        >>> data = dr3.get_astrometry(gc, radius=0.1) # Radius must be passed as deg
+        INFO: Query finished. [astroquery.utils.tap.core]
+        Sample number of sources: 45865
+        >>> data
+             SOURCE_ID              ra         ...        pmdec        pmdec_error
+                                   deg         ...       mas / yr        mas / yr
+               int64             float64       ...       float64         float32
+        ------------------- ------------------ ... ------------------- -----------
+        4689637445779054208   5.76563951251253 ...  -2.259232804525973  0.27563116
+        4689638850232458368  5.874682871570303 ... -2.3177094407812033  0.17122078
+                ...                ...         ...         ...             ...
+
+    The methods also have the save option, to save both the result of the query
+    and its information, such as the parameters used.
+
     """
     def __init__(self, gaia_table: Optional[Union[str, list]] = "gaiadr3.gaia_source"):
         """
@@ -165,28 +195,29 @@ class GaiaQuery:
         """The string representation"""
         return self.__get_str()
 
-    def free_query(self, gc:Cluster, radius, save:bool=False, **kwargs):
+    def free_query(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
         """
-        This method allows to perform an ADQL search into the Gaia catalogue with
+        This function allows to perform an ADQL search into the Gaia catalogue with
         personalized parameters, such as data to collect and conditions to apply.
 
         Parameters
         ----------
+        radius : float
+            Radius, in degrees, of the scan circle.
         gc : ggcas.cluster.Cluster
             Globular Cluster object created with the G-GCAS module.
-        radius : float | ArrayLike
-            Radius, in degrees, of the scan circle.
         save : bool, optional
-            Whether to save the file for the qued data or not.
+            Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
-            ra : Right ascension coordinate for the centre of the scan (if no gc
-                is provided).
-            dec : Declination coordinate for the centre of the scan (if no gc is
-                 provided)
-            name : String which provides the folder name where to save the data.
-                  Needed if no 'gc' object is supplied: if it is not given, and
-                  save was True, the data will be stored in the 'UntrackedData'
-                  folder.
+            ra : float or str
+                Right ascension coordinate for the centre of the scan (if no gc is provided).
+            dec : float or str
+                Declination coordinate for the centre of the scan (if no gc is provided)
+            name : str
+                String which provides the folder name where to save the data.
+                Needed if no 'gc' object is supplied: if it is not given, and
+                save was True, the data will be stored in the 'UntrackedData'
+                folder.
             data : str or list of str
                 List of parameters to retrieve, from the ones printed by ''.print_table()''.
                 If this argument is missing, the only parameter retrieved is 'source_id'.
@@ -199,8 +230,6 @@ class GaiaQuery:
         result : astropy table
             Result of the async query, stored into an astropy table.
 
-        Example
-        -------
         """
         if gc is None:
             ra = kwargs.get('ra', None)
@@ -244,29 +273,33 @@ class GaiaQuery:
         sample = self._run_query(savename, ra, dec, radius, dat, condition, save)
         return sample
 
-    def get_astrometry(self, gc:Cluster, radius, save:bool=False, **kwargs):
+    def get_astrometry(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
         """
+        A pre-constructed ADQL search into the Gaia catalogue with fixed data
+        retrieved, which is the principal astrometric parameters, with the possibility
+        to add personalized query conditions.
 
+        The retrieved data is:
+        'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
 
         Parameters
         ----------
+        radius : float
+            Radius, in degrees, of the scan circle.
         gc : ggcas.cluster.Cluster
             Globular Cluster object created with the G-GCAS module.
-        radius : float | ArrayLike
-            Radius, in degrees, of the scan circle.
         save : bool, optional
-            Whether to save the file or not. If the quesry is to be saved, the
-            save argument must be the name of the globular cluster, so that the
-            software knows the folder where to save, with a new tracking number.
+            Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
-            ra : Right ascension coordinate for the centre of the scan (if no gc
-                is provided).
-            dec : Declination coordinate for the centre of the scan (if no gc is
-                 provided)
-            name : String which provides the folder name where to save the data.
-                  Needed if no 'gc' object is supplied: if it is not given, and
-                  save was True, the data will be stored in the 'UntrackedData'
-                  folder.
+            ra : float or str
+                Right ascension coordinate for the centre of the scan (if no gc is provided).
+            dec : float or str
+                Declination coordinate for the centre of the scan (if no gc is provided)
+            name : str
+                String which provides the folder name where to save the data.
+                Needed if no 'gc' object is supplied: if it is not given, and
+                save was True, the data will be stored in the 'UntrackedData'
+                folder.
             conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
@@ -274,7 +307,7 @@ class GaiaQuery:
         Returns
         -------
         astro_cluster : astropy.Table
-            Astropy table with pf the query results.
+            Astropy table with  the query results.
         """
         if gc is None:
             ra = kwargs.get('ra', None)
@@ -313,37 +346,41 @@ class GaiaQuery:
         astro_cluster = self._run_query(savename, ra, dec, radius, astrometry, cond, save)
         return astro_cluster
 
-    def get_photometry(self, gc:Cluster, radius, save:str=False, **kwargs):
+    def get_photometry(self, radius, gc:Cluster=None, save:str=False, **kwargs):
         """
+        A pre-constructed ADQL search into the Gaia catalogue with fixed data
+        retrieved, which is the principal photometric parameters, with the possibility
+        to add personalized query conditions.
 
+        The retrieved data is:
+        'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
 
         Parameters
         ----------
+        radius : float
+            Radius, in degrees, of the scan circle.
         gc : ggcas.cluster.Cluster
             Globular Cluster object created with the G-GCAS module.
-        radius : float | ArrayLike
-            Radius, in degrees, of the scan circle.
         save : bool, optional
-            Whether to save the file or not. If the quesry is to be saved, the
-            save argument must be the name of the globular cluster, so that the
-            software knows the folder where to save, with a new tracking number.
+            Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
-            ra : Right ascension coordinate for the centre of the scan (if no gc
-                is provided).
-            dec : Declination coordinate for the centre of the scan (if no gc is
-                 provided)
-            name : String which provides the folder name where to save the data.
-                  Needed if no 'gc' object is supplied: if it is not given, and
-                  save was True, the data will be stored in the 'UntrackedData'
-                  folder.
+            ra : float or str
+                Right ascension coordinate for the centre of the scan (if no gc is provided).
+            dec : float or str
+                Declination coordinate for the centre of the scan (if no gc is provided)
+            name : str
+                String which provides the folder name where to save the data.
+                Needed if no 'gc' object is supplied: if it is not given, and
+                save was True, the data will be stored in the 'UntrackedData'
+                folder.
             conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
 
         Returns
         -------
-        photo_cluster : TYPE
-            DESCRIPTION.
+        photo_cluster : astropy.Table
+            Astropy table with the results.
         """
         if gc is None:
             ra = kwargs.get('ra', None)
@@ -382,36 +419,40 @@ class GaiaQuery:
         photo_cluster = self._run_query(savename, ra, dec, radius, photometry, cond, save)
         return photo_cluster
 
-    def get_rv(self, gc:Cluster, radius, save:bool=False, **kwargs):
+    def get_rv(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
         """
+        A pre-constructed ADQL search into the Gaia catalogue with fixed data
+        retrieved, which is the radial velociti parameter with its error, with
+        the possibility to add personalized query conditions.
 
+        The retrieved data is:
+        'source_id, radial_velocity, radial_velocity_error'
 
         Parameters
         ----------
+        radius : float
+            Radius, in degrees, of the scan circle.
         gc : ggcas.cluster.Cluster
             Globular Cluster object created with the G-GCAS module.
-        radius : float | ArrayLike
-            Radius, in degrees, of the scan circle.
         save : bool, optional
-            Whether to save the file or not. If the quesry is to be saved, the
-            save argument must be the name of the globular cluster, so that the
-            software knows the folder where to save, with a new tracking number.
+            Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
-            ra : Right ascension coordinate for the centre of the scan (if no gc
-                is provided).
-            dec : Declination coordinate for the centre of the scan (if no gc is
-                 provided)
-            name : String which provides the folder name where to save the data.
-                  Needed if no 'gc' object is supplied: if it is not given, and
-                  save was True, the data will be stored in the 'UntrackedData'
-                  folder.
+            ra : float or str
+                Right ascension coordinate for the centre of the scan (if no gc is provided).
+            dec : float or str
+                Declination coordinate for the centre of the scan (if no gc is provided)
+            name : str
+                String which provides the folder name where to save the data.
+                Needed if no 'gc' object is supplied: if it is not given, and
+                save was True, the data will be stored in the 'UntrackedData'
+                folder.
             conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
         Returns
         -------
-        rv_cluster : TYPE
-            DESCRIPTION.
+        rv_cluster : astropy.Table
+            Astropy t able with te result.
         """
         if gc is None:
             ra = kwargs.get('ra', None)
@@ -452,24 +493,26 @@ class GaiaQuery:
 
     def _run_query(self, gc_id, ra, dec, radius, data, conditions, save):
         """
-
+        The actual sub-routine which sends the query, checking if data already
+        exists with the same query conditions, in which case loading it.
 
         Parameters
         ----------
-        gc_id : TYPE
-            DESCRIPTION.
-        ra : TYPE
-            DESCRIPTION.
-        dec : TYPE
-            DESCRIPTION.
-        radius : TYPE
-            DESCRIPTION.
-        data : TYPE
-            DESCRIPTION.
-        conditions : TYPE
-            DESCRIPTION.
-        save : TYPE
-            DESCRIPTION.
+        gc_id : str
+            Folder name, used to check de existing data and to save the qued data
+            (if save=True). Usually is the Cluster's name.'
+        ra : str
+            Right ascension of the centre of the scan.
+        dec : str
+            Declination of the centre of the scan.
+        radius : str
+            Radius of the circular scan.
+        data : str
+            The data to retrieve from the query.
+        conditions : list of str
+            The conditions to apply on the requested data.
+        save : bool
+            Wether to save or not the retrieved data.
         """
         check = self.__check_query_exists(gc_id)
         if check is False:
@@ -491,14 +534,15 @@ Loading it...""")
 
     def _saveQuery(self, dat, name:str):
         """
-
+        Routine for saving the query with its information, in the 'query_data.txt'
+        and 'query_info.txt' files
 
         Parameters
         ----------
-        dat : TYPE
-            DESCRIPTION.
+        dat : astropy.Table
+            The astropy table containing all the retrieved data.
         name : str
-            DESCRIPTION.
+            Where to save the data, usually the cluster's name.
 
         """
         config = configparser.ConfigParser()
@@ -520,17 +564,12 @@ Loading it...""")
 
     def _checkPathExist(self, dest: str):
         """
-
+        Check if the path exists, and if not creates it.
 
         Parameters
         ----------
         dest : str
-            DESCRIPTION.
-
-        Returns
-        -------
-        TYPE
-            DESCRIPTION.
+            the path to check.
 
         """
         self._fold = fn.CLUSTER_DATA_FOLDER(dest)
@@ -541,21 +580,23 @@ Loading it...""")
 
     def _formatCheck(self, data: Optional[Union[str,list]], conditions: Optional[Union[str,list]]):
         """
-
+        Function to check and correct the format the 'data' and 'conditions'
+        variables were imput with.
 
         Parameters
         ----------
         data : Optional[Union[str,list]]
-            DESCRIPTION.
+            The data variable, containing all the requested parameters.
         conditions : Optional[Union[str,list]]
-            DESCRIPTION.
+            The conditions variable, containing all the conditions to apply to the
+            query.
 
         Returns
         -------
-        dat : TYPE
-            DESCRIPTION.
-        cond : TYPE
-            DESCRIPTION.
+        dat : str
+            The correct format for the data variable.
+        cond : list of str
+            The correct format for the conditions variable.
 
         """
         dat  = ''
@@ -579,25 +620,26 @@ Loading it...""")
 
     def _adqlWriter(self, ra, dec, radius, data, conditions):
         """
-
+        This function writes the query, correctly formatting all the variables
+        in order to be accepted by the GAIA ADQL language.
 
         Parameters
         ----------
-        ra : TYPE
-            DESCRIPTION.
-        dec : TYPE
-            DESCRIPTION.
-        radius : TYPE
-            DESCRIPTION.
-        data : TYPE
-            DESCRIPTION.
-        conditions : TYPE
-            DESCRIPTION.
+        ra : str
+            Right ascension.
+        dec : str
+            Declination.
+        radius : str
+            Scan radius.
+        data : str
+            Data to retrieve.
+        conditions : list of str
+            Conditions to apply.
 
         Returns
         -------
-        query : TYPE
-            DESCRIPTION.
+        query : str
+            The full string to input the query with.
 
         """
         if isinstance(ra, u.Quantity) and isinstance(dec, u.Quantity):
@@ -617,18 +659,19 @@ Loading it...""")
 
     def __check_query_exists(self, name):
         """
-
+        Checks wether the requested query already exist saved for the Cluster.
 
         Parameters
         ----------
-        name : TYPE
-            DESCRIPTION.
+        name : str
+            Folder where to search for saved data. Usually is the cluster's name
 
         Returns
         -------
-        check : TYPE
-            DESCRIPTION.
-
+        check : bool or tuple
+            If no data was found to be compatible with the search, this is False.
+            Either way it is a tuple, which first elemnt is True while the second
+            is the complete file path to the corresponding saved data.
         """
         config = configparser.ConfigParser()
         tns = osu.tnlist(name)

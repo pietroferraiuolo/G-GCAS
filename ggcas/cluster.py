@@ -30,6 +30,7 @@ import astropy.units as u
 from astropy.table import Table
 from ggcas.utility import folder_paths as fn
 from ggcas.analyzers.calculus import king_integrator
+from ggcas.plots import label_font, title_font
 
 class Cluster:
     """
@@ -88,7 +89,7 @@ Harris Catalog 2010 edition Parameters
 
     def __repr__(self):
         """Representation"""
-        return f"< Cluster object: {self.id} >"
+        return f"<ggcas.cluster.Cluster object: {self.id}>"
 
     def show_model(self, **kwargs):
         """
@@ -99,18 +100,24 @@ Harris Catalog 2010 edition Parameters
         **kwargs :
             color : color of the main plot.
             scale : scale of the axes, default linear.
+            grid  : dotted grid on the plot
         """
         scale = kwargs.get('scale', None)
         c = kwargs.get('color', 'black')
+        grid = kwargs.get('grid', False)
         plt.figure(figsize=(8,6))
         plt.plot(self.model['xi'], self.model['w'], color=c)
         plt.plot([self.model['xi'].min(), self.model['xi'].min()],
-                 [self.model['w'].min(), self.model['w'].max()],
+                 [self.model['w'].min()-1, self.model['w'].max()],
                  c='red', linestyle='--',
                  label=rf"$W_0$={self.model['w'].max()}")
-        plt.xlabel(r"$\xi$ = $\dfrac{r}{r_t}$")
-        plt.ylabel("w")
-        plt.title('Integrated King Model')
+        plt.xlabel(r"$\xi$ = $\dfrac{r}{r_t}$", fontdict=label_font)
+        plt.ylabel("w", fontdict=label_font)
+        plt.title('Integrated King Model', fontdict=title_font)
+        plt.ylim(-0.2, self.model['w'].max()+0.2)
+        plt.xlim(-0.05, 1.05)
+        if grid:
+            plt.grid()
         if scale is not None:
             plt.xscale(scale)
             plt.yscale(scale)
