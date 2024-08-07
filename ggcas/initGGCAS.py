@@ -13,7 +13,8 @@ Documentation
 =============
 
 """
-import os, numpy as np, matplotlib.pyplot as plt
+import os, numpy as np
+from matplotlib import pyplot as plt
 from ggcas.cluster import Cluster
 from ggcas.analyzers import calculus, effective_potential as efp, kinematics as kin
 from ggcas.query import GaiaQuery

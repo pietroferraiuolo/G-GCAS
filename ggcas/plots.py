@@ -217,15 +217,14 @@ def histogram(data, kde=False, **kwargs):
             Label of the plot's x-axis.
         alpha : float
             Transparency of the bins.
-        color : str
+        hcolor : str
             Color of the histogram's bins.
+        kcolor : str
+            Color of the kde curve.
 
     Returns
     -------
-    bins : ArrayLike
-        List of bin positions on x axis.
-    counts : ArrayLike
-        Count number for each bin.
+    hist_result :
 
     Example
     -------
@@ -244,7 +243,7 @@ def histogram(data, kde=False, **kwargs):
     and so on.
 
     """
-    xlabel =kwargs.get('xlabel','')
+    xlabel = kwargs.get('xlabel','')
     alpha  = kwargs.get('alpha', 1)
     hcolor = kwargs.get('hcolor','gray')
     kcolor = kwargs.get('kcolor', 'red')

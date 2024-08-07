@@ -247,9 +247,9 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'free'}
             }
-        dat = kwargs.get('data','source_id')
-        cond = kwargs.get(['cond', 'conditions', 'condition'], None)
+        dat = osu._get_kwargs(('data', 'dat','params', 'parameters'), 'source_id', **kwargs)
         self._queryInfo['Scan Info']['Data Acquired'],_ = self._formatCheck(dat, None)
+        cond = osu._get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -315,21 +315,14 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'astrometry'}
             }
-        if 'conditions' in kwargs:
-            if isinstance(kwargs['conditions'], (str, list)):
-                cond = kwargs['conditions']
-            else:
-                raise TypeError("'conditions' argument must be a string or a list of strings")
-            if isinstance(cond, str):
-                self._queryInfo['Scan Info']['Conditions Applied'] = cond
-            else:
-                ccond = ''
-                for c in range(len(cond)-1):
-                    ccond += cond[c]+', '
-                ccond += cond[-1]
-                self._queryInfo['Scan Info']['Conditions Applied'] = ccond
+        cond = osu._get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        if isinstance(cond, list):
+            ccond = ''
+            for c in range(len(cond)-1):
+                ccond += c+', '
+            ccond += cond[-1]
+            self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
-            cond=None
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         astro_cluster = self._run_query(savename, ra, dec, radius, astrometry, cond, save)
         return astro_cluster
@@ -388,21 +381,14 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'photometry'}
             }
-        if 'conditions' in kwargs:
-            if isinstance(kwargs['conditions'], (str, list)):
-                cond = kwargs['conditions']
-            else:
-                raise TypeError("'conditions' argument must be a string or a list of strings")
-            if isinstance(cond, str):
-                self._queryInfo['Scan Info']['Conditions Applied'] = cond
-            else:
-                ccond = ''
-                for c in range(len(cond)-1):
-                    ccond += c+', '
-                ccond += cond[-1]
-                self._queryInfo['Scan Info']['Conditions Applied'] = ccond
+        cond = osu._get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        if isinstance(cond, list):
+            ccond = ''
+            for c in range(len(cond)-1):
+                ccond += c+', '
+            ccond += cond[-1]
+            self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
-            cond=None
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         photo_cluster = self._run_query(savename, ra, dec, radius, photometry, cond, save)
         return photo_cluster
@@ -460,21 +446,14 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'radvel'}
             }
-        if 'conditions' in kwargs:
-            if isinstance(kwargs['conditions'], (str, list)):
-                cond = kwargs['conditions']
-            else:
-                raise TypeError("'conditions' argument must be a string or a list of strings")
-            if isinstance(cond, str):
-                self._queryInfo['Scan Info']['Conditions Applied'] = cond
-            else:
-                ccond = ''
-                for c in range(len(cond)-1):
-                    ccond += c+', '
-                ccond += cond[-1]
-                self._queryInfo['Scan Info']['Conditions Applied'] = ccond
+        cond = osu._get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        if isinstance(cond, list):
+            ccond = ''
+            for c in range(len(cond)-1):
+                ccond += c+', '
+            ccond += cond[-1]
+            self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
-            cond=None
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
         return rv_cluster

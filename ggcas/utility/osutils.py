@@ -172,3 +172,10 @@ def _findTracknum(tn, complete_path:bool=False):
     if len(path_list)==1:
         path_list = path_list[0]
     return path_list
+
+def _get_kwargs(names:tuple, default, **kwargs):
+    possible_keys = names
+    for key in possible_keys:
+        if key in kwargs:
+            return kwargs[key]
+    return default
