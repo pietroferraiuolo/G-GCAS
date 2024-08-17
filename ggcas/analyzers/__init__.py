@@ -4,5 +4,5 @@ Author(s):
 """
 __all__ = ['kinematics', 'effective_potential']
 
-from . import kinematics
+from . import dynamics
 from . import effective_potential

@@ -90,6 +90,33 @@ def available_tables(key:str=None):
         for table in tables:
             print(table.name)
 
+# =============================================================================
+# Implementare la classe 'sample' che è un oggetto con tutte le caratteristiche
+# del sample risultato della query, ed è tirato fuori dalla query stessa.
+# =============================================================================
+
+class Sample:
+    """
+    Class for better handling the query result sample.
+    
+    Parameters
+    ----------
+    gc : ggcas.cluster.Cluster
+        Globular cluster object used for the query.
+    sample : astropy.table.Table
+        Table containing the retrieve sample's data.
+    """
+    def __init__(self, sample, gc:Cluster=None):
+        """The constructor"""
+        self.gc     = gc
+        self.qinfo  = None
+        self.sample = sample
+    
+    def __str__(self):
+        """The string representation"""
+        return self.gc.__str__()+'\n'+self.sample.__str__()
+        
+
 class GaiaQuery:
     """
     Classs for the Gaia Query language execution.
@@ -221,13 +248,23 @@ class GaiaQuery:
             data : str or list of str
                 List of parameters to retrieve, from the ones printed by ''.print_table()''.
                 If this argument is missing, the only parameter retrieved is 'source_id'.
+                Aliases:
+                    'dat'
+                    'data'
+                    'params'
+                    'parameters'
             conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
+                Aliases:
+                    'cond'
+                    'conds'
+                    'condition'
+                    'conditions'
 
         Returns
         -------
-        result : astropy table
+        job_result : astropy table
             Result of the async query, stored into an astropy table.
 
         """
@@ -247,9 +284,9 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'free'}
             }
-        dat = osu._get_kwargs(('data', 'dat','params', 'parameters'), 'source_id', **kwargs)
+        dat = osu.get_kwargs(('data', 'dat','params', 'parameters'), 'source_id', kwargs)
         self._queryInfo['Scan Info']['Data Acquired'],_ = self._formatCheck(dat, None)
-        cond = osu._get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -291,6 +328,11 @@ class GaiaQuery:
             conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
+                Aliases:
+                    'cond'
+                    'conds'
+                    'condition'
+                    'conditions'
 
         Returns
         -------
@@ -315,7 +357,7 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'astrometry'}
             }
-        cond = osu._get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -357,6 +399,11 @@ class GaiaQuery:
             conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
+                Aliases:
+                    'cond'
+                    'conds'
+                    'condition'
+                    'conditions'
 
         Returns
         -------
@@ -381,7 +428,7 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'photometry'}
             }
-        cond = osu._get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -423,6 +470,11 @@ class GaiaQuery:
             conditions : str or list of str
                 Listo of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
+                Aliases:
+                    'cond'
+                    'conds'
+                    'condition'
+                    'conditions'
         Returns
         -------
         rv_cluster : astropy.Table
@@ -446,7 +498,7 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'radvel'}
             }
-        cond = osu._get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -458,7 +510,7 @@ class GaiaQuery:
         rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
         return rv_cluster
 
-    def _run_query(self, gc_id, ra, dec, radius, data, conditions, save):
+    def _run_query(self, gc_id, ra, dec, radius, data, cond, save):
         """
         The actual sub-routine which sends the query, checking if data already
         exists with the same query conditions, in which case loading it.
@@ -483,7 +535,7 @@ class GaiaQuery:
         """
         check = self.__check_query_exists(gc_id)
         if check is False:
-            query = self._adqlWriter(ra, dec, radius, data=data, conditions=conditions)
+            query = self._adqlWriter(ra, dec, radius, data=data, conditions=cond)
             job = Gaia.launch_job_async(query)
             sample = job.get_results()
             print(f"Sample number of sources: {len(sample):d}")
@@ -575,14 +627,14 @@ Loading it...""")
                 dat += data[len(data)-1]
             else: dat=data
         else: dat='source_id'
-        if conditions is not None:
+        if conditions != 'None':
             if isinstance(conditions, str):
                 conditions = conditions.split(',')
-            cond = '  AND '
-            for i in range(len(conditions)-1):
-                cond += conditions[i]+"""
-            AND """
-            cond += conditions[len(conditions)-1]
+                cond = '  AND '
+                for i in range(len(conditions)-1):
+                    cond += conditions[i]+"""
+                    AND """
+                cond += conditions[len(conditions)-1]
         return dat, cond
 
     def _adqlWriter(self, ra, dec, radius, data, conditions):
@@ -622,6 +674,7 @@ Loading it...""")
         circle  = ra + "," + dec + "," + radius
         dat, cond = self._formatCheck(data, conditions)
         query = self._baseQ.format(data=dat, table=self._table, circle=circle, cond=cond)
+        self.last_query = query
         return query
 
     def __check_query_exists(self, name):

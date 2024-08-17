@@ -246,8 +246,8 @@ def king_integrator(w0, output='profile'):
     Returns
     -------
     result : str or list
-        The full path of the selected output file(s) as string (or list of strings
-        multiple output files have been selected).
+        The full path of the selected output file(s) as string
+        (or list of strings if multiple output files have been selected).
     """
     if isinstance(w0, (float, int)):
         w0 = str(w0)

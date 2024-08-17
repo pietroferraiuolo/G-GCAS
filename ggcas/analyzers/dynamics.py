@@ -18,31 +18,37 @@ import astropy.units as u
 
 def velocity_conversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
     """
-    Converts the proper motion into velocities in km/s, with its error, if provided.
+    Converts the proper motion into velocities in km/s, with its error if provided.
 
     Parameters
     ----------
-    mu : TYPE
-        DESCRIPTION.
-    gc_distance : TYPE
-        DESCRIPTION.
-    mu_error : TYPE, optional
-        DESCRIPTION. The default is 0.
-    gc_distance_error : TYPE, optional
-        DESCRIPTION. The default is 0.
+    mu : float or ArrayLike
+        The proper motion component to convert.
+    gc_distance : float
+        The reference distance to use to make the conversion.
+    mu_error : float or ArrayLike, optional
+        The error(s) associated to the Proper Motion data. The default is 0, 
+        which means 'not provided'.
+    gc_distance_error : float, optional
+        The error associated to the reference distance. The default is 0, which
+        means 'not provided'.
 
     Returns
     -------
-    vkms : TYPE
-        DESCRIPTION.
-    vkms_err : TYPE
-        DESCRIPTION.
+    vkms : float or ArrayLike
+        The converted velocity in km/s.
+    vkms_err : float or ArrayLike
+        The related, converted, error.
 
     """
     vkms = mu.to(u.mas/u.yr).to(u.rad/u.s)*gc_distance.to(u.kpc).to(u.km) / u.rad
     vkms_err = np.sqrt(gc_distance**2 * mu_error.to(u.rad/u.s)**2 + \
                        mu.to(u.rad/u.s)**2 * gc_distance_error**2)/u.rad
     return vkms, vkms_err
+
+def radial_distance():
+    
+    return
 
 def density_profile(data):
     """

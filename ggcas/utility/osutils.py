@@ -38,6 +38,34 @@ def load_query(file):
     data = QTable.read(file, format='ascii.tab')
     return data
 
+def get_kwargs(names:tuple, default, kwargs):
+    """
+    Gets a tuple of possible kwargs names for a variable and checks if it was
+    passed, and in case returns it.
+
+    Parameters
+    ----------
+    names : tuple
+        Tuple containing all the possible names of a variable which can be passed
+        as a **kwargs argument.
+    default : any type
+        The default value to assign the requested key if it doesn't exist.
+    kwargs : dict
+        The dictionary of variables passed as 'Other Parameters'.
+
+    Returns
+    -------
+    key : value of the key
+        The value of the searched key if it exists. If not, the default value will
+        be returned.
+    """
+    possible_keys = names
+    for key in possible_keys:
+        if key in kwargs:
+            return kwargs[key]
+    return default
+
+
 def get_file_list(tn=None, fold=None, key:str=None):
     """
     Returns the file list of a given globular cluster datapath.
@@ -172,10 +200,3 @@ def _findTracknum(tn, complete_path:bool=False):
     if len(path_list)==1:
         path_list = path_list[0]
     return path_list
-
-def _get_kwargs(names:tuple, default, **kwargs):
-    possible_keys = names
-    for key in possible_keys:
-        if key in kwargs:
-            return kwargs[key]
-    return default

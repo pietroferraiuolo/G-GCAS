@@ -22,6 +22,7 @@ from typing import Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
+from ggcas.utility import osutils as osu
 
 label_font = {'family': 'serif',
         'color':  'black',
@@ -53,7 +54,6 @@ def scatter_2hist(x, y, kde=False, **kwargs):
     Other Parameters
     ----------------
     **kwargs : Additional parameters for customizing the plot
-
         xlabel : str
             xlabel of the plot
         ylabel : str
@@ -110,7 +110,7 @@ def scatter_2hist(x, y, kde=False, **kwargs):
         ax_histy.plot(kdey_values, yk, color='r')
     plt.show()
 
-def colorMagnitude(g, b_r, teff_gspphot):
+def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
     """
     Make a scatter plot to create a color-magnitude diagram of the sample, usin
     g BP and RP photometry and temperature information.
@@ -123,10 +123,25 @@ def colorMagnitude(g, b_r, teff_gspphot):
         Gaia color, defined and the BP mean magnitude minus the RP mean magnitude.
     t : float | ArrayLike
         Gaia computed effective surface temperature.
+
+    Other Parameters
+    ----------------
+    **kwargs : dict
+        bgc : tuple
+            A tuple with three float values, indicating the RGB gradient which
+            define a color (placeholder for the ax.set_facecolor function).
+            Aliases: 'bgc', 'bgcolor'
+        alpha : float
+            Transparency of the scatter points.
+        cmap : str
+            All accepted matplotlib colormap strings.
     """
+    bgc = osu.get_kwargs(('bgc', 'bgcolor'), (0.9,0.9,0.9), kwargs)
+    a = kwargs.get('alpha', 0.8)
+    cmap = kwargs.get('cmap', 'rainbow_r')
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7,7))
-    ax.set_facecolor((0.9,0.9,0.9))
-    plt.scatter(b_r, g, c=teff_gspphot, alpha=0.8, cmap='rainbow_r')
+    ax.set_facecolor(bgc)
+    plt.scatter(b_r, g, c=teff_gspphot, alpha=a, cmap=cmap)
     plt.colorbar(label=r'$T_{eff}$')
     plt.ylim(max(g)+0.51, min(g)-0.51)
     plt.xlabel(r"$G_{BP} - G_{RP}$", fontdict=label_font)
@@ -136,7 +151,7 @@ def colorMagnitude(g, b_r, teff_gspphot):
 
 def properMotion(pmra, pmdec, **kwargs):
     """
-    Make a scatter plot in the proper motion space of the sample
+    Make a scatter plot in the proper motion space of the sample.
 
     Parameters
     ----------
@@ -155,8 +170,8 @@ def properMotion(pmra, pmdec, **kwargs):
         alpha : float
             Transparency of the scattered data points.
     """
-    col  = kwargs.get('color', 'black')
-    size = kwargs.get('s', 3)
+    col  = osu.get_kwargs(('color','c'), 'black', kwargs)
+    size = osu.get_kwargs(('s','size'), 3, kwargs)
     alpha= kwargs.get('alpha', 0.5)
     fig, ax = plt.subplots(figsize=(8,8))
     plt.xlabel(r'$\mu_{\alpha*}$ [deg]', fontdict=label_font)
@@ -186,8 +201,8 @@ def spatial(ra, dec, **kwargs):
         alpha : float
             Transparency of the scattered data points.
     """
-    col  = kwargs.get('color', 'black')
-    size = kwargs.get('s', 3)
+    col  = osu.get_kwargs(('color','c'), 'black', kwargs)
+    size = osu.get_kwargs(('s','size'), 5, kwargs)
     alpha= kwargs.get('alpha', 0.5)
     fig, ax = plt.subplots(figsize=(8,8))
     plt.xlabel(r'$DEC$ [deg]', fontdict=label_font)
@@ -224,7 +239,9 @@ def histogram(data, kde=False, **kwargs):
 
     Returns
     -------
-    hist_result :
+    hist_result : dict
+        Dictionary containing the hinstogram results and the distribution mean
+        and standard deviation. The keys are 'h' and 'kde'.
 
     Example
     -------
@@ -264,21 +281,19 @@ def histogram(data, kde=False, **kwargs):
     bins = h[1][:len(h[0])]
     binwidth = bins[1] - bins[0]
     counts = h[0]
-    res={
-        'h': [bins, counts],
-        }
+    mean=np.mean(data)
+    std=np.std(data)
+    res={'h': [bins, counts]}
+    res['kde'] = [mean, std]
     if kde:
         kde = gaussian_kde(data)
         xk = np.linspace(min(data), max(data), 10000)
         kde_values = kde(xk)*len(data)*binwidth
-        mean=np.mean(data)
-        std=np.std(data)
         label=r"""Gaussian KDE
 $\mu$   = {:.2e}
 $\sigma^2$  = {:.2e}"""
         plt.plot(xk, kde_values, c=kcolor, label=label.format(mean, std))
         plt.legend(loc='best', fontsize='large')
-        res['kde'] = [mean, std]
     if xlim is not None:
         plt.xlim(xlim)
     plt.show()
@@ -309,10 +324,10 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
         color : str
             Color of the scattered data points.
     """
-    xlabel=kwargs.get('xlabel', 'x')
-    ylabel=kwargs.get('ylabel', 'y')
-    color=kwargs.get('color','gray')
-    s=kwargs.get('size', 10)
+    xlabel = kwargs.get('xlabel', 'x')
+    ylabel = kwargs.get('ylabel', 'y')
+    color = osu.get_kwargs(('c','color'), 'gray', kwargs)
+    s = osu.get_kwargs(('s','size'), 7.5, kwargs)
     nb2 = int(1.5*np.sqrt(len(x)))
     mean_x = np.mean(x)
     fig, (ax0, ax1) = plt.subplots(nrows=2, ncols=1, height_ratios=[1,3.5], \
