@@ -51,21 +51,29 @@ class Cluster:
     >>> from ggcas.cluster import Cluster
     >>> ngc104 = Cluster('ngc104')
     """
-    def __init__(self, name: str):
+    def __init__(self, name:str=None, **params):
         """The constructor"""
-        self.id     = name.upper()
-        self.data_path = fn.CLUSTER_DATA_FOLDER(self.id)
-        self.model_path= fn.CLUSTER_MODEL_FOLDER(self.id)
-        parms       = self._load_cluster_parameters(self.id)
-        self.model  = self._load_king_model()
-        self.ra     = parms.loc['ra']*u.deg
-        self.dec    = parms.loc['dec']*u.deg
-        self.dist   = parms.loc['dist']*u.kpc
-        self.rc     = parms.loc['rc']/60 * u.deg
-        self.rh     = parms.loc['rh']/60 * u.deg
-        self.w0     = parms.loc['w0']
-        self.logc   = parms.loc['logc']
-        self.cflag  = ['True ' if parms.loc['collapsed']=='Y' else False][0]
+        if name is not None:
+            self.id     = name.upper()
+            self.data_path = fn.CLUSTER_DATA_FOLDER(self.id)
+            self.model_path= fn.CLUSTER_MODEL_FOLDER(self.id)
+            parms       = self._load_cluster_parameters(self.id)
+            self.model  = self._load_king_model()
+            self.ra     = parms.loc['ra']*u.deg
+            self.dec    = parms.loc['dec']*u.deg
+            self.dist   = parms.loc['dist']*u.kpc
+            self.rc     = parms.loc['rc']/60 * u.deg
+            self.rh     = parms.loc['rh']/60 * u.deg
+            self.w0     = parms.loc['w0']
+            self.logc   = parms.loc['logc']
+            self.cflag  = ['True ' if parms.loc['collapsed']=='Y' else False][0]
+        else:
+            print('Not a Cluster: no model available')
+            self.data_path = fn.UNTRACKED_DATA_FOLDER
+            self.id     = 'UntrackedData'
+            self.ra     = params.get('ra', None)
+            self.dec    = params.get('dec',None)
+            self.model  = None
 
     def __str__(self):
         """String representation"""

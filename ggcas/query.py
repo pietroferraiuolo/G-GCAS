@@ -90,11 +90,6 @@ def available_tables(key:str=None):
         for table in tables:
             print(table.name)
 
-# =============================================================================
-# Implementare la classe 'sample' che è un oggetto con tutte le caratteristiche
-# del sample risultato della query, ed è tirato fuori dalla query stessa.
-# =============================================================================
-
 class Sample:
     """
     Class for better handling the query result sample.
@@ -115,6 +110,25 @@ class Sample:
     def __str__(self):
         """The string representation"""
         return self.gc.__str__()+'\n'+self.sample.__str__()
+    
+    def __repr__(self):
+        """The representation"""
+        return self.__get_repr()
+    
+    def __get_repr(self):
+        """Gets the str representation"""
+        if self.gc.id=='UntrackedData':
+            gctxt=f"""Gaia data retrieved at coordinates
+RA={self.gc.ra:.2f} DEC={self.gc.dec:.2f}
+"""
+        else:
+            gctxt=f"""Data sample for cluster {self.gc.id}
+"""
+        stxt = '\nData Columns:\n'
+        for name in self.sample.colnames:
+            stxt += name.lower()+' - '
+        stxt = stxt[:-3]
+        return gctxt+stxt
         
 
 class GaiaQuery:
@@ -271,6 +285,7 @@ class GaiaQuery:
         if gc is None:
             ra = kwargs.get('ra', None)
             dec = kwargs.get('dec', None)
+            gc = Cluster(ra=ra, dec=dec)
             savename = kwargs.get('name', 'UntrackedData')
         else:
             ra = gc.ra
@@ -295,7 +310,9 @@ class GaiaQuery:
             self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
-        sample = self._run_query(savename, ra, dec, radius, dat, cond, save)
+        samp = self._run_query(savename, ra, dec, radius, dat, cond, save)
+        sample = Sample(samp, gc=gc)
+        sample.qinfo = self._queryInfo['Scan Info']
         return sample
 
     def get_astrometry(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
@@ -342,6 +359,7 @@ class GaiaQuery:
         if gc is None:
             ra = kwargs.get('ra', None)
             dec = kwargs.get('dec', None)
+            gc = Cluster(ra=ra, dec=dec)
             savename = kwargs.get('name', 'UntrackedData')
         else:
             ra = gc.ra
@@ -367,7 +385,9 @@ class GaiaQuery:
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         astro_cluster = self._run_query(savename, ra, dec, radius, astrometry, cond, save)
-        return astro_cluster
+        astro_sample = Sample(astro_cluster, gc=gc)
+        astro_sample.qinfo = self._queryInfo['Scan Info']
+        return astro_sample
 
     def get_photometry(self, radius, gc:Cluster=None, save:str=False, **kwargs):
         """
@@ -413,6 +433,7 @@ class GaiaQuery:
         if gc is None:
             ra = kwargs.get('ra', None)
             dec = kwargs.get('dec', None)
+            gc = Cluster(ra=ra, dec=dec)
             savename = kwargs.get('name', 'UntrackedData')
         else:
             ra = gc.ra
@@ -438,7 +459,9 @@ class GaiaQuery:
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         photo_cluster = self._run_query(savename, ra, dec, radius, photometry, cond, save)
-        return photo_cluster
+        phot_sample = Sample(photo_cluster, gc=gc)
+        phot_sample.qinfo = self._queryInfo['Scan Info']
+        return phot_sample
 
     def get_rv(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
         """
@@ -483,6 +506,7 @@ class GaiaQuery:
         if gc is None:
             ra = kwargs.get('ra', None)
             dec = kwargs.get('dec', None)
+            gc = Cluster(ra=ra, dec=dec)
             savename = kwargs.get('name', 'UntrackedData')
         else:
             ra = gc.ra
@@ -508,6 +532,8 @@ class GaiaQuery:
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
+        rv_sample = Sample(rv_cluster, gc=gc)
+        rv_sample.qinfo = self._queryInfo['Scan Info']
         return rv_cluster
 
     def _run_query(self, gc_id, ra, dec, radius, data, cond, save):
