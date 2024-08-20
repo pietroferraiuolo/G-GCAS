@@ -305,7 +305,7 @@ class GaiaQuery:
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
-                ccond += c+', '
+                ccond += cond[c]+', '
             ccond += cond[-1]
             self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
@@ -379,7 +379,7 @@ class GaiaQuery:
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
-                ccond += c+', '
+                ccond += (cond[c]+', ')
             ccond += cond[-1]
             self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
@@ -449,11 +449,11 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'photometry'}
             }
-        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
-                ccond += c+', '
+                ccond += cond[c]+', '
             ccond += cond[-1]
             self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
@@ -526,7 +526,7 @@ class GaiaQuery:
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
-                ccond += c+', '
+                ccond += cond[c]+', '
             ccond += cond[-1]
             self._queryInfo['Scan Info']['Conditions Applied'] = ccond
         else:
@@ -650,17 +650,23 @@ Loading it...""")
             if isinstance(data, list):
                 for i in range(len(data)-1):
                     dat += data[i]+', '
-                dat += data[len(data)-1]
+                dat += data[-1]
             else: dat=data
         else: dat='source_id'
         if conditions != 'None':
             if isinstance(conditions, str):
                 conditions = conditions.split(',')
-                cond = '  AND '
+                cond = 'AND '
                 for i in range(len(conditions)-1):
                     cond += conditions[i]+"""
-                    AND """
-                cond += conditions[len(conditions)-1]
+    AND """
+                cond += conditions[-1]
+            else:
+                cond = 'AND '
+                for i in range(len(conditions)-1):
+                    cond += conditions[i]+"""
+    AND """
+                cond += conditions[-1]
         return dat, cond
 
     def _adqlWriter(self, ra, dec, radius, data, conditions):
@@ -687,17 +693,13 @@ Loading it...""")
             The full string to input the query with.
 
         """
-        if isinstance(ra, u.Quantity) and isinstance(dec, u.Quantity):
-            ra = str(ra / u.deg)
-            dec= str(dec / u.deg)
-        else:
-            ra = str(ra)
-            dec = str(dec)
+        if isinstance(ra, u.Quantity):
+            ra = ra / u.deg
+        if isinstance(dec, u.Quantity):
+            dec= dec / u.deg
         if isinstance(radius, u.Quantity):
-            radius  = str(radius / u.deg)
-        else:
-            radius = str(radius)
-        circle  = ra + "," + dec + "," + radius
+            radius  = radius / u.deg
+        circle  = f"{ra},{dec},{radius:.3f}"
         dat, cond = self._formatCheck(data, conditions)
         query = self._baseQ.format(data=dat, table=self._table, circle=circle, cond=cond)
         self.last_query = query

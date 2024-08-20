@@ -66,6 +66,7 @@ class Cluster:
             self.rh     = parms.loc['rh']/60 * u.deg
             self.w0     = parms.loc['w0']
             self.logc   = parms.loc['logc']
+            self.rt     = self.rc*10**self.logc
             self.cflag  = ['True ' if parms.loc['collapsed']=='Y' else False][0]
         else:
             print('Not a Cluster: no model available')
@@ -92,6 +93,7 @@ Harris Catalog 2010 edition Parameters
 .cflag                      Collapsed -> {self.cflag}
 .rc      Core radius        {self.rc:.3f}
 .rh      Half-Light radius  {self.rh:.3f}
+.rt      Tidal Radius       {self.rt:.3f}
 """
         return text
 
