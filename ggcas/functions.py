@@ -15,10 +15,18 @@ Examples
 """
 import numpy as np
 import sympy as sp
+from astropy import units as u
 
-def angular_separation():
+def angular_separation(ra0, dec0):
     """
+    
 
+    Parameters
+    ----------
+    ra0 : float
+        DESCRIPTION.
+    dec0 : float
+        DESCRIPTION.
 
     Returns
     -------
@@ -28,13 +36,19 @@ def angular_separation():
         DESCRIPTION.
 
     """
-    ra1, ra0, dec1, dec0 = sp.symbols('ra1 ra0 dec1 dec0')
+    ra1, dec1 = sp.symbols('ra1 dec1')
+    if isinstance(ra0, u.Quantity):
+        ra0 = float(ra0/u.deg)
+    if isinstance(dec0, u.Quantity):
+        dec0=float(dec0/u.deg)
     d2r = np.pi/180
     w = 2*sp.asin(sp.sqrt(sp.sin((dec0-dec1)*0.5*d2r)**2 + \
-                          sp.cos(dec0*d2r)*sp.cos(dec1*d2r) * \
+                          np.cos(dec0*d2r)*sp.cos(dec1*d2r) * \
                           sp.sin((ra0-ra1)*0.5*d2r)**2))/d2r
-    variables = [ra1, dec1, ra0, dec0]
-    return w, variables
+    variables = [ra1, dec1]
+    func = {'f': w,
+            'vars': variables}
+    return func
 
 def los_distance():
     """

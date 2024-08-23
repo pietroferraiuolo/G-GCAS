@@ -57,16 +57,16 @@ object:
     150 ebpminrp_gspphot_upper
     151 libname_gspphot
 """
-import os, configparser, numpy as np
 from typing import Optional, Union
+import os, configparser, numpy as np
 from astropy.table import Table
 from astropy import units as u
 from astroquery.gaia import Gaia
 from ggcas.cluster import Cluster
 from ggcas.utility import folder_paths as fn, osutils as osu
 from ggcas.utility.osutils import _timestamp
-QDATA = 'query_data.txt'
-QINFO = 'query_info.ini'
+_QDATA = 'query_data.txt'
+_QINFO = 'query_info.ini'
 
 def available_tables(key:str=None):
     """
@@ -93,7 +93,7 @@ def available_tables(key:str=None):
 class Sample:
     """
     Class for better handling the query result sample.
-    
+
     Parameters
     ----------
     gc : ggcas.cluster.Cluster
@@ -106,15 +106,15 @@ class Sample:
         self.gc     = gc
         self.qinfo  = None
         self.sample = sample
-    
+
     def __str__(self):
         """The string representation"""
         return self.gc.__str__()+'\n'+self.sample.__str__()
-    
+
     def __repr__(self):
         """The representation"""
         return self.__get_repr()
-    
+
     def __get_repr(self):
         """Gets the str representation"""
         if self.gc.id=='UntrackedData':
@@ -129,7 +129,7 @@ RA={self.gc.ra:.2f} DEC={self.gc.dec:.2f}
             stxt += name.lower()+' - '
         stxt = stxt[:-3]
         return gctxt+stxt
-        
+
 
 class GaiaQuery:
     """
@@ -226,6 +226,7 @@ class GaiaQuery:
                   {cond}
                 """
         self.last_result = None
+        self.last_query = None
         print(f"Initialized with Gaia table: '{gaia_table}'")
 
     def __repr__(self):
@@ -322,7 +323,8 @@ class GaiaQuery:
         to add personalized query conditions.
 
         The retrieved data is:
-        'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
+        'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra,
+        pmra_error, pmdec, pmdec_error'
 
         Parameters
         ----------
@@ -396,7 +398,8 @@ class GaiaQuery:
         to add personalized query conditions.
 
         The retrieved data is:
-        'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
+        'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag,
+        phot_bp_rp_excess_factor, teff_gspphot'
 
         Parameters
         ----------
@@ -595,8 +598,8 @@ Loading it...""")
         fold = self._checkPathExist(name.upper())
         tnfold = os.path.join(fold, tn)
         os.mkdir(tnfold)
-        data = os.path.join(tnfold, QDATA)
-        info = os.path.join(tnfold, QINFO)
+        data = os.path.join(tnfold, _QDATA)
+        info = os.path.join(tnfold, _QINFO)
         if isinstance(dat, Table) is False:
             dat = Table(dat)
         dat.write(data, format='ascii.tab')
@@ -728,7 +731,7 @@ Loading it...""")
             return False
         check = False
         for tn in tns:
-            file_path = os.path.join(tn, QINFO)
+            file_path = os.path.join(tn, _QINFO)
             if os.path.exists(file_path):
                 config.read(file_path)
                 try:
@@ -741,7 +744,7 @@ Loading it...""")
                 if (data_acquired == self._queryInfo['Scan Info']['Data Acquired'] and
                     conditions_applied == self._queryInfo['Scan Info']['Conditions Applied'] and
                     scan_radius == str(self._queryInfo['Scan Info']['Scan Radius'])):
-                    check = (True, os.path.join(tn, QDATA))
+                    check = (True, os.path.join(tn, _QDATA))
                     break
         return check
 

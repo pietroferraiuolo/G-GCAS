@@ -18,6 +18,10 @@ setuptools.setup(
     name=about['__title__'],
     version=about['__version__'],
     packages=setuptools.find_packages(),
+    include_package_data=True,
+    package_data={
+        'ggcas': ['data/*.xlsx', 'data/query/**/**/*.txt', 'data/models/**/*.txt'],
+    },
     install_requires=requires,
     author=about['__author__'],
     author_email=about['__author_email__'],

@@ -22,9 +22,7 @@ Now we can call methods to read the parameters
 >>> ngc104.w0
 8.82
 """
-import os, shutil
-import pandas as pd
-import numpy as np
+import os, shutil, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.table import Table

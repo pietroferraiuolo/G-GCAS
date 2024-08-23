@@ -12,80 +12,90 @@ How to Use it
 """
 import os
 import subprocess
+import multiprocessing as mp
 from typing import Dict, Any
 import numpy as np
 import sympy as sp
 from . import _glpoints
 from ggcas.utility import folder_paths as fn, osutils as osu
 
-king_dir = fn.KING_INTEGRATOR_FOLDER
-king_exe = os.path.join(king_dir, 'king_integrator')
+_king_dir = fn.KING_INTEGRATOR_FOLDER
+_king_exe = os.path.join(_king_dir, 'king_integrator')
 
-def gaus_legendre_integrator(fnc, a, b, points):
+def compute_numerical_function(func, variables, var_data):
     """
-    Integrates the function fcn(x) between a and b using the Gauss-Legendre method.
+    Compute the numerical value of a function, passing by the function, it's
+    variables and the data associated to the variables.
 
     Parameters
     ----------
-    fcn : callable
-        The function to integrate.
-    a : float
-        The lower limit of integration.
-    b : float
-        The upper limit of integration.
-    points : int
-        The number of points to use for the integration (20, 40, 80, 96).
+    func : sympy.core.function
+        Function to compute. Must be a sympy expression.
+    variables : list of sympy variables
+        Variables of the function, as sympy symbols, organizaed in a list.
+    var_data : list of ndarray
+        Numerical values of the variables, organized in a list ordered the same
+        way as the order of the variable list.
 
     Returns
     -------
-    area : float
-        The integral area of fcn(x) from a to b.
+    computed_func : float | ArrayLike
+        List of values of the function computed for each data point.
 
     Notes
     -----
-    Note that the imput function must be a 'pythonic' function, and not a sympy
-    functions, as it is not implemented yet.
+    When the computation exceeds the minute running with all cores, which should
+    happen with ~ 2500 points per core, the expression gets compiled with numpy
+    significantly increasing computations times, while being compatible with the
+    full computation up to 10e-9.
     """
-    if points == 20:
-        x = np.array(_glpoints.x20)
-        w = np.array(_glpoints.w20)
-    elif points == 40:
-        x = np.array(_glpoints.x40)
-        w = np.array(_glpoints.w40)
-    elif points == 80:
-        x = np.array(_glpoints.x80)
-        w = np.array(_glpoints.w80)
-    elif points == 96:
-        x = np.array(_glpoints.x96)
-        w = np.array(_glpoints.w96)
+    data = np.array(var_data)
+    N = data.shape[-1]
+    n_cores = mp.cpu_count()
+    val_dicts = []
+    for n in range(len(var_data[0])):
+        data_dict = {}
+        for i, var in enumerate(variables):
+            var_name = f"{var}"
+            data_dict[var_name] = var_data[i][n]
+        val_dicts.append(data_dict)
+    if N < 5000:
+        # Normal symbolic computation
+        print(f'Computing simbolic function with {N} data points')
+        print('Computation up to 1 minute...')
+        computed_func = [float(sp.N(func.subs(vals))) for vals in val_dicts]
+        print('Complete.')
+    elif N<(2500*n_cores):
+        # multiprocessing computation
+        def compute_sympy(vals):
+            return float(sp.N(func.subs(vals)))
+        print(f"Large dataset: using all {n_cores} cores")
+        with mp.Pool(n_cores) as pool:
+            computed_func = pool.map(compute_sympy, val_dicts)
     else:
-        raise ValueError("Supported point values are 20, 40, 80, and 96.")
-    area = 0.0
-    try:
-        for i in range(int(points/2)):
-            xi = (b - a) / 2.0 * x[i] + (b + a) / 2.0
-            area += w[i] * fnc(xi)
-            xi = -(b - a) / 2.0 * x[i] + (b + a) / 2.0
-            area += w[i] * fnc(xi)
-    except TypeError as te:
-        raise NotImplementedError(f"{type(fnc)} function type not implemented yet. Define your function using the classic python functions definition") from te
-    area *= (b - a) / 2.0
-    return area
+        # lambdify computation
+        print("WARNING: too many points, compiling expression with NumPy.")
+        f_lambdified = sp.lambdify(variables, func, modules="numpy")
+        computed_func = f_lambdified(*var_data)
+        result = []
+        for x in computed_func:
+            result.append(float(x))
+    return np.array(result)
 
 def compute_error(func, variables, var_data, var_errors, corr:bool=False,
                                                         corr_values:list=None):
     """
-
+    Numerical computation of the error-formula for the input function.
 
     Parameters
     ----------
-    func : TYPE
+    func : sympy function
         DESCRIPTION.
-    variables : TYPE
+    variables : list of sympy symbols
         DESCRIPTION.
-    var_data : TYPE
+    var_data : list of ndarray
         DESCRIPTION.
-    var_errors : TYPE
+    var_errors : list of ndarray
         DESCRIPTION.
     corr : bool, optional
         DESCRIPTION. The default is False.
@@ -94,7 +104,7 @@ def compute_error(func, variables, var_data, var_errors, corr:bool=False,
 
     Returns
     -------
-    computed_error : TYPE
+    computed_error : list of floats
         DESCRIPTION.
 
     """
@@ -121,37 +131,6 @@ def compute_error(func, variables, var_data, var_errors, corr:bool=False,
             vals_to_pass.append(corr_values[0])
     computed_error = compute_numerical_function(func, vars_to_pass, vals_to_pass)
     return computed_error
-
-def compute_numerical_function(func, variables, var_data):
-    """
-    Compute the numerical value of a function, passing by the function, it's
-    variables and the data associated to the variables.
-
-    Parameters
-    ----------
-    func : sympy.core.function
-        Function to compute. Must be a sympy expression.
-    variables : list of sympy variables
-        Variables of the function, as sympy symbols, organizaed in a list.
-    var_data : list of ndarray
-        Numerical values of the variables, organized in a list ordered the same
-        way as the order of the variable list.
-
-    Returns
-    -------
-    computed_func : float | ArrayLike
-        List of values of the function computed for each data point.
-
-    """
-    val_dicts = []
-    for n in range(len(var_data[0])):
-        data_dict = {}
-        for i, var in enumerate(variables):
-            var_name = f"{var}"
-            data_dict[var_name] = var_data[i][n]
-        val_dicts.append(data_dict)
-    computed_func = [float(sp.N(func.subs(vals))) for vals in val_dicts]
-    return computed_func
 
 def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]:
     """
@@ -215,6 +194,57 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
         returns["correlations"] = corr
     return returns
 
+def gaus_legendre_integrator(fnc, a, b, points):
+    """
+    Integrates the function fcn(x) between a and b using the Gauss-Legendre method.
+
+    Parameters
+    ----------
+    fcn : callable
+        The function to integrate, written as a callable python function.
+    a : float
+        The lower limit of integration.
+    b : float
+        The upper limit of integration.
+    points : int
+        The number of points to use for the integration (20, 40, 80, 96).
+
+    Returns
+    -------
+    area : float
+        The integral area of fcn(x) from a to b.
+
+    Notes
+    -----
+    Note that the imput function must be a 'pythonic' function, and not a sympy
+    functions, as it is not implemented yet.
+    """
+    if points == 20:
+        x = np.array(_glpoints.x20)
+        w = np.array(_glpoints.w20)
+    elif points == 40:
+        x = np.array(_glpoints.x40)
+        w = np.array(_glpoints.w40)
+    elif points == 80:
+        x = np.array(_glpoints.x80)
+        w = np.array(_glpoints.w80)
+    elif points == 96:
+        x = np.array(_glpoints.x96)
+        w = np.array(_glpoints.w96)
+    else:
+        raise ValueError("Supported point values are 20, 40, 80, and 96.")
+    area = 0.0
+    try:
+        for i in range(int(points/2)):
+            xi = (b - a) / 2.0 * x[i] + (b + a) / 2.0
+            area += w[i] * fnc(xi)
+            xi = -(b - a) / 2.0 * x[i] + (b + a) / 2.0
+            area += w[i] * fnc(xi)
+    except TypeError as te:
+        raise NotImplementedError(f"{type(fnc)} function type not implemented yet. Define your function using the classic python functions definition") from te
+    area *= (b - a) / 2.0
+    return area
+
 def king_integrator(w0, output='profile'):
     r"""
     This function calls a Fortran90 code for the Single-Mass King model integration
@@ -251,15 +281,15 @@ def king_integrator(w0, output='profile'):
     """
     if isinstance(w0, (float, int)):
         w0 = str(w0)
-    result = subprocess.run([king_exe, w0], capture_output=True, text=True,
-                            cwd=king_dir, check=False)
+    result = subprocess.run([_king_exe, w0], capture_output=True, text=True,
+                            cwd=_king_dir, check=False)
     if result.returncode != 0:
         print("Error during trhe Fortran90 code execution:")
         print(result.stderr)
     else:
         print("Calling Fortran90 code executor...\n")
         print(result.stdout)
-    filelist = osu.get_file_list(fold=king_dir, key='.dat')
+    filelist = osu.get_file_list(fold=_king_dir, key='.dat')
     result = []
     if 'all' in output:
         result = filelist

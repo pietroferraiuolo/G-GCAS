@@ -3,42 +3,41 @@
 .ggcas
 |
 |__data
-    |
-    |__Catalogue.xlsx
-    |
-    |__query
-    .    |
-    .    |__{gc1}
-    .    |
-    .    |__{gc2}
-    .    |
-    .    |__{gc3}
-    .    .
-    .    .
-    .    .
-    .    |__{gcn}
-    .        |
-    .        |___{tn}
-    .             |
-    .             |__'query_data.txt'
-    .             |
-    .             |
-    .             |__'query_info.ini'
-    .             |
-    .             |
-    .             |__'spatial_info.txt'
-    .             |
-    .             |
-    .             |__'velocity_info.txt'
-    .             |
-    .             |
-    .             |__data4
-    |
-    |
-    |__models
-        |
-        |__{gcn}
-            |
-            |___'SM_king.txt'
-            |
-            |___'MM_king.txt'
+.    |
+.    |__Catalogue.xlsx
+.    |
+.    |__query
+.    .    |
+.    .    |__{gc1}
+.    .    |
+.    .    |__{gc2}
+.    .    |
+.    .    |__{gc3}
+.    .    .
+.    .    .
+.    .    .
+.    .    |__{gcn}
+.    .        |
+.    .        |___{tn}
+.    .             |
+.    .             |__'query_data.txt'
+.    .             |
+.    .             |
+.    .             |__'query_info.ini'
+.    .             |
+.    .             |
+.    .             |__'spatial_info.txt'
+.    .             |
+.    .             |
+.    .             |__'velocity_info.txt'
+.    |
+.    |
+.    |__models
+.        |
+.        |__{gcn}
+.            |
+.            |___'SM_king.txt'
+.            |
+.            |___'MM_king.txt'
+|
+|__modules...
