@@ -76,28 +76,11 @@ class Cluster:
 
     def __str__(self):
         """String representation"""
-        text = \
-f"""
-Harris Catalog 2010 edition Parameters
-
-       Key                  Value
-----------------------------------------
-.id      Cluster Name       {self.id}
-.ra      Position in sky    RA  {self.ra:.2f}
-.dec                        DEC {self.dec:.2f}
-.dist    Distance           {self.dist:.2f}
-.w0      W0 Parameter       {self.w0}
-.logc    Concentration      logc={self.logc:.2f}
-.cflag                      Collapsed -> {self.cflag}
-.rc      Core radius        {self.rc:.3f}
-.rh      Half-Light radius  {self.rh:.3f}
-.rt      Tidal Radius       {self.rt:.3f}
-"""
-        return text
+        return self.__get_str()
 
     def __repr__(self):
         """Representation"""
-        return f"<ggcas.cluster.Cluster object: {self.id}>"
+        return self.__get_repr()
 
     def show_model(self, **kwargs):
         """
@@ -183,3 +166,38 @@ Harris Catalog 2010 edition Parameters
             model['rho'] = mod.rho_rho0
             shutil.move(result, os.path.join(self.model_path, 'SM_king.txt'))
         return model
+
+    def __get_repr(self):
+        """repr creation"""
+        if self.id=='UntrackedData':
+            text = "<ggcas.cluster.Cluster object>"
+        else:
+            text = f"<ggcas.cluster.Cluster object: {self.id}>"
+        return text
+
+    def __get_str(self):
+        """str creation"""
+        if self.id=='UntrackedData':
+            text= \
+f"""
+Scansion at RA {self.ra:.3f} DEC {self.dec:.3f}
+"""
+        else:
+            text = \
+f"""
+Harris Catalog 2010 edition Parameters
+
+       Key                  Value
+----------------------------------------
+.id      Cluster Name       {self.id}
+.ra      Position in sky    RA  {self.ra:.2f}
+.dec                        DEC {self.dec:.2f}
+.dist    Distance           {self.dist:.2f}
+.w0      W0 Parameter       {self.w0}
+.logc    Concentration      logc={self.logc:.2f}
+.cflag                      Collapsed -> {self.cflag}
+.rc      Core radius        {self.rc:.3f}
+.rh      Half-Light radius  {self.rh:.3f}
+.rt      Tidal Radius       {self.rt:.3f}
+"""
+        return text

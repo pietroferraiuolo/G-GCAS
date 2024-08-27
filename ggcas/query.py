@@ -301,7 +301,7 @@ class GaiaQuery:
             'Flag': {'Query': 'free'}
             }
         dat = osu.get_kwargs(('data', 'dat','params', 'parameters'), 'source_id', kwargs)
-        self._queryInfo['Scan Info']['Data Acquired'],_ = self._formatCheck(dat, None)
+        self._queryInfo['Scan Info']['Data Acquired'],_ = self._formatCheck(dat, 'None')
         cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''

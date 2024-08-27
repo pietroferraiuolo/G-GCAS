@@ -16,7 +16,9 @@ Documentation
 import os, numpy as np
 from matplotlib import pyplot as plt
 from ggcas.cluster import Cluster
-from ggcas.analyzers import calculus, effective_potential as efp, dynamics as dy
+from ggcas.analyzers import calculus as gcalc
+from ggcas.analyzers import effective_potential as gep
+from ggcas.analyzers import dynamics as gdy
 from ggcas.query import GaiaQuery
 from ggcas import plots as gplt, functions as gfnc
 dr3 = GaiaQuery()
