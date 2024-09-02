@@ -301,8 +301,8 @@ $\sigma^2$  = {:.2e}"""
 
 def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     """
-    Make a scatter plot of a quantity 'x', with its projected histogram, relati
-    ve to a quantity 'y'.
+    Make a scatter plot of a quantity 'x', with its projected histogram, relative
+    to a quantity 'y'.
 
     Parameters
     ----------
@@ -368,4 +368,63 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     title = xlabel+' distribution '
     fig = plt.suptitle(title, fontsize=23.5)
     plt.show()
-    return mean_x, err_xm
+    return [mean_x, err_xm]
+
+def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
+    """
+    Scatter plot with errorbars.
+
+    Parameters
+    ----------
+    data : ndarray
+        DESCRIPTION.
+    dataerr : ndarray
+        DESCRIPTION.
+    x : ndarray, optional
+        DESCRIPTION. The default is None.
+    xerr : ndarray, optional
+        DESCRIPTION. The default is None.
+
+    Other Parameters
+    ----------------
+    **kwargs : Additional callbacks for matplotlib (see matplotlib.pyplot.errorbar documentation).
+        fmt : str
+            Scatter point shape.
+        color : str
+            Scatter point color.
+            Aliases - 'sc' ; 'scolor' ; 'scatcol'
+        ecolor : str
+            Error bar color.
+            Aliases - 'ec' ; 'errc' ; 'errcolor' ; 'errorcolor'
+        markersize : float
+            Scatter point size.
+            Aliases - 's' ; 'ms'
+        capsize : float
+            Errorbar cap length.
+        elinewidth : float
+            Errorbar thickness.
+            Aliases - 'elw' ; 'errlinew'
+        barsabove : bool
+            If Ture, the errorbars will be plotted over the scatter points
+        title : str
+        xlabel : str
+        ylabel : str
+    """
+    ec     = osu.get_kwargs(('ecolor', 'ec', 'errc', 'errcolor','errorcolor'), 'red', kwargs)
+    sc     = osu.get_kwargs(('color', 'scolor', 'sc', 'scatcol'), 'black', kwargs)
+    ms     = osu.get_kwargs(('markersize', 'ms', 's'), 2, kwargs)
+    cs     = kwargs.get('capsize', 1.5)
+    ba     = kwargs.get('barsabove', False)
+    elw    = osu.get_kwargs(('elinewidth', 'elw', 'errlinew'), 1, kwargs)
+    fmt    = kwargs.get('fmt', 'x')
+    title  = kwargs.get('title', '')
+    xlabel = kwargs.get('xlabel', '')
+    ylabel = kwargs.get('ylabel', '')
+    x = np.linspace(0, 1, len(data)) if x is None else x
+    plt.figure()
+    plt.errorbar(x, data, yerr=dataerr, xerr=xerr, fmt=fmt, capsize=cs, ecolor=ec, \
+                 elinewidth=elw, markersize=ms, color=sc, barsabove=ba)
+    plt.xlabel(xlabel, fontdict=label_font)
+    plt.ylabel(ylabel, fontdict=label_font)
+    plt.title(title, fontdict=title_font)
+    plt.show()

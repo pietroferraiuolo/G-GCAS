@@ -17,89 +17,147 @@ import numpy as np
 import sympy as sp
 from astropy import units as u
 
-def angular_separation(ra0, dec0):
+def angular_separation(ra0=None, dec0=None):
     """
-    
+
 
     Parameters
     ----------
-    ra0 : float
+    ra0 : float, optional
         DESCRIPTION.
-    dec0 : float
+    dec0 : float, optional
         DESCRIPTION.
 
     Returns
     -------
-    w : sympy expression
-        DESCRIPTION.
-    variables : list of sympy symbols
+    func : dict
         DESCRIPTION.
 
     """
-    ra1, dec1 = sp.symbols('ra1 dec1')
-    if isinstance(ra0, u.Quantity):
-        ra0 = float(ra0/u.deg)
-    if isinstance(dec0, u.Quantity):
-        dec0=float(dec0/u.deg)
-    d2r = np.pi/180
-    w = 2*sp.asin(sp.sqrt(sp.sin((dec0-dec1)*0.5*d2r)**2 + \
-                          np.cos(dec0*d2r)*sp.cos(dec1*d2r) * \
-                          sp.sin((ra0-ra1)*0.5*d2r)**2))/d2r
+    ra1, dec1 = sp.symbols('alpha_1 \delta_1')
     variables = [ra1, dec1]
+    d2r = np.pi/180
+    if ra0 is not None and dec0 is not None:
+        if isinstance(ra0, u.Quantity):
+            ra0 = float(ra0/u.deg)
+        if isinstance(dec0, u.Quantity):
+            dec0=float(dec0/u.deg)
+        costerm = np.cos(dec0*d2r)
+    else:
+        ra0, dec0 = sp.symbols('alpha_0 \delta_0')
+        variables.append(ra0)
+        variables.append(dec0)
+        costerm = sp.cos(dec0*d2r)
+    w = 2*sp.asin(sp.sqrt(sp.sin((dec0-dec1)*0.5*d2r)**2 + \
+                          costerm*sp.cos(dec1*d2r) * \
+                          sp.sin((ra0-ra1)*0.5*d2r)**2))/d2r
     func = {'f': w,
             'vars': variables}
     return func
 
 def los_distance():
     """
-
+    
 
     Returns
     -------
-    r : sympy expression
-        DESCRIPTION.
-    parallax : sympy symbol
+    func : TYPE
         DESCRIPTION.
 
     """
     parallax = sp.symbols('omega')
     r = 1/parallax
-    return r, parallax
+    func = {'f': r,
+            'vars': parallax}
+    return func
 
-def radial_distance_2d():
+def radial_distance_2d(analytical_w=False, **params):
+    """
+    Returns the formula for the 2d-projection on the plane of the sky of the radial
+    distance of a source from the center of the cluster (or from the given RA/DEC
+    coordinates).
+
+    Parameters
+    ----------
+    analytical_w : bool, optional
+        Whether to have the full expression of the angular separation in the returned
+        formula, or the representing symbol (if, e.g, has been altrady calculated).
+        The default is False.
+
+    Other Parameters
+    ----------------
+    **params : dict
+        Additional parameters, callback for the 'angular_separation' function.
+        ra0 : float
+            RA coordinate from which compute the angular separation.
+        dec0 : float
+            DEC coordinate from which compute the angular separation.
+
+    Returns
+    -------
+    func : dict
+        Dictionary containing the formula and the relative variables for the 
+        2D-projected radial distance.
+
+    """
+    rgc = sp.symbols('r_gc')
+    variables = [rgc]
+    if analytical_w is False:
+        w = sp.symbols('theta_x0')
+        variables.append(w)
+    else:
+        ww = angular_separation()
+        for var in ww['vars']:
+            variables.append(var)
+        w = ww['f']
+    r_2d = rgc*sp.tan(w)
+    func = {'f': r_2d,
+            'vars': variables}
+    return func
+
+def radial_distance_3d(gc_distance=None, analytical_r2d:bool=False, analytical_w:bool=False):
     """
 
 
     Returns
     -------
-    r2d : sympy expression
-        DESCRIPTION.
-    variables : list of sympy symbols
-        DESCRIPTION.
-
+    func : dict
+        Dictionary containing the formula and the relative variables for the 
+        3D radial distance.
+    
+    Notes
+    -----
+    If gc_distance is given as argument, the computation of this formula returns
+    the radial distance in parsec, otherwise the unit will be the one used when
+    passing the cluster's distance manually in the computation.
     """
-    rx, parallax = sp.symbols('r_gc theta')
-    r_2d = rx*sp.tan(parallax)
-    variables = [rx, parallax]
-    return r_2d, variables
-
-
-def radial_distance_3d():
-    """
-
-
-    Returns
-    -------
-    R : sympy expression
-        DESCRIPTION.
-    variables : list of sympy symbols
-        DESCRIPTION.
-
-    """
-    d, r2d = sp.symbols('d, r_2d')
-    r_3d = sp.sqrt(d**2 + r2d**2)
-    variables = [d, r2d]
-    return r_3d, variables
+    rx = los_distance()
+    variables = [rx['vars']]
+    if gc_distance is not None:
+        rgc = gc_distance.to(u.pc).value \
+                        if isinstance(gc_distance, u.Quantity) else gc_distance
+    else:
+        rgc = sp.symbols('r_gc')
+        variables.append(rgc)
+    if (analytical_r2d,analytical_w)==(False, True):
+        print("WARNING: 'analytical_r2d is False, no effect for analytical_w")
+    if analytical_r2d:
+        r2_d = radial_distance_2d(analytical_w=analytical_w)
+        r2d = r2_d['f']
+        for v in r2_d['vars']:
+            variables.append(v)
+        if gc_distance is not None:
+            r2d = sp.N(r2d.subs({rgc: gc_distance}))
+        variables.remove(sp.symbols('r_gc'))
+    else:
+        r2d = sp.symbols('r_2d')
+        variables.append(r2d)
+    D = rx['f']-rgc
+    r_3d = sp.sqrt(D**2 + r2d**2)
+    func = {'f': r_3d,
+            'vars': variables,
+            'd': D}
+    return func
 
 def total_velocity():
     """
@@ -107,44 +165,45 @@ def total_velocity():
 
     Returns
     -------
-    V : TYPE
-        DESCRIPTION.
-    list
-        DESCRIPTION.
-
+    func : dict
+        Dictionary containing the formula and the relative variables for the 
+        total velocity.
     """
     vx, vy = sp.symbols('v_x, v_y')
     V = 1.5*(vx**2 + vy**2)
     variables = [vx,vy]
-    return V, variables
+    func = {'f': V,
+            'vars': variables}
+    return func
 
-def effective_potential(shell = False):
+def effective_potential(shell:bool=False):
     """
 
 
     Parameters
     ----------
-    shell : TYPE, optional
+    shell : bool, optional
         DESCRIPTION. The default is False.
 
     Returns
     -------
-    poteff : TYPE
-        DESCRIPTION.
-    variables : TYPE
-        DESCRIPTION.
-
+    func : dict
+        Dictionary containing the formula and the relative variables for the 
+        effective gravitational potential.
     """
     if shell:
-        dN, x = sp.symbols('DeltaN, x')
+        dN, x, lnB = sp.symbols('\Delta\ N, x, lnB')
         A, a, b, r, m, sigma, dr, dx = sp.symbols('A, alpha, beta, r_*, m, sigma, dr, dx')
-        lnB = 16*sp.sqrt(2)*A*(sp.pi*b*r)**2 * a*(m*sigma)**3 * dr*dx
-        constants = [lnB, [A, a, b, r, m, sigma, dr, dx]]
-        variables = [dN, x]
-        variables.append(constants)
+        lnb = 16*sp.sqrt(2)*A*(sp.pi*b*r)**2 * a*(m*sigma)**3 * dr*dx
+        variables = {
+            'x': [dN, x, lnB],
+            'const': [lnb, A, a, b, r, m, sigma, dr, dx]
+            }
         poteff = lnB - sp.ln(dN/sp.sqrt(x)) - x
     else:
         x, w = sp.symbols('x, w')
         variables = [x,w]
         poteff = -sp.ln(1-sp.exp(x-w))
-    return poteff, variables
+    func = {'f': poteff,
+            'vars': variables}
+    return func

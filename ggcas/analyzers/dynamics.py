@@ -46,9 +46,21 @@ def velocity_conversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
                        mu.to(u.rad/u.s)**2 * gc_distance_error**2)/u.rad
     return vkms, vkms_err
 
-def radial_distance():
+# Passare il Sample object, così da far fare tutto a lui
+
+def compute_r2d():
     
     return
+
+def compute_r3d():
+    
+    return
+
+def compute_Vtot():
+    
+    return
+
+#
 
 def density_profile(data):
     """

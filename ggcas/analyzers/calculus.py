@@ -16,8 +16,8 @@ import multiprocessing as mp
 from typing import Dict, Any
 import numpy as np
 import sympy as sp
-from . import _glpoints
 from ggcas.utility import folder_paths as fn, osutils as osu
+from . import _glpoints
 
 _king_dir = fn.KING_INTEGRATOR_FOLDER
 _king_exe = os.path.join(_king_dir, 'king_integrator')
@@ -44,43 +44,23 @@ def compute_numerical_function(func, variables, var_data):
 
     Notes
     -----
-    When the computation exceeds the minute running with all cores, which should
-    happen with ~ 2500 points per core, the expression gets compiled with numpy
+    When the computation exceeds 30 seconds running on all cores, which should
+    happen with ~2000 points per core, the expression gets compiled with numpy,
     significantly increasing computations times, while being compatible with the
-    full computation up to 10e-9.
+    full computation precision up to 10e-9.
     """
-    data = np.array(var_data)
-    N = data.shape[-1]
     n_cores = mp.cpu_count()
-    val_dicts = []
-    for n in range(len(var_data[0])):
-        data_dict = {}
-        for i, var in enumerate(variables):
-            var_name = f"{var}"
-            data_dict[var_name] = var_data[i][n]
-        val_dicts.append(data_dict)
-    if N < 5000:
-        # Normal symbolic computation
-        print(f'Computing simbolic function with {N} data points')
-        print('Computation up to 1 minute...')
-        computed_func = [float(sp.N(func.subs(vals))) for vals in val_dicts]
-        print('Complete.')
-    elif N<(2500*n_cores):
-        # multiprocessing computation
-        def compute_sympy(vals):
-            return float(sp.N(func.subs(vals)))
-        print(f"Large dataset: using all {n_cores} cores")
-        with mp.Pool(n_cores) as pool:
-            computed_func = pool.map(compute_sympy, val_dicts)
+    N = np.array(var_data).shape[-1]
+    if N<(2000*n_cores):
+        # Multicore computation
+        print(f"Computation using all {n_cores} cores.")
+        val_dicts = _data_dict_creation(variables, var_data)
+        computed_func = _multicore_computation(n_cores, func, val_dicts)
     else:
         # lambdify computation
-        print("WARNING: too many points, compiling expression with NumPy.")
-        f_lambdified = sp.lambdify(variables, func, modules="numpy")
-        computed_func = f_lambdified(*var_data)
-        result = []
-        for x in computed_func:
-            result.append(float(x))
-    return np.array(result)
+        print("WARNING: computation time exceeding 30s. Compiling expression with NumPy.")
+        computed_func = _lambdified_computation(func, variables, var_data)
+    return np.array(computed_func)
 
 def compute_error(func, variables, var_data, var_errors, corr:bool=False,
                                                         corr_values:list=None):
@@ -183,7 +163,7 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
         for c in x:
             if c!=0:
                 corrs.append(c)
-    returns = {
+    erp = {
         "error_formula": error_formula,
         "error_variables": {
             'variables': variables,
@@ -191,8 +171,8 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
             }
     }
     if correlation:
-        returns["correlations"] = corr
-    return returns
+        erp["correlations"] = corr
+    return erp
 
 def gaus_legendre_integrator(fnc, a, b, points):
     """
@@ -269,7 +249,8 @@ def king_integrator(w0, output='profile'):
             - Etot: total energy of the system
             - params:
             - phi: information about the gravitational potential of the system
-            - profiles: (normalized) density and w0 profiles with respect to the dimentionless radial distance from the centre
+            - profiles: (normalized) density and w0 profiles with respect to the
+            dimentionless radial distance from the centre
             - Skin: Surface kinetick energy distribution
             - x0Cv:
 
@@ -307,3 +288,90 @@ def king_integrator(w0, output='profile'):
     for file in filelist:
         os.remove(file)
     return result
+
+def _multicore_computation(n_cores, func, val_dicts):
+    """
+    Computation of the input function using multicore parallelization
+
+    Parameters
+    ----------
+    n_cores : int
+        Number of cores used.
+    func : sympy function
+        The function to numerically compute.
+    val_dicts : dict
+        The dictionaries of variable-values used to compute the function.
+
+    Returns
+    -------
+    computed_func : ndarray
+        Array of the computed function.
+
+    """
+    compute = __compute_sympy(func)
+    with mp.Pool(n_cores) as pool:
+        computed_func = pool.map(compute.compute, val_dicts)
+    return computed_func
+
+def _lambdified_computation(func, variables, var_data):
+    """
+    Compute the input function compiling the sympy expression using numpy, for
+    way faster computation.
+
+    Parameters
+    ----------
+    func : sympy function
+        The function to compute.
+    variables : list of sympy symbols
+        The variables of the function.
+    var_data : ndarray
+        The values for the variables of the function.
+
+    Returns
+    -------
+    computed_func : ndarray
+        The result computed function.
+    """
+    f_lambdified = sp.lambdify(variables, func, modules="numpy")
+    result = f_lambdified(*var_data)
+    computed_func = []
+    for x in result:
+        computed_func.append(float(x))
+    return computed_func
+
+def _data_dict_creation(variables, var_data):
+    """
+    function which creates the list of dictionaries in the format needed to compute
+    sympy functions.
+
+    Parameters
+    ----------
+    variables : list of sympy symbols
+        The variables of the function to compute.
+    var_data : ndarray
+        the values for the variables of the function to compute.
+
+    Returns
+    -------
+    val_dicts : list of dict
+        A list of dictionaries, each containing the variables with an associated
+        value, to be passed to the function in order to be computed.
+    """
+    N = np.array(var_data).shape[-1]
+    val_dicts = []
+    for n in range(N):
+        data_dict = {}
+        for i, var in enumerate(variables):
+            var_name = f"{var}"
+            data_dict[var_name] = var_data[i][n]
+        val_dicts.append(data_dict)
+    return val_dicts
+
+class __compute_sympy():
+    """
+    Sub-Class for multiprocessing computation
+    """
+    def __init__(self, func):
+        self.f = func
+    def compute(self, vals):
+        return float(sp.N(self.f.subs(vals)))
