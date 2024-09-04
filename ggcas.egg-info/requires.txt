@@ -5,4 +5,3 @@ matplotlib
 astropy
 astroquery
 sympy
-datetime
