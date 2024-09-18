@@ -6,8 +6,8 @@
 !C    CALCOLA COL FORMALISMO NEWTONIANO LE CONFIGURAZIONI DI EQUILIBRIO
 !C    GRAVITAZIONALE DI UN GAS. LA FUNZIONE DI DISTRIBUZIONE DI KING E'
 !C    TRATTATA COME NELL'ARTICOLO DEL 1966
-!C
-!C
+!C    KING I.P. 1966 AJ 71 64
+
       PROGRAM MAIN
         IMPLICIT REAL*8(A-H,O-Z)
         REAL*4 temp1,temp2
@@ -22,7 +22,6 @@
         !      DIMENSION PARW0(2000) !221
         ! subroutines do not need external declaration!!!!
         EXTERNAL FCT,OUTP, INTGAU!, SURFDENS
-!   real*8 fcnqd
         external :: fcnqd, fcnqd1, fcnqd2
         external :: fu1, fu2, fu3, fu4, funzerr, funzione
         real :: w0
@@ -51,8 +50,6 @@
    DATA NAMESID/"NGC 4372","NGC 5139","NGC 6121","NGC 6656",&
    "Pal 5","GLIMPSE02"/
 
-
-   !PRINT*,"Analyzed the following GCs: ",NAMESID
    OPEN(UNIT=1,FILE='params.dat',STATUS='replace') !,ACCESS='append')
    CLOSE(UNIT=1,STATUS='keep')
    OPEN(UNIT=1,FILE='profiles.dat',STATUS='replace')!,ACCESS='append')
@@ -74,7 +71,6 @@
    WRITE(1,303)'w0 x1 x2 x3 xi1 xi2 xi3 conc c'
    CLOSE(UNIT=1,STATUS='keep')
    OPEN(UNIT=1,FILE='Skin.dat',STATUS='replace')
-   ! WRITE(1,303)'x xi w Sk'
    CLOSE(UNIT=1,STATUS='keep')
 
    temp1=0.0d0
@@ -82,23 +78,16 @@
    call second(temp1)
 
    PRINT*, 'Executing Single-Mass King model integration routine.'
-   !PRINT*,'IW1,IW2,IWSTEP  1,200,1  W0 = PARW0(IW)'
-!     READ*, IW1,IW2,IWSTEP
    IW1=1
    IW2=6!135!160    !221
    IWSTEP=1
-!     Costruisco un ciclo che va da w0=0.1 a w0=45
-!        PARW0(1)=0.1d0
-!        DO i=2,IW2
-!           PARW0(i)=PARW0(i-1)+0.1d0
-!        ENDDO
 
 !    l'indice che precisa che subroutine per gli integrali si vuole usare
 !    il valore 3 corrisponde a 80 punti
 
    indgau = 4
 
-!    l'errore relativo si decide a priori e ci d� la precisione voluta
+!    l'errore relativo si decide a priori e ci da la precisione voluta
    relerr = 1.d-9
 
 
@@ -116,14 +105,12 @@
       dw(1) = 0.d0
       wwww = w0
       estr2= w0
-      !call prova(funzione, "PROVA", 2.0D0)
       call intgau(fcnqd,qd)
-      !print*,qd
       rho0 = qd
-   !        PRINT*,rho0,IW
          rapp(1) = qd/rho0
 
-   !       INIZIALIZZAZIONE (per evitare la singolarit� iniziale)
+!c ********************** INIZIALIZZAZIONE **************************
+!c             (per evitare la singolarità iniziale)
       AAA  = -1.5d0
       XMIN = (-relerr*w0/AAA)**0.5d0
       IIII = DLOG10(XMIN)
@@ -140,8 +127,8 @@
       call intgau(fcnqd,qd)
       rapp(2) = qd/rho0
 
-!       FINE INIZIALIZZAZIONE
-!
+!c ******************* FINE INIZIALIZZAZIONE ************************
+!********************************************************************
       nfn   = 2
       passo = x(nfn)/10.0d0!10!2
       xmax  = x(nfn)*10.0d0!10!2
@@ -202,7 +189,6 @@
          IF(kk==nfn) csi(kk)=conc/conc
       END DO
 
-
       xlogc =   dlog10(conc)
       xmu1  = -(4.d0*pai/9.d0)*(x(nfn-1)**2.d0)*dw(nfn-1)
       xmu2  = -(4.d0*pai/9.d0)*(x(nfn)**2.d0)*dw(nfn)
@@ -221,9 +207,6 @@
    !  Evaluate heat capacity profile and total value
       call calorespecifico(fcnqd1,fu1,fu2,fu3,fu4)!,funzerr)
 
-   !  xKb=1.380649d-23 !J/K
-   !  xKb=1.380649d-16  !erg/K
-   !  xKb=8.61733262d-5  !eV/K
       xKb=1.0d0
       Ct0_NtK=xKb*Ctot0
       Ct1_NtK=xKb*Ctot1!/xmu
@@ -270,17 +253,7 @@
          secpezz(l)=sum2
 
       phi_g2(l)=-(9.d0/xm_k)*((sum1/x(l))+sum2)
-
-   !     phi_g2(l)=-(9.d0)*(mu_r(l)/x(l)+secpezz(l))
-   !     PRINT*,phi_g(l),phi_g2(l),phi_g(l)-phi_g2(l),sum1, sum2
-   !           PRINT*,xmu_r(l),secpezz(l)
       ENDDO
-
-
-
-
-
-   !     2: Egr=(1/2)int_0^R rho*phi_g dV
       DO k=2,nfn-1
          eg2(k)=xnhat(k)*(-9.d0)*((xmu_r(k)/x(k)))!+secpezz(k))!*(-C-w(k))
       ENDDO
@@ -295,35 +268,12 @@
          sum=sum+b*h*0.5d0
       ENDDO
       egt2=sum*4.d0*pai
-   !        egt3=2.d0*egt2
-   !        PRINT*,egt,egt2,egt-egt2
-
       Shat=IW*0.01d0
-
-
    !    scrive i parametri principali delle configurazioni in un unico file
    !    w0, concentrazione, log10 concentrazione, mu (massa adimensionale)
-
       OPEN(UNIT=1,FILE='params.dat',STATUS='old',ACCESS='append')
       WRITE(1,301) w0,conc,xlogc,xmu
       CLOSE(UNIT=1,STATUS='keep')
-
-
-!     scrive i profili di ogni configurazione (uno di seguito all'altro)
-!     IF(w0==1..OR.w0==3..OR.w0==5..OR.w0==7..OR.w0==9..OR.w0==12.)THEN
-!      IF((abs(xlogc-1.28).le.0.01).OR.(abs(xlogc-1.48).le.0.01)
-!     1  .OR.(abs(xlogc-1.68).le.0.01).OR.(abs(xlogc-1.88).le.0.01))THEN
-!     IF(w0==8.d0.OR.w0==8.1d0)THEN
-!     IF(w0==6.15d0.OR.w0==7.58d0.OR.w0==8.50d0)THEN
-
-!        IF(IW==1.OR.IW==25.OR.IW==50.OR.IW==75.OR.IW==100.OR.IW==125
-!     1       .OR.IW==150.OR.IW==175.OR.IW==200)THEN
-!      IF((abs(xlogc-0.5).le.0.015).OR.(abs(xlogc-1.0).le.0.015).OR.
-!     1       (abs(xlogc-1.5).le.0.015).OR.(abs(xlogc-2.0).le.0.015).OR.
-!     2      (abs(xlogc-2.5).le.0.015).OR.(abs(xlogc-3.00).le.0.015))THEN
-!     IF(IW==25.OR.IW==54.OR.IW==75.OR.IW==93.OR.IW==115)THEN
-!     IF(w0==8.0d0.OR.w0==8.2d0)THEN
-!        IF(abs(w0-40.0d0).lt.1.0d-2)THEN
       OPEN(UNIT=1,FILE='profiles.dat',STATUS='old',ACCESS='append')
       WRITE(1,303)'x xi w rho_rho0 SD v2 logc=',xlogc
          DO jj=1,nfn
@@ -361,20 +311,8 @@
          ENDDO
          CLOSE(UNIT=1,STATUS='keep')
       ENDIF
-
-   !      s2_v02=((4.d0*pai/9.d0)**(2.d0))*(rho0hat**(2.d0/3.d0))*
-   !     1     (xmu**(-4.d0/3.d0))
       espo=4.d0/3.d0
       s2_v02=(1.d0/(xMcap**espo))
-   !      Et_Mv02=((4.d0*pai/9.d0)**(2.d0))*2.d0*((2.d0*pai)**(2.5d0))*
-   !     1     (xnhat0**(-1.d0/3.d0))*(xmu**(-7.d0/3.d0))*4.d0*
-   !     2     pai*(conc**(3.d0))*Etot
-
-   !      Et_Mv02=s2_v02*((4.d0*pai*(conc**3.d0)*Etot)/(rho0hat*xmu))*
-   !     1     (4.d0*pai*dsqrt(2.d0))
-   !      Et_Mv02=(4.d0*pai*sqrt(2.d0))*((4.d0*pai/(9.d0*xmu))**(3.d0))*
-   !     1     (xMcap**(2.d0/3.d0))*4.d0*pai*(conc**3.d0)*Etot
-
       Et_Mv02=s2_v02*(Etot1/xMcap)
       xkt=s2_v02*(xkt/xMcap)
       egt=s2_v02*(egt/xMcap)
@@ -408,17 +346,8 @@
       ENDDO
       CLOSE(UNIT=1,STATUS='keep') !,dispose='keep')
 
-
-
-!      call caloric_curve()
-!     PRINT*,'stampo su file CC,w0=',w0
-!      PRINT*,xsave,ysave,w0save,w0
-!      OPEN(UNIT=1,FILE='CalCurve.dat',status='old',access='append')
-!      WRITE(1,302)w0,xsave,ysave,w0save,fw0
-!      CLOSE(UNIT=1,STATUS='keep')
-
 301   FORMAT(1pd9.2,1pd10.3,1x,1p2d15.8)
-302    FORMAT(1p11d16.8)
+302   FORMAT(1p11d16.8)
 303   FORMAT(A70,1p3d15.8)
 304   FORMAT(1p5d16.8)
 305   FORMAT(A30,A30)
@@ -533,9 +462,6 @@ END PROGRAM
    DO i=2,10000
       xs2_v02(i)=xs2_v02(i-1)+xincr2        !\in[0.5,2]
       yEt_Mv02(i)=yEt_Mv02(i-1)+xincr !\in[-2,5]
-!     print*,xs2_v02(i),yEt_Mv02(i)
-!         xs(i)=0.0d0
-!         ys(i)=0.0d0
    ENDDO
 !     Per un dato w0, c'� un solo valore di y e di x tc y=xf(w0).
 !     E' dopo che nel grafico (x,y) trovo punti con diverso w0 ma stella y o x
@@ -547,9 +473,6 @@ END PROGRAM
       xxx=0.0d0
       xxx=xs2_v02(i)
       ex2=0.0d0
-!         xsave=0.0d0
-!         ysave=0.0d0
-!         w0save=0.0d0
       yyy=0.0d0
       xxxx=0.0d0
 
@@ -557,62 +480,16 @@ END PROGRAM
          yyy=yEt_Mv02(j)
          fw0=Etot/xMhat
          xxxx=yyy/fw0
-!            PRINT*,xxxx,xxx,abs((xxxx-xxx)/xxx),w0
-!            IF((abs((xxxx-xxx)/xxx).le.1.d-6))THEN!.AND.(ex2==0.0d0))THEN
          IF((abs((xxxx-xxx)/xxx)).lt.(abs((xs(i)-xxx)/xxx)).AND.&
          (abs((xxxx-xxx)/xxx).le.1.0d-7))THEN
-!     IF((abs((xxxx-xxx)/xxx).le.1.d-7))THEN
-               k=k+1
+            k=k+1
             xs(k)=xxxx
             ys(k)=yyy
             XRE(k)=abs((xs(k)-xxx)/xxx)
-
-!               w0save=w0
             ex2=1.0d0
-!     PRINT*,'x=',xsave,'y=',ysave,'w0=',w0save
-!               PRINT*,xs(k),ys(k),w0,abs((xxxx-xxx)/xxx),i,j,k
-!            ELSEIF((abs(xxxx-xxx)/xxx.lt.(abs(xsave-xxx)/xxx)).AND.
-!     1          (ex2==1.d0))THEN
-!               xsave=xxxx
-!               PRINT*,'aggiorno xsave'
-!               PRINT*,'ERRORE: dato w0 ed x, esistono piu valori di y',
-!     1  't.c. y=x*f(w0)'
-!               xsave(i)=xxx
-!               ysave2(i)=yyy
-!               w0save2(i)=w0
-!               ex2=2.0d0
-!            ELSEIF((abs(xxxx-xxx)/xxx.le.1.d-3).AND.(ex2==2.d0))THEN
-!               xsave(i)=xxx
-!               ysave3(i)=yyy
-!               w0save3(i)=w0
-!               ex2=3.0d0
-!            ELSEIF((abs(xxxx-xxx)/xxx.le.1.d-3).AND.(ex2==3.d0))THEN
-!               xsave(i)=xxx
-!               ysave4(i)=yyy
-!               w0save4(i)=w0
-!               ex2=4.0d0
          ENDIF
       ENDDO
    ENDDO
-!      xsave=xs(1)
-!      DO i=2,10000
-!         xxx=0.0d0
-!         xxx=xs2_v02(i)
-!         PRINT*,xxx,xs(i),xsave,ysave,ys(i)
-!         IF((abs((xxx-xs(i))/xxx)).lt.(abs((xxx-xsave)/xxx)))THEN
-!            PRINT*,'prova'
-!            PRINT*,(abs((xxx-xs(i))/xxx)),(abs((xxx-xsave)/xxx))
-!            xsave=xs(i)
-!            ysave=ys(i)
-!            w0save=w0
-!
-!         ENDIF
-
-!      ENDDO
-
-
-
-!     k=MINLOC(xs)
 
    allocate (xre2(1:k))
    allocate (xsv(1:k))

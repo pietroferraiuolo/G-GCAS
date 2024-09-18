@@ -90,7 +90,7 @@ def available_tables(key:str=None):
         for table in tables:
             print(table.name)
 
-class Sample:
+class _Sample:
     """
     Class for better handling the query result sample.
 
@@ -312,7 +312,7 @@ class GaiaQuery:
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         samp = self._run_query(savename, ra, dec, radius, dat, cond, save)
-        sample = Sample(samp, gc=gc)
+        sample = _Sample(samp, gc=gc)
         sample.qinfo = self._queryInfo['Scan Info']
         return sample
 
@@ -387,7 +387,7 @@ class GaiaQuery:
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         astro_cluster = self._run_query(savename, ra, dec, radius, astrometry, cond, save)
-        astro_sample = Sample(astro_cluster, gc=gc)
+        astro_sample = _Sample(astro_cluster, gc=gc)
         astro_sample.qinfo = self._queryInfo['Scan Info']
         return astro_sample
 
@@ -462,7 +462,7 @@ class GaiaQuery:
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         photo_cluster = self._run_query(savename, ra, dec, radius, photometry, cond, save)
-        phot_sample = Sample(photo_cluster, gc=gc)
+        phot_sample = _Sample(photo_cluster, gc=gc)
         phot_sample.qinfo = self._queryInfo['Scan Info']
         return phot_sample
 
@@ -525,7 +525,7 @@ class GaiaQuery:
                 },
             'Flag': {'Query': 'radvel'}
             }
-        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', **kwargs)
+        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -535,7 +535,7 @@ class GaiaQuery:
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
-        rv_sample = Sample(rv_cluster, gc=gc)
+        rv_sample = _Sample(rv_cluster, gc=gc)
         rv_sample.qinfo = self._queryInfo['Scan Info']
         return rv_cluster
 
