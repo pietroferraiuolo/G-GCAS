@@ -31,7 +31,13 @@ ggcas/data/query/NGC6121/20240814_202648/query_data.txt
 ggcas/utility/__init__.py
 ggcas/utility/folder_paths.py
 ggcas/utility/osutils.py
+test/__init__.py
 test/test_cluster.py
 test/test_functions.py
 test/test_plots.py
 test/test_query.py
+test/analyzers/__init__.py
+test/analyzers/test_calculus.py
+test/utility/__init__.py
+test/utility/test_folder_paths.py
+test/utility/test_osutils.py
