@@ -10,7 +10,7 @@ import os
 
 
 try:
-    BASE_PATH = os.environ['GCASDATA']
+    BASE_PATH = os.getenv('GCASDATA')
 except KeyError as exc:
     raise KeyError("Environment variable not found! Define the GCASDATA env variable that points to '.../G-GCAS/ggcas/data") from exc
 BASE_DATA_PATH          = os.path.join(BASE_PATH, 'data')
