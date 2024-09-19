@@ -1,7 +1,8 @@
 {
 	"folders": [
 		{
-			"path": "../.."
+			"name": "G-GCAS",
+			"path": "."
 		}
 	],
 	"settings": {}
