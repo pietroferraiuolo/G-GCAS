@@ -4,7 +4,6 @@ Created on May 2024
 
 Information about the current version of the g-gcas package.
 """
-
 __title__ = 'ggcas'
 __long_title__ = 'G-GCAS : Gaia Globular Cluster Analysis Software'
 __description__ = 'Software to gather and analyze data retrieved on the Gaia archive'
