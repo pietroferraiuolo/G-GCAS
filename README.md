@@ -165,5 +165,4 @@ Guidelines for contributing to your project.
 6. Create a new Pull Request.
 
 ## License
-
-Include the license under which your project is distributed.
+MIT License
