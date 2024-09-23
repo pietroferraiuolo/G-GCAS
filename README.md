@@ -21,11 +21,11 @@ cd yourproject
 npm install
 ```
 #__________________________________________________________________________________________________#
-## Packages Documentation
+# Packages Documentation
 
 - [KING.F90] This Fortran program calculates the equilibrium configurations of a gravitational gas using the King distribution function as described in the 1966 article by I.P. King (King, I.P. (1966). AJ 71, 64.). The program is designed to analyze isotropic King models and can be modified to handle anisotropic Boltzmann functions.
 
-# Cluster Module
+### Cluster Module
 
 - [Description]
 This module contains the `Cluster` class, which encapsulates all the information of a specified cluster. The class is designed to load and manage parameters of globular clusters from the Harris Catalogue 2010 Edition.
