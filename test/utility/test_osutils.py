@@ -69,17 +69,34 @@ class TestOsutils(unittest.TestCase):
     @patch('os.path.join')
     def test_findTracknum(self, mock_join, mock_listdir):
         # Mock the listdir and join functions
-        mock_listdir.return_value = ['folder1', 'folder2', 'folder3']
         mock_join.side_effect = lambda basepath, folder: f"{basepath}/{folder}"
-
+        def mock_listdir_res():
+            mock_listdir.side_effect = [
+                ['gc_folder1', 'gc_folder2', 'gc_folder3'],  # First call to os.listdir
+                ['tn_1', 'tn_2'],  # Second call to os.listdir for gc_folder1
+                ['tn_2'],  # Second call to os.listdir for gc_folder2
+                ['tn_3']  # Second call to os.listdir for gc_folder3
+            ]
         # Test with complete_path=False
-        result = osu._findTracknum('folder1', complete_path=False)
-        expected = ['folder1']
+        mock_listdir_res()
+        result = osu._findTracknum('tn_1', complete_path=False)
+        expected = 'gc_folder1'
         self.assertEqual(result, expected)
-
+        # Test with multiple folders
+        mock_listdir_res()
+        result2 = osu._findTracknum('tn_2', complete_path=False)
+        expected2 = ['gc_folder1','gc_folder2']
+        self.assertEqual(result2, expected2)
         # Test with complete_path=True
-        result = osu._findTracknum('folder1', complete_path=True)
-        expected = ['/basepath/folder1']
+        mock_listdir_res()
+        result = osu._findTracknum('tn_3', complete_path=True)
+        expected = os.path.join(
+            os.path.join(
+                fn.QUERY_DATA_FOLDER,
+                'gc_folder3'
+            ), 
+            'tn_3'
+        )
         self.assertEqual(result, expected)
 
 if __name__ == '__main__':
