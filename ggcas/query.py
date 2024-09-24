@@ -1,4 +1,6 @@
 """
+Module: query.py
+
 Author(s)
 ---------
     - Pietro Ferraiuolo : Written in 2024
@@ -15,7 +17,8 @@ Gaia data release 3 table)
 
     >>> from ggcas import query
     >>> gq = query.GaiaQuery()
-    Initialized with Gaia table: 'gaiadr3.gaia_source'
+    >>> Initialized with Gaia table: 'gaiadr3.gaia_source'
+    
 
 To check all the available Gaia mission tables
 

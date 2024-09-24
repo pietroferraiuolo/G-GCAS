@@ -1,19 +1,101 @@
 """
+Module: functions.py
+
 Author(s)
 ---------
     - Pietro Ferraiuolo : Written in 2024
 
 Description
 -----------
+This module provides a set of functions to compute various astronomical and physical quantities such as angular separation, line-of-sight distance, radial distances in 2D and 3D, total velocity, and effective gravitational potential.
+
+Functions
+---------
+- angular_separation(ra0=None, dec0=None)
+    Computes the angular separation between two points in the sky.
+
+- los_distance()
+    Computes the line-of-sight distance based on parallax.
+
+- radial_distance_2d(analytical_w=False, **params)
+    Computes the 2D-projected radial distance of a source from the center of a cluster or given RA/DEC coordinates.
+
+- radial_distance_3d(gc_distance=None, analytical_r2d: bool = False, analytical_w: bool = False)
+    Computes the 3D radial distance of a source from the center of a cluster or given RA/DEC coordinates.
+
+- total_velocity()
+    Computes the total velocity based on the given velocity components.
+
+- effective_potential(shell: bool = False)
+    Computes the effective gravitational potential, optionally considering a shell model.
 
 How to Use
 ----------
+1. Import the module:
+    ```python
+    import functions
+    ```
+
+2. Call the desired function with appropriate parameters:
+    ```python
+    result = functions.angular_separation(ra0=10.0, dec0=20.0)
+    ```
 
 Examples
 --------
+Example usage of `angular_separation` function:
+    ```python
+    import functions
+    from astropy import units as u
 
+    ra0 = 10.0 * u.deg
+    dec0 = 20.0 * u.deg
+    result = functions.angular_separation(ra0, dec0)
+    print(result)
+    ```
+
+Example usage of `los_distance` function:
+    ```python
+    import functions
+
+    result = functions.los_distance()
+    print(result)
+    ```
+
+Example usage of `radial_distance_2d` function:
+    ```python
+    import functions
+
+    result = functions.radial_distance_2d(analytical_w=True, ra0=10.0, dec0=20.0)
+    print(result)
+    ```
+
+Example usage of `radial_distance_3d` function:
+    ```python
+    import functions
+    from astropy import units as u
+
+    gc_distance = 1000 * u.pc
+    result = functions.radial_distance_3d(gc_distance=gc_distance, analytical_r2d=True, analytical_w=True)
+    print(result)
+    ```
+
+Example usage of `total_velocity` function:
+    ```python
+    import functions
+
+    result = functions.total_velocity()
+    print(result)
+    ```
+
+Example usage of `effective_potential` function:
+    ```python
+    import functions
+
+    result = functions.effective_potential(shell=True)
+    print(result)
+    ```
 """
-
 import numpy as np
 import sympy as sp
 from astropy import units as u
