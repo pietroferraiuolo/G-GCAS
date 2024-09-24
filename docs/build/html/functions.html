@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Plots" href="plots.html" /><link rel="prev" title="Cluster" href="cluster.html" />
 
     <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
-        <title>Functions - G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</title>
+        <title>Functions - G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=387cc868" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
@@ -179,7 +179,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</div></a>
+      <a href="index.html"><div class="brand">G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -203,7 +203,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</span>
+  <span class="sidebar-brand-text">G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -278,54 +278,33 @@
 </section>
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.functions.angular_separation">
-<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">angular_separation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.angular_separation" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">angular_separation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.angular_separation" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>w</strong> (<em>sympy expression</em>) – DESCRIPTION.</p></li>
-<li><p><strong>variables</strong> (<em>list of sympy symbols</em>) – DESCRIPTION.</p></li>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ra0</strong> (<em>float</em><em>, </em><em>optional</em>) – DESCRIPTION.</p></li>
+<li><p><strong>dec0</strong> (<em>float</em><em>, </em><em>optional</em>) – DESCRIPTION.</p></li>
 </ul>
-</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>func</strong> – DESCRIPTION.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.functions.effective_potential">
-<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">effective_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shell</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.effective_potential" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">effective_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shell</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.effective_potential" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>shell</strong> (<em>TYPE</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is False.</p>
+<dd class="field-odd"><p><strong>shell</strong> (<em>bool</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is False.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>poteff</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>variables</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ggcas.functions.error_propagation">
-<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">error_propagation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#ggcas.functions.error_propagation" title="Link to this definition">¶</a></dt>
-<dd><p>Computes the imput function’s error with the standard error propagation
-formula.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>func</strong> (<em>sympy expression</em>) – DESCRIPTION.</p></li>
-<li><p><strong>variables</strong> (<em>list</em><em> of </em><em>sympy symbols</em>) – DESCRIPTION.</p></li>
-<li><p><strong>corr</strong> (<em>boolean</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>result</strong> – A dictionary containing the results.
-Keys:
-- “error_formula” : sympy expression
-- “error_variables” : list of sympy symbols
-- “correlations” : list of sympy symbols (only if corr=True)</p>
+<dd class="field-even"><p><strong>func</strong> – Dictionary containing the formula and the relative variables for the
+effective gravitational potential.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
@@ -338,41 +317,64 @@ Keys:
 <span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">los_distance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.los_distance" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>r</strong> (<em>sympy expression</em>) – DESCRIPTION.</p></li>
-<li><p><strong>parallax</strong> (<em>sympy symbol</em>) – DESCRIPTION.</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p><strong>func</strong> – DESCRIPTION.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>TYPE</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.functions.radial_distance_2d">
-<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">radial_distance_2d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.radial_distance_2d" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>r2d</strong> (<em>sympy expression</em>) – DESCRIPTION.</p></li>
-<li><p><strong>variables</strong> (<em>list of sympy symbols</em>) – DESCRIPTION.</p></li>
+<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">radial_distance_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analytical_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.radial_distance_2d" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the formula for the 2d-projection on the plane of the sky of the radial
+distance of a source from the center of the cluster (or from the given RA/DEC
+coordinates).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>analytical_w</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to have the full expression of the angular separation in the returned
+formula, or the representing symbol (if, e.g, has been altrady calculated).
+The default is False.</p></li>
+<li><p><strong>**params</strong> (<em>dict</em>) – <p>Additional parameters, callback for the ‘angular_separation’ function.
+ra0 : float</p>
+<blockquote>
+<div><p>RA coordinate from which compute the angular separation.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>dec0<span class="classifier">float</span></dt><dd><p>DEC coordinate from which compute the angular separation.</p>
+</dd>
+</dl>
+</p></li>
 </ul>
-</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>func</strong> – Dictionary containing the formula and the relative variables for the
+2D-projected radial distance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.functions.radial_distance_3d">
-<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">radial_distance_3d</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.radial_distance_3d" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">radial_distance_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gc_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analytical_r2d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analytical_w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.radial_distance_3d" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>R</strong> (<em>sympy expression</em>) – DESCRIPTION.</p></li>
-<li><p><strong>variables</strong> (<em>list of sympy symbols</em>) – DESCRIPTION.</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p><strong>func</strong> – Dictionary containing the formula and the relative variables for the
+3D radial distance.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>If gc_distance is given as argument, the computation of this formula returns
+the radial distance in parsec, otherwise the unit will be the one used when
+passing the cluster’s distance manually in the computation.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -380,11 +382,11 @@ Keys:
 <span class="sig-prename descclassname"><span class="pre">ggcas.functions.</span></span><span class="sig-name descname"><span class="pre">total_velocity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.functions.total_velocity" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>V</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><em>list</em> – DESCRIPTION.</p></li>
-</ul>
-</p>
+<dd class="field-odd"><p><strong>func</strong> – Dictionary containing the formula and the relative variables for the
+total velocity.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -452,7 +454,6 @@ Keys:
 <li><a class="reference internal" href="#how-to-use">How to Use</a></li>
 <li><a class="reference internal" href="#ggcas.functions.angular_separation"><code class="docutils literal notranslate"><span class="pre">angular_separation()</span></code></a></li>
 <li><a class="reference internal" href="#ggcas.functions.effective_potential"><code class="docutils literal notranslate"><span class="pre">effective_potential()</span></code></a></li>
-<li><a class="reference internal" href="#ggcas.functions.error_propagation"><code class="docutils literal notranslate"><span class="pre">error_propagation()</span></code></a></li>
 <li><a class="reference internal" href="#ggcas.functions.los_distance"><code class="docutils literal notranslate"><span class="pre">los_distance()</span></code></a></li>
 <li><a class="reference internal" href="#ggcas.functions.radial_distance_2d"><code class="docutils literal notranslate"><span class="pre">radial_distance_2d()</span></code></a></li>
 <li><a class="reference internal" href="#ggcas.functions.radial_distance_3d"><code class="docutils literal notranslate"><span class="pre">radial_distance_3d()</span></code></a></li>
@@ -468,7 +469,7 @@ Keys:
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=a58bc63e"></script>
+</div><script src="_static/documentation_options.js?v=9dc39874"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=4e2eecee"></script>

@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Query" href="query.html" /><link rel="prev" title="Functions" href="functions.html" />
 
     <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
-        <title>Plots - G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</title>
+        <title>Plots - G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=387cc868" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
@@ -179,7 +179,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</div></a>
+      <a href="index.html"><div class="brand">G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -203,7 +203,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</span>
+  <span class="sidebar-brand-text">G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -271,21 +271,81 @@
 </section>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>Module which contains useful plots for visualizing globular cluster’s kinetic d
+ata.
+Refer to the individual functions documentation for more information about thei
+r use.</p>
 </section>
 <section id="how-to-use">
 <h2>How to Use<a class="headerlink" href="#how-to-use" title="Link to this heading">¶</a></h2>
-<p class="rubric">Examples</p>
+<p>Just import the module</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ggcas</span> <span class="kn">import</span> <span class="n">plots</span> <span class="k">as</span> <span class="n">gplt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gplt</span><span class="o">.</span><span class="n">scatter_2hist</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="c1"># your data</span>
+</pre></div>
+</div>
 </section>
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.plots.colorMagnitude">
-<span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">colorMagnitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">teff_gspphot</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.colorMagnitude" title="Link to this definition">¶</a></dt>
-<dd><p>Perform a scatter plot to create a color-magnitude diagram of the sample, using photometry and temperature information.</p>
+<span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">colorMagnitude</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">teff_gspphot</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.colorMagnitude" title="Link to this definition">¶</a></dt>
+<dd><p>Make a scatter plot to create a color-magnitude diagram of the sample, usin
+g BP and RP photometry and temperature information.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>g</strong> (<em>float</em><em> | </em><em>ArrayLike</em>) – Gaia mean magnitude in the G band.</p></li>
 <li><p><strong>b_r</strong> (<em>fliat</em><em> | </em><em>ArrayLike</em>) – Gaia color, defined and the BP mean magnitude minus the RP mean magnitude.</p></li>
 <li><p><strong>t</strong> (<em>float</em><em> | </em><em>ArrayLike</em>) – Gaia computed effective surface temperature.</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – <dl class="simple">
+<dt>bgc<span class="classifier">tuple</span></dt><dd><p>A tuple with three float values, indicating the RGB gradient which
+define a color (placeholder for the ax.set_facecolor function).
+Aliases: ‘bgc’, ‘bgcolor’</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>Transparency of the scatter points.</p>
+</dd>
+<dt>cmap<span class="classifier">str</span></dt><dd><p>All accepted matplotlib colormap strings.</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ggcas.plots.errorbar">
+<span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">errorbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataerr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xerr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.errorbar" title="Link to this definition">¶</a></dt>
+<dd><p>Scatter plot with errorbars.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>) – DESCRIPTION.</p></li>
+<li><p><strong>dataerr</strong> (<em>ndarray</em>) – DESCRIPTION.</p></li>
+<li><p><strong>x</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is None.</p></li>
+<li><p><strong>xerr</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is None.</p></li>
+<li><p><strong>**kwargs</strong> (<em>Additional callbacks for matplotlib</em><em> (</em><em>see matplotlib.pyplot.errorbar documentation</em><em>)</em><em>.</em>) – <dl class="simple">
+<dt>fmt<span class="classifier">str</span></dt><dd><p>Scatter point shape.</p>
+</dd>
+<dt>color<span class="classifier">str</span></dt><dd><p>Scatter point color.
+Aliases - ‘sc’ ; ‘scolor’ ; ‘scatcol’</p>
+</dd>
+<dt>ecolor<span class="classifier">str</span></dt><dd><p>Error bar color.
+Aliases - ‘ec’ ; ‘errc’ ; ‘errcolor’ ; ‘errorcolor’</p>
+</dd>
+<dt>markersize<span class="classifier">float</span></dt><dd><p>Scatter point size.
+Aliases - ‘s’ ; ‘ms’</p>
+</dd>
+<dt>capsize<span class="classifier">float</span></dt><dd><p>Errorbar cap length.</p>
+</dd>
+<dt>elinewidth<span class="classifier">float</span></dt><dd><p>Errorbar thickness.
+Aliases - ‘elw’ ; ‘errlinew’</p>
+</dd>
+<dt>barsabove<span class="classifier">bool</span></dt><dd><p>If Ture, the errorbars will be plotted over the scatter points</p>
+</dd>
+</dl>
+<p>title : str
+xlabel : str
+ylabel : str</p>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -294,54 +354,70 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.plots.histogram">
 <span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.histogram" title="Link to this definition">¶</a></dt>
-<dd><p>Plots the data distribution with a histogram. The number of bins is defined as 1.5*sqrt(N). If kde is set on Tue, the kerned desdity estimation will be computed and plotted over the histogram.</p>
+<dd><p>Plots the data distribution with a histogram. The number of bins is defined
+as 1.5*sqrt(N). If kde is True, the kernel density estimation will be compu
+ted and plotted over the histogram.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>ArrayLike</em>) – Imput dataset for the histogram.</p></li>
-<li><p><strong>kde</strong> (<em>Boolean</em>) – Gaussian Kernel density estimation of the histogram. The default value is False.</p></li>
+<li><p><strong>data</strong> (<em>ArrayLike</em>) – Input dataset for the histogram.</p></li>
+<li><p><strong>kde</strong> (<em>boolean</em>) – Option for the computation of the Gaussian Kernel density estimation of
+the histogram. The default is False.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Additional parameters for customizing the plot.</em>) – <dl class="simple">
 <dt>xlabel<span class="classifier">str</span></dt><dd><p>Label of the plot’s x-axis.</p>
 </dd>
 <dt>alpha<span class="classifier">float</span></dt><dd><p>Transparency of the bins.</p>
 </dd>
-<dt>color<span class="classifier">str</span></dt><dd><p>Color of the histogram’s bins.</p>
+<dt>hcolor<span class="classifier">str</span></dt><dd><p>Color of the histogram’s bins.</p>
+</dd>
+<dt>kcolor<span class="classifier">str</span></dt><dd><p>Color of the kde curve.</p>
 </dd>
 </dl>
 </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>bins</strong> (<em>ArrayLike</em>) – DESCRIPTION.</p></li>
-<li><p><strong>counts</strong> (<em>ArrayLike</em>) – DESCRIPTION.</p></li>
-</ul>
-</p>
+<dd class="field-even"><p><strong>hist_result</strong> – Dictionary containing the hinstogram results and the distribution mean
+and standard deviation. The keys are ‘h’ and ‘kde’.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
+<p class="rubric">Example</p>
+<p>The output can be used to make other plots and computations. For example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ggcas</span> <span class="kn">import</span> <span class="n">plots</span> <span class="k">as</span> <span class="n">gplt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">gplt</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, with the result, you can make for example a scatter plot</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>and so on.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.plots.properMotion">
-<span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">properMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmdec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.properMotion" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">properMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pmra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pmdec</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.properMotion" title="Link to this definition">¶</a></dt>
+<dd><p>Make a scatter plot in the proper motion space of the sample.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pmra</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>pmdec</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-</ul>
+<li><p><strong>pmra</strong> (<em>ArrayLike</em>) – Right Ascension direction of the proper mition.</p></li>
+<li><p><strong>pmdec</strong> (<em>ArrayLike</em>) – Declination direction for the proper motion.</p></li>
+<li><p><strong>**kwargs</strong> (<em>additional parameters for customizing the plot.</em>) – <dl class="simple">
+<dt>color<span class="classifier">str</span></dt><dd><p>Color of the scattered data points.</p>
+</dd>
+<dt>s<span class="classifier">int or float</span></dt><dd><p>Size of the scattered data points.</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>Transparency of the scattered data points.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ggcas.plots.raDec">
-<span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">raDec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.raDec" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ra</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>dec</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -350,34 +426,25 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.plots.scat_xhist">
 <span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">scat_xhist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xerr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.scat_xhist" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Make a scatter plot of a quantity ‘x’, with its projected histogram, relative
+to a quantity ‘y’.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>y</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>xerr</strong> (<em>TYPE</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is None.</p></li>
-<li><p><strong>**kwarg</strong> (<em>Optional Args:</em>) – <ul>
-<li><dl class="simple">
-<dt>xlabel<span class="classifier">str</span></dt><dd><p>DESCRIPTION. The default is ‘x’.</p>
+<li><p><strong>x</strong> (<em>ndarray</em>) – Input data.</p></li>
+<li><p><strong>y</strong> (<em>ndarray</em>) – Related data.</p></li>
+<li><p><strong>xerr</strong> (<em>int</em><em> of </em><em>ndarray</em><em>, </em><em>optional</em>) – Error on the input data points. Can be either a single value or an arra
+y with the same size as the input data. The default is None.</p></li>
+<li><p><strong>**kwarg</strong> (<em>additional arguments for customizing the plot.</em>) – <dl class="simple">
+<dt>xlabel<span class="classifier">str</span></dt><dd><p>Label on x axis. The default is ‘x’.</p>
+</dd>
+<dt>ylabel<span class="classifier">str</span></dt><dd><p>Label on y axis. The default is ‘y’.</p>
+</dd>
+<dt>color<span class="classifier">str</span></dt><dd><p>Color of the scattered data points.</p>
 </dd>
 </dl>
-</li>
-<li><dl class="simple">
-<dt>ylabel<span class="classifier">str</span></dt><dd><p>DESCRIPTION. The default is ‘y’.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>color<span class="classifier">str</span></dt><dd><p>DESCRIPTION.</p>
-</dd>
-</dl>
-</li>
-</ul>
 </p></li>
 </ul>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -385,13 +452,15 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="ggcas.plots.scatter_2hist">
 <span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">scatter_2hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kde</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.scatter_2hist" title="Link to this definition">¶</a></dt>
-<dd><p>Make a scatter plot with histograms</p>
-<p>Make a 2D scatter of two quantities, with the respective histogram distributions projected on each axis.</p>
+<dd><p>Make a 2D scatter of two data arrays, with the respective histogram distrib
+utions projected on each axis. The kde option allows for gaussian regresssi
+on on the plotted data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> (<em>ArrayLike</em>) – Data to be scattered on x-axis</p></li>
 <li><p><strong>y</strong> (<em>ArrayLike</em>) – Data to be scattered on y-axis</p></li>
+<li><p><strong>kde</strong> (<em>boolean</em><em>, </em><em>optional</em>) – Option to show the Gaussian regression on the data. Default is false.</p></li>
 <li><p><strong>**kwargs</strong> (<em>Additional parameters for customizing the plot</em>) – <dl class="simple">
 <dt>xlabel<span class="classifier">str</span></dt><dd><p>xlabel of the plot</p>
 </dd>
@@ -406,6 +475,29 @@
 <dt>colory<span class="classifier">str</span></dt><dd><p>color of the histogram on y-axis</p>
 </dd>
 <dt>scatter_color<span class="classifier">str</span></dt><dd><p>color of the scattered dots</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ggcas.plots.spatial">
+<span class="sig-prename descclassname"><span class="pre">ggcas.plots.</span></span><span class="sig-name descname"><span class="pre">spatial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.plots.spatial" title="Link to this definition">¶</a></dt>
+<dd><p>Make a scatter plot in the spatial plot, that is in the Ra-Dec plane.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ra</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
+<li><p><strong>dec</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
+<li><p><strong>**kwargs</strong> (<em>additional parameters for customizing the plot</em>) – <dl class="simple">
+<dt>color<span class="classifier">str</span></dt><dd><p>Color of the scattered data points.</p>
+</dd>
+<dt>s<span class="classifier">int or float</span></dt><dd><p>Size of the scattered data points.</p>
+</dd>
+<dt>alpha<span class="classifier">float</span></dt><dd><p>Transparency of the scattered data points.</p>
 </dd>
 </dl>
 </p></li>
@@ -476,11 +568,12 @@
 <li><a class="reference internal" href="#description">Description</a></li>
 <li><a class="reference internal" href="#how-to-use">How to Use</a></li>
 <li><a class="reference internal" href="#ggcas.plots.colorMagnitude"><code class="docutils literal notranslate"><span class="pre">colorMagnitude()</span></code></a></li>
+<li><a class="reference internal" href="#ggcas.plots.errorbar"><code class="docutils literal notranslate"><span class="pre">errorbar()</span></code></a></li>
 <li><a class="reference internal" href="#ggcas.plots.histogram"><code class="docutils literal notranslate"><span class="pre">histogram()</span></code></a></li>
 <li><a class="reference internal" href="#ggcas.plots.properMotion"><code class="docutils literal notranslate"><span class="pre">properMotion()</span></code></a></li>
-<li><a class="reference internal" href="#ggcas.plots.raDec"><code class="docutils literal notranslate"><span class="pre">raDec()</span></code></a></li>
 <li><a class="reference internal" href="#ggcas.plots.scat_xhist"><code class="docutils literal notranslate"><span class="pre">scat_xhist()</span></code></a></li>
 <li><a class="reference internal" href="#ggcas.plots.scatter_2hist"><code class="docutils literal notranslate"><span class="pre">scatter_2hist()</span></code></a></li>
+<li><a class="reference internal" href="#ggcas.plots.spatial"><code class="docutils literal notranslate"><span class="pre">spatial()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -492,7 +585,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=a58bc63e"></script>
+</div><script src="_static/documentation_options.js?v=9dc39874"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=4e2eecee"></script>

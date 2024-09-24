@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Functions" href="functions.html" /><link rel="prev" title="Analyzer" href="analyzer.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="prev" title="Analyzer" href="analyzer.html" />
 
     <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
-        <title>Cluster - G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</title>
+        <title>Cluster - G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=387cc868" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
@@ -179,7 +179,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</div></a>
+      <a href="index.html"><div class="brand">G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -203,7 +203,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</span>
+  <span class="sidebar-brand-text">G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -215,10 +215,6 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="analyzer.html">Analyzer</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Cluster</a></li>
-<li class="toctree-l1"><a class="reference internal" href="functions.html">Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plots.html">Plots</a></li>
-<li class="toctree-l1"><a class="reference internal" href="query.html">Query</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
 </ul>
 
 </div>
@@ -271,21 +267,75 @@
 </section>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>A module which contains the Cluster class, which contains all the information of
+a specified cluster.</p>
 </section>
 <section id="how-to-use">
 <h2>How to Use<a class="headerlink" href="#how-to-use" title="Link to this heading">¶</a></h2>
-<p class="rubric">Examples</p>
+<p>Initialize the class with a cluster’s name. As example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ggcas.cluster</span> <span class="kn">import</span> <span class="n">Cluster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ngc104</span> <span class="o">=</span> <span class="n">Cluster</span><span class="p">(</span><span class="s1">&#39;ngc104&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we can call methods to read the parameters</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ngc104</span><span class="o">.</span><span class="n">id</span>
+<span class="go">&#39;NGC104&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ngc104</span><span class="o">.</span><span class="n">w0</span>
+<span class="go">8.82</span>
+</pre></div>
+</div>
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="ggcas.cluster.Cluster">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ggcas.cluster.</span></span><span class="sig-name descname"><span class="pre">Cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.cluster.Cluster" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ggcas.cluster.</span></span><span class="sig-name descname"><span class="pre">Cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.cluster.Cluster" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for the cluster parameter loading.</p>
-<p>Contains loaded parameters from the Harris Catalogue 2010 Edition</p>
+<p>Upon initializing, it is loaded with the specified cluster’s parameters, ta
+ken from the Harris Catalogue 2010 Edition.</p>
 <dl class="py method">
 <dt class="sig sig-object py">
 <span class="sig-name descname"><span class="pre">_loadClusterParameters(self,</span> <span class="pre">name)</span> <span class="pre">:</span> <span class="pre">function</span></span></dt>
 <dd><p>Loads the desired cluster’s parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">How</span> <span class="pre">to</span> <span class="pre">Use</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">----------</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Initialize</span> <span class="pre">the</span> <span class="pre">class</span> <span class="pre">with</span> <span class="pre">a</span> <span class="pre">cluster's</span> <span class="pre">name.</span> <span class="pre">As</span> <span class="pre">example</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">from</span> <span class="pre">ggcas.cluster</span> <span class="pre">import</span> <span class="pre">Cluster</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">ngc104</span> <span class="pre">=</span> <span class="pre">Cluster('ngc104')</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ggcas.cluster.Cluster.show_model">
+<span class="sig-name descname"><span class="pre">show_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.cluster.Cluster.show_model" title="Link to this definition">¶</a></dt>
+<dd><p>Function for plotting the loaded king model.</p>
+<section id="optional-parameters">
+<h2>Optional Parameters<a class="headerlink" href="#optional-parameters" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt><a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs :</dt><dd><p>color : color of the main plot.
+scale : scale of the axes, default linear.
+grid  : grid on the plot</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </dd></dl>
@@ -297,15 +347,7 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="functions.html">
-              <div class="page-info">
-                <div class="context">
-                  <span>Next</span>
-                </div>
-                <div class="title">Functions</div>
-              </div>
-              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
-            </a>
+          
           <a class="prev-page" href="analyzer.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
@@ -351,7 +393,10 @@
 <li><a class="reference internal" href="#author-s">Author(s)</a></li>
 <li><a class="reference internal" href="#description">Description</a></li>
 <li><a class="reference internal" href="#how-to-use">How to Use</a></li>
-<li><a class="reference internal" href="#ggcas.cluster.Cluster"><code class="docutils literal notranslate"><span class="pre">Cluster</span></code></a></li>
+<li><a class="reference internal" href="#ggcas.cluster.Cluster"><code class="docutils literal notranslate"><span class="pre">Cluster</span></code></a><ul>
+<li><a class="reference internal" href="#ggcas.cluster.Cluster.show_model"><code class="docutils literal notranslate"><span class="pre">Cluster.show_model()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -363,7 +408,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=a58bc63e"></script>
+</div><script src="_static/documentation_options.js?v=9dc39874"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=4e2eecee"></script>

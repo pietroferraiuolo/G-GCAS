@@ -1,7 +1,7 @@
-Cluster
-=======
+setup module
+============
 
-.. automodule:: ggcas.cluster
+.. automodule:: setup
    :members:
    :undoc-members:
    :show-inheritance:

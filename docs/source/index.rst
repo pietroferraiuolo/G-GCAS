@@ -10,12 +10,12 @@ G-GCAS: Gaia Globular Clusters Analysis Software's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   analyzer
    cluster
    functions
    plots
    query
    utils
+   analyzers
 
 
 

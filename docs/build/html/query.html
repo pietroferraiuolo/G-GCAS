@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Utils" href="utils.html" /><link rel="prev" title="Plots" href="plots.html" />
 
     <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
-        <title>Query - G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</title>
+        <title>Query - G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=387cc868" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
@@ -179,7 +179,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</div></a>
+      <a href="index.html"><div class="brand">G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -203,7 +203,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">G-GCAS: Gaia Globular Clusters Analysis Software 0.1.1 documentation</span>
+  <span class="sidebar-brand-text">G-GCAS: Gaia Globular Clusters Analysis Software 0.9.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -271,131 +271,406 @@
 </section>
 <section id="description">
 <h2>Description<a class="headerlink" href="#description" title="Link to this heading">¶</a></h2>
+<p>Thi module contains the GaiaQuery class, which handles the ADQL language to make
+queries for globular clusters data retrievement fast and easy.</p>
 </section>
-<section id="how-to-use">
-<h2>How to Use<a class="headerlink" href="#how-to-use" title="Link to this heading">¶</a></h2>
-<p class="rubric">Examples</p>
+<section id="how-to-use-it">
+<h2>How to Use it<a class="headerlink" href="#how-to-use-it" title="Link to this heading">¶</a></h2>
+<p>After importing the module, initialize the class with a table (default is the
+Gaia data release 3 table)</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ggcas</span> <span class="kn">import</span> <span class="n">query</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gq</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">GaiaQuery</span><span class="p">()</span>
+<span class="go">Initialized with Gaia table: &#39;gaiadr3.gaia_source&#39;</span>
+</pre></div>
+</div>
+<p>To check all the available Gaia mission tables</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">query</span><span class="o">.</span><span class="n">available_tables</span><span class="p">()</span>
+<span class="go">INFO: Retrieving tables... [astroquery.utils.tap.core]</span>
+<span class="go">INFO: Parsing tables... [astroquery.utils.tap.core]</span>
+<span class="go">INFO: Done. [astroquery.utils.tap.core]</span>
+<span class="go">external.apassdr9</span>
+<span class="go">external.catwise2020</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>To show information about the loaded table(s), one can get the table description
+with the ‘__repr__’ method, that is:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">gq</span>
+<span class="go">GAIADR3.GAIA_SOURCE</span>
+<span class="go">-------------------</span>
+<span class="go">This table has an entry for every Gaia observed source as published with this</span>
+<span class="go">data release. It contains the basic source parameters, in their final state</span>
+<span class="go">as processed by the Gaia Data Processing and Analysis Consortium from the raw</span>
+<span class="go">data coming from the spacecraft. The table is complemented with others containing</span>
+<span class="go">information specific to certain kinds of objects</span>
+<span class="go">(e.g.~Solar--system objects, non--single stars, variables etc.) and value--added</span>
+<span class="go">processing (e.g.~astrophysical parameters etc.). Further array data types</span>
+<span class="go">(spectra, epoch measurements) are presented separately via Datalink resources.</span>
+</pre></div>
+</div>
+<p>While for a complete list of parameters within the table, print out the query
+object:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">gq</span><span class="p">)</span>
+<span class="go">0 solution_id</span>
+<span class="go">1 designation</span>
+<span class="go">2 source_id</span>
+<span class="go">3 random_index</span>
+<span class="go">4 ref_epoch</span>
+<span class="go">.</span>
+<span class="go">.</span>
+<span class="go">.</span>
+<span class="go">150 ebpminrp_gspphot_upper</span>
+<span class="go">151 libname_gspphot</span>
+</pre></div>
+</div>
 </section>
 <dl class="py class">
 <dt class="sig sig-object py" id="ggcas.query.GaiaQuery">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ggcas.query.</span></span><span class="sig-name descname"><span class="pre">GaiaQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gaia_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaiadr3.gaia_source'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Classs for the Gaia Query language execution.</p>
+<section id="id1">
+<h2>Description<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>With this class, it is possible to easily perform async queries and retriev
+e data from the ESA/GAIA catalogue. It is possible to use different data re
+leases by loading different data tables in the initialization of the class.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.freeQuery">
-<span class="sig-name descname"><span class="pre">freeQuery</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.freeQuery" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ra</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>dec</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>radius</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>save</strong> (<em>str</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is False.</p></li>
-<li><p><strong>**kwargs</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>TypeError</strong> – DESCRIPTION.</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>result</strong> – DESCRIPTION.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>TYPE</p>
-</dd>
-</dl>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">free_query:</span></span></dt>
+<dd><p>Perform an ADQL search into the Gaia catalogue with custom data to retrieve
+and conditions to apply.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.getAstrometry">
-<span class="sig-name descname"><span class="pre">getAstrometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.getAstrometry" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ra</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>dec</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>radius</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>save</strong> (<em>str</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is False.</p></li>
-<li><p><strong>**kwargs</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>TypeError</strong> – DESCRIPTION.</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>astro_cluster</strong> – DESCRIPTION.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>TYPE</p>
-</dd>
-</dl>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_atrometry:</span></span></dt>
+<dd><p>A pre-constructed ADQL search into the Gaia catalogue with fixed data
+retrieved, which is the principal astrometric parameters, with the possibility
+to add personalized query conditions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.getPhotometry">
-<span class="sig-name descname"><span class="pre">getPhotometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.getPhotometry" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ra</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>dec</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>radius</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>save</strong> (<em>str</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is False.</p></li>
-<li><p><strong>**kwargs</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>TypeError</strong> – DESCRIPTION.</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>photo_cluster</strong> – DESCRIPTION.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>TYPE</p>
-</dd>
-</dl>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_photometry:</span></span></dt>
+<dd><p>A pre-constructed ADQL search into the Gaia catalogue with fixed data
+retrieved, which is the principal photometric parameters, with the possibility
+to add personalized query conditions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.getRV">
-<span class="sig-name descname"><span class="pre">getRV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.getRV" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ra</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>dec</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>radius</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-<li><p><strong>save</strong> (<em>str</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is False.</p></li>
-<li><p><strong>**kwargs</strong> (<em>TYPE</em>) – DESCRIPTION.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>TypeError</strong> – DESCRIPTION.</p>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rv_cluster</strong> – DESCRIPTION.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>TYPE</p>
-</dd>
-</dl>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_rv:</span></span></dt>
+<dd><p>A pre-constructed ADQL search into the Gaia catalogue with fixed data
+retrieved, which is the radial velociti parameter with its error, with
+the possibility to add personalized query conditions.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.printTable">
-<span class="sig-name descname"><span class="pre">printTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.printTable" title="Link to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">How</span> <span class="pre">to</span> <span class="pre">Use</span> <span class="pre">it</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">-------------</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">Import</span> <span class="pre">the</span> <span class="pre">class</span> <span class="pre">and</span> <span class="pre">initialize</span> <span class="pre">it</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">from</span> <span class="pre">ggcas.query</span> <span class="pre">import</span> <span class="pre">GaiaQuery</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">dr3</span> <span class="pre">=</span> <span class="pre">GaiaQuery()</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">'Initialized</span> <span class="pre">with</span> <span class="pre">Gaia</span> <span class="pre">table:</span> <span class="pre">gaiadr3.gaia_source'</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">To</span> <span class="pre">use</span> <span class="pre">a</span> <span class="pre">different</span> <span class="pre">Gaia</span> <span class="pre">catalogue</span> <span class="pre">simply</span> <span class="pre">initialize</span> <span class="pre">the</span> <span class="pre">class</span> <span class="pre">to</span> <span class="pre">it:</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">table</span> <span class="pre">=</span> <span class="pre">'gaiadr2.gaia_source'</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">&gt;&gt;&gt;</span> <span class="pre">dr2</span> <span class="pre">=</span> <span class="pre">GaiaQuery(gaia_table=table)</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">'Initialized</span> <span class="pre">with</span> <span class="pre">Gaia</span> <span class="pre">table:</span> <span class="pre">gaiadr2.gaia_source'</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">The</span> <span class="pre">queries,</span> <span class="pre">to</span> <span class="pre">work</span> <span class="pre">efficiently,</span> <span class="pre">require</span> <span class="pre">a</span> <span class="pre">'ggcas.cluster.Cluster'</span> <span class="pre">object:</span> <span class="pre">so,</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">let's</span> <span class="pre">take</span> <span class="pre">an</span> <span class="pre">example</span> <span class="pre">cluster,</span> <span class="pre">ngc104:</span></span></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">ggcas.cluster</span> <span class="kn">import</span> <span class="n">Cluster</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span> <span class="o">=</span> <span class="n">Cluster</span><span class="p">(</span><span class="s1">&#39;ngc104&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gc</span>
+<span class="go">&lt;ggcas.cluster.Cluster object: NGC104&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">At</span> <span class="pre">this</span> <span class="pre">point,</span> <span class="pre">simply</span> <span class="pre">passing</span> <span class="pre">as</span> <span class="pre">argument</span> <span class="pre">the</span> <span class="pre">gc</span> <span class="pre">object</span> <span class="pre">to</span> <span class="pre">the</span> <span class="pre">query</span> <span class="pre">function:</span></span></dt>
+<dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">dr3</span><span class="o">.</span><span class="n">get_astrometry</span><span class="p">(</span><span class="n">gc</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span> <span class="c1"># Radius must be passed as deg</span>
+<span class="go">INFO: Query finished. [astroquery.utils.tap.core]</span>
+<span class="go">Sample number of sources: 45865</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span>
+<span class="go">     SOURCE_ID              ra         ...        pmdec        pmdec_error</span>
+<span class="go">                           deg         ...       mas / yr        mas / yr</span>
+<span class="go">       int64             float64       ...       float64         float32</span>
+<span class="go">------------------- ------------------ ... ------------------- -----------</span>
+<span class="go">4689637445779054208   5.76563951251253 ...  -2.259232804525973  0.27563116</span>
+<span class="go">4689638850232458368  5.874682871570303 ... -2.3177094407812033  0.17122078</span>
+<span class="go">        ...                ...         ...         ...             ...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">The</span> <span class="pre">methods</span> <span class="pre">also</span> <span class="pre">have</span> <span class="pre">the</span> <span class="pre">save</span> <span class="pre">option,</span> <span class="pre">to</span> <span class="pre">save</span> <span class="pre">both</span> <span class="pre">the</span> <span class="pre">result</span> <span class="pre">of</span> <span class="pre">the</span> <span class="pre">query</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">and</span> <span class="pre">its</span> <span class="pre">information,</span> <span class="pre">such</span> <span class="pre">as</span> <span class="pre">the</span> <span class="pre">parameters</span> <span class="pre">used.</span></span></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.free_query">
+<span class="sig-name descname"><span class="pre">free_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ggcas.html#ggcas.cluster.Cluster" title="ggcas.cluster.Cluster"><span class="pre">Cluster</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.free_query" title="Link to this definition">¶</a></dt>
+<dd><p>This function allows to perform an ADQL search into the Gaia catalogue with
+personalized parameters, such as data to collect and conditions to apply.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>dump</strong> (<em>TYPE</em><em>, </em><em>optional</em>) – DESCRIPTION. The default is False.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em>) – Radius, in degrees, of the scan circle.</p></li>
+<li><p><strong>gc</strong> (<a class="reference internal" href="ggcas.html#ggcas.cluster.Cluster" title="ggcas.cluster.Cluster"><em>ggcas.cluster.Cluster</em></a>) – Globular Cluster object created with the G-GCAS module.</p></li>
+<li><p><strong>save</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the obtained data with its information or not.</p></li>
+<li><p><strong>**kwargs</strong> (<em>additional optional arguments</em>) – <dl>
+<dt>ra<span class="classifier">float or str</span></dt><dd><p>Right ascension coordinate for the centre of the scan (if no gc is provided).</p>
+</dd>
+<dt>dec<span class="classifier">float or str</span></dt><dd><p>Declination coordinate for the centre of the scan (if no gc is provided)</p>
+</dd>
+<dt>name<span class="classifier">str</span></dt><dd><p>String which provides the folder name where to save the data.
+Needed if no ‘gc’ object is supplied: if it is not given, and
+save was True, the data will be stored in the ‘UntrackedData’
+folder.</p>
+</dd>
+<dt>data<span class="classifier">str or list of str</span></dt><dd><p>List of parameters to retrieve, from the ones printed by ‘’.print_table()’’.
+If this argument is missing, the only parameter retrieved is ‘source_id’.
+Aliases:</p>
+<blockquote>
+<div><p>’dat’
+‘data’
+‘params’
+‘parameters’</p>
+</div></blockquote>
+</dd>
+<dt>conditions<span class="classifier">str or list of str</span></dt><dd><p>Listo of conditions on the parameters to apply upon scanning the
+archive. If no conditions are supplied, no conditions are applied.
+Aliases:</p>
+<blockquote>
+<div><p>’cond’
+‘conds’
+‘condition’
+‘conditions’</p>
+</div></blockquote>
+</dd>
+</dl>
+</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>DESCRIPTION.</p>
+<dd class="field-even"><p><strong>job_result</strong> – Result of the async query, stored into an astropy table.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>TYPE</p>
+<dd class="field-odd"><p>astropy table</p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.get_astrometry">
+<span class="sig-name descname"><span class="pre">get_astrometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ggcas.html#ggcas.cluster.Cluster" title="ggcas.cluster.Cluster"><span class="pre">Cluster</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.get_astrometry" title="Link to this definition">¶</a></dt>
+<dd><p>A pre-constructed ADQL search into the Gaia catalogue with fixed data
+retrieved, which is the principal astrometric parameters, with the possibility
+to add personalized query conditions.</p>
+<p>The retrieved data is:
+‘source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra,
+pmra_error, pmdec, pmdec_error’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em>) – Radius, in degrees, of the scan circle.</p></li>
+<li><p><strong>gc</strong> (<a class="reference internal" href="ggcas.html#ggcas.cluster.Cluster" title="ggcas.cluster.Cluster"><em>ggcas.cluster.Cluster</em></a>) – Globular Cluster object created with the G-GCAS module.</p></li>
+<li><p><strong>save</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the obtained data with its information or not.</p></li>
+<li><p><strong>**kwargs</strong> (<em>additional optional arguments</em>) – <dl>
+<dt>ra<span class="classifier">float or str</span></dt><dd><p>Right ascension coordinate for the centre of the scan (if no gc is provided).</p>
+</dd>
+<dt>dec<span class="classifier">float or str</span></dt><dd><p>Declination coordinate for the centre of the scan (if no gc is provided)</p>
+</dd>
+<dt>name<span class="classifier">str</span></dt><dd><p>String which provides the folder name where to save the data.
+Needed if no ‘gc’ object is supplied: if it is not given, and
+save was True, the data will be stored in the ‘UntrackedData’
+folder.</p>
+</dd>
+<dt>conditions<span class="classifier">str or list of str</span></dt><dd><p>Listo of conditions on the parameters to apply upon scanning the
+archive. If no conditions are supplied, no conditions are applied.
+Aliases:</p>
+<blockquote>
+<div><p>’cond’
+‘conds’
+‘condition’
+‘conditions’</p>
+</div></blockquote>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>astro_cluster</strong> – Astropy table with  the query results.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.Table</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.get_photometry">
+<span class="sig-name descname"><span class="pre">get_photometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ggcas.html#ggcas.cluster.Cluster" title="ggcas.cluster.Cluster"><span class="pre">Cluster</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.get_photometry" title="Link to this definition">¶</a></dt>
+<dd><p>A pre-constructed ADQL search into the Gaia catalogue with fixed data
+retrieved, which is the principal photometric parameters, with the possibility
+to add personalized query conditions.</p>
+<p>The retrieved data is:
+‘source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag,
+phot_bp_rp_excess_factor, teff_gspphot’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em>) – Radius, in degrees, of the scan circle.</p></li>
+<li><p><strong>gc</strong> (<a class="reference internal" href="ggcas.html#ggcas.cluster.Cluster" title="ggcas.cluster.Cluster"><em>ggcas.cluster.Cluster</em></a>) – Globular Cluster object created with the G-GCAS module.</p></li>
+<li><p><strong>save</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the obtained data with its information or not.</p></li>
+<li><p><strong>**kwargs</strong> (<em>additional optional arguments</em>) – <dl>
+<dt>ra<span class="classifier">float or str</span></dt><dd><p>Right ascension coordinate for the centre of the scan (if no gc is provided).</p>
+</dd>
+<dt>dec<span class="classifier">float or str</span></dt><dd><p>Declination coordinate for the centre of the scan (if no gc is provided)</p>
+</dd>
+<dt>name<span class="classifier">str</span></dt><dd><p>String which provides the folder name where to save the data.
+Needed if no ‘gc’ object is supplied: if it is not given, and
+save was True, the data will be stored in the ‘UntrackedData’
+folder.</p>
+</dd>
+<dt>conditions<span class="classifier">str or list of str</span></dt><dd><p>Listo of conditions on the parameters to apply upon scanning the
+archive. If no conditions are supplied, no conditions are applied.
+Aliases:</p>
+<blockquote>
+<div><p>’cond’
+‘conds’
+‘condition’
+‘conditions’</p>
+</div></blockquote>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>photo_cluster</strong> – Astropy table with the results.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.Table</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ggcas.query.GaiaQuery.get_rv">
+<span class="sig-name descname"><span class="pre">get_rv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ggcas.html#ggcas.cluster.Cluster" title="ggcas.cluster.Cluster"><span class="pre">Cluster</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.GaiaQuery.get_rv" title="Link to this definition">¶</a></dt>
+<dd><p>A pre-constructed ADQL search into the Gaia catalogue with fixed data
+retrieved, which is the radial velociti parameter with its error, with
+the possibility to add personalized query conditions.</p>
+<p>The retrieved data is:
+‘source_id, radial_velocity, radial_velocity_error’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radius</strong> (<em>float</em>) – Radius, in degrees, of the scan circle.</p></li>
+<li><p><strong>gc</strong> (<a class="reference internal" href="ggcas.html#ggcas.cluster.Cluster" title="ggcas.cluster.Cluster"><em>ggcas.cluster.Cluster</em></a>) – Globular Cluster object created with the G-GCAS module.</p></li>
+<li><p><strong>save</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the obtained data with its information or not.</p></li>
+<li><p><strong>**kwargs</strong> (<em>additional optional arguments</em>) – <dl>
+<dt>ra<span class="classifier">float or str</span></dt><dd><p>Right ascension coordinate for the centre of the scan (if no gc is provided).</p>
+</dd>
+<dt>dec<span class="classifier">float or str</span></dt><dd><p>Declination coordinate for the centre of the scan (if no gc is provided)</p>
+</dd>
+<dt>name<span class="classifier">str</span></dt><dd><p>String which provides the folder name where to save the data.
+Needed if no ‘gc’ object is supplied: if it is not given, and
+save was True, the data will be stored in the ‘UntrackedData’
+folder.</p>
+</dd>
+<dt>conditions<span class="classifier">str or list of str</span></dt><dd><p>Listo of conditions on the parameters to apply upon scanning the
+archive. If no conditions are supplied, no conditions are applied.
+Aliases:</p>
+<blockquote>
+<div><p>’cond’
+‘conds’
+‘condition’
+‘conditions’</p>
+</div></blockquote>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>rv_cluster</strong> – Astropy t able with te result.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>astropy.Table</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ggcas.query.available_tables">
+<span class="sig-prename descclassname"><span class="pre">ggcas.query.</span></span><span class="sig-name descname"><span class="pre">available_tables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ggcas.query.available_tables" title="Link to this definition">¶</a></dt>
+<dd><p>Prints out the complete list of data tables present in the Gaia archive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em><em>, </em><em>optional</em>) – A key used to restrict the printed tables. As example, if
+&gt;&gt;&gt; key = ‘gaiadr3’
+then only tables relative to the complete 3th data release will be printed
+out. Default is None, meaning all the tables will be printed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
@@ -458,15 +733,15 @@
 <li><a class="reference internal" href="#">Query</a><ul>
 <li><a class="reference internal" href="#author-s">Author(s)</a></li>
 <li><a class="reference internal" href="#description">Description</a></li>
-<li><a class="reference internal" href="#how-to-use">How to Use</a></li>
+<li><a class="reference internal" href="#how-to-use-it">How to Use it</a></li>
 <li><a class="reference internal" href="#ggcas.query.GaiaQuery"><code class="docutils literal notranslate"><span class="pre">GaiaQuery</span></code></a><ul>
-<li><a class="reference internal" href="#ggcas.query.GaiaQuery.freeQuery"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.freeQuery()</span></code></a></li>
-<li><a class="reference internal" href="#ggcas.query.GaiaQuery.getAstrometry"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.getAstrometry()</span></code></a></li>
-<li><a class="reference internal" href="#ggcas.query.GaiaQuery.getPhotometry"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.getPhotometry()</span></code></a></li>
-<li><a class="reference internal" href="#ggcas.query.GaiaQuery.getRV"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.getRV()</span></code></a></li>
-<li><a class="reference internal" href="#ggcas.query.GaiaQuery.printTable"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.printTable()</span></code></a></li>
+<li><a class="reference internal" href="#ggcas.query.GaiaQuery.free_query"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.free_query()</span></code></a></li>
+<li><a class="reference internal" href="#ggcas.query.GaiaQuery.get_astrometry"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.get_astrometry()</span></code></a></li>
+<li><a class="reference internal" href="#ggcas.query.GaiaQuery.get_photometry"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.get_photometry()</span></code></a></li>
+<li><a class="reference internal" href="#ggcas.query.GaiaQuery.get_rv"><code class="docutils literal notranslate"><span class="pre">GaiaQuery.get_rv()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#ggcas.query.available_tables"><code class="docutils literal notranslate"><span class="pre">available_tables()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -478,7 +753,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=a58bc63e"></script>
+</div><script src="_static/documentation_options.js?v=9dc39874"></script>
     <script src="_static/doctools.js?v=9a2dae69"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=4e2eecee"></script>
