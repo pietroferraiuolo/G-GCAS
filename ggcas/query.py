@@ -90,47 +90,6 @@ def available_tables(key:str=None):
         for table in tables:
             print(table.name)
 
-class _Sample:
-    """
-    Class for better handling the query result sample.
-
-    Parameters
-    ----------
-    gc : ggcas.cluster.Cluster
-        Globular cluster object used for the query.
-    sample : astropy.table.Table
-        Table containing the retrieve sample's data.
-    """
-    def __init__(self, sample, gc:Cluster=None):
-        """The constructor"""
-        self.gc     = gc
-        self.qinfo  = None
-        self.sample = sample
-
-    def __str__(self):
-        """The string representation"""
-        return self.gc.__str__()+'\n'+self.sample.__str__()
-
-    def __repr__(self):
-        """The representation"""
-        return self.__get_repr()
-
-    def __get_repr(self):
-        """Gets the str representation"""
-        if self.gc.id=='UntrackedData':
-            gctxt=f"""Gaia data retrieved at coordinates
-RA={self.gc.ra:.2f} DEC={self.gc.dec:.2f}
-"""
-        else:
-            gctxt=f"""Data sample for cluster {self.gc.id}
-"""
-        stxt = '\nData Columns:\n'
-        for name in self.sample.colnames:
-            stxt += name.lower()+' - '
-        stxt = stxt[:-3]
-        return gctxt+stxt
-
-
 class GaiaQuery:
     """
     Classs for the Gaia Query language execution.
@@ -215,16 +174,16 @@ class GaiaQuery:
         self._path      = fn.BASE_DATA_PATH
         self._fold      = None
         self._queryInfo = {}
-        self._baseQ     = """SELECT {data}
-                FROM {table}
-                WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
-                  {cond}
-                """
-        self._joinQ     = """SELECT {data}
-                FROM {table}
-                WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
-                  {cond}
-                """
+        self._baseQ     = \
+"""SELECT {data}
+FROM {table}
+WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
+    {cond}"""
+        self._joinQ     = \
+"""SELECT {data}
+FROM {table}
+WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
+    {cond}"""
         self.last_result = None
         self.last_query = None
         print(f"Initialized with Gaia table: '{gaia_table}'")
@@ -237,7 +196,7 @@ class GaiaQuery:
         """The string representation"""
         return self.__get_str()
 
-    def free_query(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
+    def free_query(self, radius, gc:Optional[Union[Cluster,str]]=None, save:bool=False, **kwargs):
         """
         This function allows to perform an ADQL search into the Gaia catalogue with
         personalized parameters, such as data to collect and conditions to apply.
@@ -246,8 +205,8 @@ class GaiaQuery:
         ----------
         radius : float
             Radius, in degrees, of the scan circle.
-        gc : ggcas.cluster.Cluster
-            Globular Cluster object created with the G-GCAS module.
+        gc : ggcas.cluster.Cluster or str
+            String name or Cluster object created with the G-GCAS module of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
@@ -289,9 +248,15 @@ class GaiaQuery:
             gc = Cluster(ra=ra, dec=dec)
             savename = kwargs.get('name', 'UntrackedData')
         else:
-            ra = gc.ra
-            dec = gc.dec
-            savename = gc.id
+            if isinstance(gc, Cluster):
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
+            elif isinstance(gc, str):
+                gc=Cluster(gc)
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
         self._queryInfo = {
             'Scan Info': {
                 'RA': ra,
@@ -316,7 +281,7 @@ class GaiaQuery:
         sample.qinfo = self._queryInfo['Scan Info']
         return sample
 
-    def get_astrometry(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
+    def get_astrometry(self, radius, gc:Optional[Union[Cluster,str]]=None, save:bool=False, **kwargs):
         """
         A pre-constructed ADQL search into the Gaia catalogue with fixed data
         retrieved, which is the principal astrometric parameters, with the possibility
@@ -330,8 +295,8 @@ class GaiaQuery:
         ----------
         radius : float
             Radius, in degrees, of the scan circle.
-        gc : ggcas.cluster.Cluster
-            Globular Cluster object created with the G-GCAS module.
+        gc : ggcas.cluster.Cluster or str
+            String name or Cluster object created with the G-GCAS module of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
@@ -364,9 +329,15 @@ class GaiaQuery:
             gc = Cluster(ra=ra, dec=dec)
             savename = kwargs.get('name', 'UntrackedData')
         else:
-            ra = gc.ra
-            dec = gc.dec
-            savename = gc.id
+            if isinstance(gc, Cluster):
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
+            elif isinstance(gc, str):
+                gc=Cluster(gc)
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
         astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
         self._queryInfo = {
             'Scan Info': {
@@ -391,7 +362,7 @@ class GaiaQuery:
         astro_sample.qinfo = self._queryInfo['Scan Info']
         return astro_sample
 
-    def get_photometry(self, radius, gc:Cluster=None, save:str=False, **kwargs):
+    def get_photometry(self, radius, gc:Optional[Union[Cluster,str]]=None, save:str=False, **kwargs):
         """
         A pre-constructed ADQL search into the Gaia catalogue with fixed data
         retrieved, which is the principal photometric parameters, with the possibility
@@ -405,8 +376,8 @@ class GaiaQuery:
         ----------
         radius : float
             Radius, in degrees, of the scan circle.
-        gc : ggcas.cluster.Cluster
-            Globular Cluster object created with the G-GCAS module.
+        gc : ggcas.cluster.Cluster or str
+            String name or Cluster object created with the G-GCAS module of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
@@ -439,9 +410,15 @@ class GaiaQuery:
             gc = Cluster(ra=ra, dec=dec)
             savename = kwargs.get('name', 'UntrackedData')
         else:
-            ra = gc.ra
-            dec = gc.dec
-            savename = gc.id
+            if isinstance(gc, Cluster):
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
+            elif isinstance(gc, str):
+                gc=Cluster(gc)
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
         photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
         self._queryInfo = {
             'Scan Info': {
@@ -466,7 +443,7 @@ class GaiaQuery:
         phot_sample.qinfo = self._queryInfo['Scan Info']
         return phot_sample
 
-    def get_rv(self, radius, gc:Cluster=None, save:bool=False, **kwargs):
+    def get_rv(self, radius, gc:Optional[Union[Cluster,str]]=None, save:bool=False, **kwargs):
         """
         A pre-constructed ADQL search into the Gaia catalogue with fixed data
         retrieved, which is the radial velociti parameter with its error, with
@@ -479,8 +456,8 @@ class GaiaQuery:
         ----------
         radius : float
             Radius, in degrees, of the scan circle.
-        gc : ggcas.cluster.Cluster
-            Globular Cluster object created with the G-GCAS module.
+        gc : ggcas.cluster.Cluster or str
+            String name or Cluster object created with the G-GCAS module of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
@@ -512,9 +489,15 @@ class GaiaQuery:
             gc = Cluster(ra=ra, dec=dec)
             savename = kwargs.get('name', 'UntrackedData')
         else:
-            ra = gc.ra
-            dec = gc.dec
-            savename = gc.id
+            if isinstance(gc, Cluster):
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
+            elif isinstance(gc, str):
+                gc=Cluster(gc)
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
         rv = 'source_id, radial_velocity, radial_velocity_error'
         self._queryInfo = {
             'Scan Info': {
@@ -800,3 +783,84 @@ Loading it...""")
                 text += f"{i} {column.name}\n"
                 i+=1
         return text
+
+class _Sample:
+    """
+    Class for better handling the query result sample.
+
+    Parameters
+    ----------
+    gc : ggcas.cluster.Cluster
+        Globular cluster object used for the query.
+    sample : astropy.table.Table
+        Table containing the retrieve sample's data.
+    """
+    def __init__(self, sample, gc:Cluster=None):
+        """The constructor"""
+        self.gc     = gc
+        self.qinfo  = None
+        self.sample = sample
+
+    def __str__(self):
+        """The string representation"""
+        return self.gc.__str__()+'\n'+self.sample.__str__()
+
+    def __repr__(self):
+        """The representation"""
+        return self.__get_repr()
+
+    def __get_repr(self):
+        """Gets the str representation"""
+        if self.gc.id=='UntrackedData':
+            gctxt=f"""Gaia data retrieved at coordinates
+RA={self.gc.ra:.2f} DEC={self.gc.dec:.2f}
+"""
+        else:
+            gctxt=f"""Data sample for cluster {self.gc.id}
+"""
+        stxt = '\nData Columns:\n'
+        for name in self.sample.colnames:
+            stxt += name.lower()+' - '
+        stxt = stxt[:-3]
+        return gctxt+stxt
+    
+    def to_pandas(self,overwrite:bool=False, *args, **kwargs):
+        """
+        Converts the sample to a pandas DataFrame
+
+        Parameters
+        ----------
+        *args : tuple
+            Positional arguments to pass to the astropy.Table to_pandas method.
+        **kwargs : dict
+            Keyword arguments to pass to the astropy.Table to_pandas method.
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            The DataFrame containing the sample data.
+        """
+        pandas_df = self.sample.to_pandas(*args, **kwargs)
+        if overwrite:
+            self._table = self.sample
+            self.sample = pandas_df
+            return self.sample.head(5)
+        print(pandas_df.head(5))
+        return pandas_df
+    
+    def to_table(self, *args):
+        """
+        Converts the sample to an astropy Table.
+
+        Parameters
+        ----------
+        *args : tuple
+            Positional arguments to pass to the astropy.Table constructor.
+
+        Returns
+        -------
+        table : astropy.Table
+            The table containing the sample data.
+        """
+        self.sample = self._table
+        return self.sample
