@@ -1,5 +1,7 @@
 from typing import Optional, Union, Tuple, Dict
 import numpy as np
+import pandas as pd
+import ggcas
 
 def scatter_2hist(
     x: np.ndarray, y: np.ndarray, kde: bool = False, **kwargs
@@ -12,9 +14,9 @@ def colorMagnitude(
     **kwargs
 ) -> None: ...
 
-def properMotion(pmra: np.ndarray, pmdec: np.ndarray, **kwargs) -> None: ...
+def properMotion(sample:Union[ggcas._query._Sample, pd.DataFrame], **kwargs) -> None: ...
 
-def spatial(ra: np.ndarray, dec: np.ndarray, **kwargs) -> None: ...
+def spatial(sample:Union[ggcas._query._Sample, pd.DataFrame], **kwargs) -> None: ...
 
 def histogram(
     data: np.ndarray, kde: bool = False, **kwargs

@@ -1,5 +1,6 @@
 import unittest
 import numpy as np
+import pandas as pd
 from ggcas import plots as gplt
 
 class TestPlots(unittest.TestCase):
@@ -17,6 +18,7 @@ class TestPlots(unittest.TestCase):
         self.dec = np.random.uniform(-90, 90, 100)
         self.data = np.random.randn(100)
         self.dataerr = np.random.uniform(0.1, 0.5, 100)
+        self.sample = pd.DataFrame({'ra': self.ra, 'dec': self.dec, 'pmra': self.pmra, 'pmdec': self.pmdec})
 
     def test_scatter_2hist(self):
         try:
@@ -32,13 +34,13 @@ class TestPlots(unittest.TestCase):
 
     def test_properMotion(self):
         try:
-            gplt.properMotion(self.pmra, self.pmdec, color='blue', s=10, alpha=0.7)
+            gplt.properMotion(self.sample, color='blue', s=10, alpha=0.7)
         except Exception as e:
             self.fail(f"properMotion raised an exception: {e}")
 
     def test_spatial(self):
         try:
-            gplt.spatial(self.ra, self.dec, color='red', s=15, alpha=0.6)
+            gplt.spatial(self.sample, color='red', s=15, alpha=0.6)
         except Exception as e:
             self.fail(f"spatial raised an exception: {e}")
 
