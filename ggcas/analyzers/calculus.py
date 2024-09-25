@@ -16,7 +16,7 @@ import multiprocessing as mp
 from typing import Dict, Any
 import numpy as np
 import sympy as sp
-from ggcas.utility import folder_paths as fn, osutils as osu
+from ggcas._utility import folder_paths as fn, osutils as osu
 from . import _glpoints
 
 _king_dir = fn.KING_INTEGRATOR_FOLDER

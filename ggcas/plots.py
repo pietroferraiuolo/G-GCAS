@@ -22,7 +22,7 @@ from typing import Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde
-from ggcas.utility import osutils as osu
+from ggcas._utility import osutils as osu
 
 label_font = {'family': 'serif',
         'color':  'black',

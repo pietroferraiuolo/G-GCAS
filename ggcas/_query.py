@@ -65,9 +65,9 @@ import os, configparser, numpy as np
 from astropy.table import Table
 from astropy import units as u
 from astroquery.gaia import Gaia
-from ggcas.cluster import Cluster
-from ggcas.utility import folder_paths as fn, osutils as osu
-from ggcas.utility.osutils import _timestamp
+from ggcas._cluster import Cluster
+from ggcas._utility import folder_paths as fn, osutils as osu
+from ggcas._utility.osutils import _timestamp
 _QDATA = 'query_data.txt'
 _QINFO = 'query_info.ini'
 

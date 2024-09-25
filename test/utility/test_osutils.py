@@ -2,8 +2,8 @@ import unittest
 import os
 from unittest.mock import patch
 from astropy.table import QTable
-from ggcas.utility import osutils as osu
-from ggcas.utility import folder_paths as fn
+from ggcas._utility import osutils as osu
+from ggcas._utility import folder_paths as fn
 import numpy as np
 
 class TestOsutils(unittest.TestCase):

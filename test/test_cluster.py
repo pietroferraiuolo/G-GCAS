@@ -1,5 +1,5 @@
 import unittest
-from ggcas.cluster import Cluster
+from ggcas._cluster import Cluster
 import astropy.units as u
 import pandas as pd
 import numpy as np

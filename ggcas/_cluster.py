@@ -27,7 +27,7 @@ import os, shutil, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.table import Table
-from ggcas.utility import folder_paths as fn
+from ggcas._utility import folder_paths as fn
 from ggcas.analyzers.calculus import king_integrator
 from ggcas.plots import label_font, title_font
 

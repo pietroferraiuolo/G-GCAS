@@ -16,7 +16,7 @@ Examples
 import os
 from astropy.table import QTable
 import datetime as dt
-from ggcas.utility import folder_paths as fn
+from ggcas._utility import folder_paths as fn
 datapath    = fn.BASE_DATA_PATH
 querypath   = fn.QUERY_DATA_FOLDER
 
@@ -38,42 +38,18 @@ def load_query(file):
     data = QTable.read(file, format='ascii.tab')
     return data
 
-def get_kwargs(names:tuple, default, kwargs):
-    """
-    Gets a tuple of possible kwargs names for a variable and checks if it was
-    passed, and in case returns it.
-
-    Parameters
-    ----------
-    names : tuple
-        Tuple containing all the possible names of a variable which can be passed
-        as a **kwargs argument.
-    default : any type
-        The default value to assign the requested key if it doesn't exist.
-    kwargs : dict
-        The dictionary of variables passed as 'Other Parameters'.
-
-    Returns
-    -------
-    key : value of the key
-        The value of the searched key if it exists. If not, the default value will
-        be returned.
-    """
-    possible_keys = names
-    for key in possible_keys:
-        if key in kwargs:
-            return kwargs[key]
-    return default
-
-
 def get_file_list(tn=None, fold=None, key:str=None):
     """
     Returns the file list of a given globular cluster datapath.
 
     Parameters
     ----------
-    gc_name: str
-        Name of the globular cluster to search data of.
+    tn: str
+        Tracking number of the data to search for.
+    fold : str
+        The name of the folder to search for the tracking number, or the complete
+        folder path, including the tn, in case it is a data folder (then 'tn' must
+        be none, as default).
     key : str, optional
         A key which identify specific files to return.
 
@@ -82,14 +58,20 @@ def get_file_list(tn=None, fold=None, key:str=None):
     fl : list os str
         List of sorted files inside the folder.
 
+    Raises
+    ------
+    FileNotFoundError
+        If the specified path does not exist.
+    TypeError
+        If the 'key' argument is not a string.
+
     Examples
     --------
     Here are some examples regarding the use of the 'key' argument. Let's say
     we need a list of files inside ''tn = '20160516_114916' '' for GC 'ngc104'
 
-        >>> gc_name = 'ngc104'
         >>> tn = '20160516_114916'
-        >>> get_file_list(gc_name, tn=tn)
+        >>> get_file_list(tn=tn) # if only that [gc_name] folder has that tn folder
         ['.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/spatial_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt',
@@ -98,11 +80,27 @@ def get_file_list(tn=None, fold=None, key:str=None):
 
     Let's suppose we want only the list of 'xxx_data.txt' files:
 
-        >>> get_file_list(gc_name, tn=tn, key='_data')
+        >>> get_file_list(tn=tn, key='_data')
         ['.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/query_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/spatial_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/velocity_data.txt',
          '.../G-GCAS/ggcas/data/query/[gc_name]/[tn]/dynamical_data.txt']
+
+    This function can be used to retrieve a list of folders too. Say we want to
+    know which cluster has king-model data available:
+
+        >>> foldpath = '.../G-GCAS/ggcas/data/models/'
+        >>> fold_list = get_file_list(fold=foldpath)
+        >>> fold_list
+        ['.../G-GCAS/ggcas/data/models/NGC104',
+         '.../G-GCAS/ggcas/data/models/NGC4372',
+         '.../G-GCAS/ggcas/data/models/NGC6121']
+
+    These are the folders of the clusters which have king-model data available. indeed,
+    if we check:
+        
+        >>> get_file_list(fold=fold_list[0])
+        ['.../G-GCAS/ggcas/data/models/NGC104/SM_king.txt']
     """
     if tn is None and fold is not None:
         fl = sorted([os.path.join(fold, file) \
@@ -135,6 +133,33 @@ def get_file_list(tn=None, fold=None, key:str=None):
             raise TypeError("'key' argument must be a string") from err
         fl = selected_list
     return fl
+
+def get_kwargs(names:tuple, default, kwargs):
+    """
+    Gets a tuple of possible kwargs names for a variable and checks if it was
+    passed, and in case returns it.
+
+    Parameters
+    ----------
+    names : tuple
+        Tuple containing all the possible names of a variable which can be passed
+        as a **kwargs argument.
+    default : any type
+        The default value to assign the requested key if it doesn't exist.
+    kwargs : dict
+        The dictionary of variables passed as 'Other Parameters'.
+
+    Returns
+    -------
+    key : value of the key
+        The value of the searched key if it exists. If not, the default value will
+        be returned.
+    """
+    possible_keys = names
+    for key in possible_keys:
+        if key in kwargs:
+            return kwargs[key]
+    return default
 
 def tnlist(gc_name:str):
     """

@@ -1,7 +1,7 @@
 from typing import Optional, Union, List, Tuple, Dict
 import pandas
 from astropy.table import Table
-from ggcas.cluster import Cluster
+from ggcas._cluster import Cluster
 
 def available_tables(key: Optional[str] = None) -> None: ...
 
