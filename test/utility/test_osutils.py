@@ -30,7 +30,7 @@ class TestOsutils(unittest.TestCase):
 
     @patch('os.listdir')
     @patch('os.path.join')
-    @patch('ggcas.utility.osutils._findTracknum')
+    @patch('ggcas._utility.osutils._findTracknum')
     def test_get_file_list(self, mock_findTracknum, mock_join, mock_listdir):
         # Mock the listdir and join functions
         mock_listdir.return_value = ['file1.txt', 'file2_data.txt', 'file3.txt']
@@ -48,7 +48,7 @@ class TestOsutils(unittest.TestCase):
         self.assertEqual(result, expected)
 
     @patch('os.listdir')
-    @patch('ggcas.utility.osutils.fn.CLUSTER_DATA_FOLDER')
+    @patch('ggcas._utility.osutils.fn.CLUSTER_DATA_FOLDER')
     def test_tnlist(self, mock_cluster_data_folder, mock_listdir):
         # Mock the CLUSTER_DATA_FOLDER and listdir functions
         mock_cluster_data_folder.return_value = '/basepath/gc_name'
