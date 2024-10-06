@@ -59,7 +59,6 @@ class Cluster:
             self.data_path = fn.CLUSTER_DATA_FOLDER(self.id)
             self.model_path = fn.CLUSTER_MODEL_FOLDER(self.id)
             parms = self._load_cluster_parameters(self.id)
-            self.model = self._load_king_model()
             self.ra = parms.loc["ra"] * u.deg
             self.dec = parms.loc["dec"] * u.deg
             self.dist = parms.loc["dist"] * u.kpc
@@ -69,6 +68,7 @@ class Cluster:
             self.logc = parms.loc["logc"]
             self.rt = self.rc * 10**self.logc
             self.cflag = ["True " if parms.loc["collapsed"] == "Y" else False][0]
+            self.model = self._load_king_model()
         else:
             print("Not a Cluster: no model available")
             self.data_path = fn.UNTRACKED_DATA_FOLDER
@@ -165,7 +165,8 @@ class Cluster:
             print(
                 f"WARNING: no king model file found for '{self.id}'. Performing the Single-Mass King model integration."
             )
-            os.mkdir(self.model_path)
+            if not os.path.exists(self.model_path):
+                os.mkdir(self.model_path)
             result = king_integrator(self.w0)
             model = Table()
             mod = pd.read_csv(result, delim_whitespace=True, skipfooter=1)
