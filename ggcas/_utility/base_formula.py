@@ -18,8 +18,12 @@ class BaseFormula(ABC):
     """
     def __init__(self):
         """The constructor"""
-        self._variables:List[sp.Basic] = []
-        self._formula:sp.Basic = None
+        self._variables:List[sp.Basic]  = []
+        self._formula:sp.Basic          = None
+        self._errFormula:sp.Basic       = None
+        self._errFormula:sp.Basic       = None
+        self._values:ArrayLike          = None
+        self._errors:ArrayLike          = None
 
     @property
     def formula(self) -> sp.Basic:
@@ -31,9 +35,29 @@ class BaseFormula(ABC):
         """Return the variables"""
         return self._variables
 
+    @property
+    def values(self) -> ArrayLike:
+        """Return the values"""
+        return self._values
+    
+    @property
+    def errors(self) -> ArrayLike:
+        """Return the errors"""
+        return self._errors
+    
+    @property
+    def errFormula(self) -> sp.Basic:
+        """Return the error formula"""
+        return self._errFormula
+
     @abstractmethod
     def compute(self, values:List[ArrayLike]) -> ArrayLike:
         """Compute the formula"""
+        pass
+
+    @abstractmethod
+    def compute_error(self, values:List[ArrayLike], errors:List[ArrayLike]) -> ArrayLike:
+        """Compute the error of the formula"""
         pass
 
     @abstractmethod

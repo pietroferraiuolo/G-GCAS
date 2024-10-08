@@ -13,7 +13,7 @@ How to Use it
 import os
 import subprocess
 import multiprocessing as mp
-from typing import Dict, Any
+from typing import Dict, Any, List
 import numpy as np
 import sympy as sp
 from ggcas._utility import folder_paths as fn, osutils as osu
@@ -62,32 +62,31 @@ def compute_numerical_function(func, variables, var_data):
         computed_func = _lambdified_computation(func, variables, var_data)
     return np.array(computed_func)
 
-def compute_error(func, variables, var_data, var_errors, corr:bool=False,
-                                                        corr_values:list=None):
+def compute_error(func, variables, var_data, var_errors, corr_values:list=None):
     """
     Numerical computation of the error-formula for the input function.
 
     Parameters
     ----------
     func : sympy function
-        DESCRIPTION.
+        The symbolic function for which the error needs to be computed.
     variables : list of sympy symbols
-        DESCRIPTION.
+        The list of symbolic variables in the function.
     var_data : list of ndarray
-        DESCRIPTION.
+        The list of data arrays corresponding to each variable.
     var_errors : list of ndarray
-        DESCRIPTION.
-    corr : bool, optional
-        DESCRIPTION. The default is False.
+        The list of error arrays corresponding to each variable.
     corr_values : list, optional
-        DESCRIPTION. The default is None.
+        The list of correlation values between the variables. The default is None.
 
     Returns
     -------
     computed_error : list of floats
-        DESCRIPTION.
+        The computed numerical error for the input function.
 
     """
+    if corr_values is not None:
+        corr = True
     err_func = error_propagation(func, variables, correlation=corr)
     func = err_func['error_formula']
     errors = err_func['error_variables']['errors']
