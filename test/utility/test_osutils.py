@@ -9,15 +9,23 @@ import numpy as np
 class TestOsutils(unittest.TestCase):
 
     @patch('astropy.table.QTable.read')
-    def test_load_query(self, mock_read):
+    @patch('osutils._findTracknum')
+    def test_load_data(self, mock_findTracknum, mock_read):
+        # Mock the _findTracknum function
+        mock_findTracknum.return_value = '/mock/path'
+
         # Mock the QTable.read function
         mock_table = QTable(names=('col1', 'col2'), rows=[(1, 2), (3, 4)])
         mock_read.return_value = mock_table
-        # Test the load_query function
-        result = osu.load_query('dummy_file')
+
+        # Test the load_data function
+        result = osu.load_data('dummy_tracking_number')
+
+        # Assertions
         self.assertTrue(np.array_equal(result['col1'], mock_table['col1']))
         self.assertTrue(np.array_equal(result['col2'], mock_table['col2']))
-        mock_read.assert_called_once_with('dummy_file', format='ascii.tab')
+        mock_findTracknum.assert_called_once_with('dummy_tracking_number', complete_path=True)
+        mock_read.assert_called_once_with('/mock/path/query_data.txt', format='ascii.tab')
 
     def test_get_kwargs(self):
         # Test with key present in kwargs

@@ -204,6 +204,39 @@ def angular_separation(ra0=None, dec0=None):
     func = {"f": w, "vars": variables}
     return func
 
+class LosDistance(BaseFormula):
+    """
+    Class for the analytical line-of-sight distance.
+    """
+    def __init__(self):
+        """The constructor"""
+        super().__init__()
+        self._get_formula()
+
+    def _get_formula(self):
+        """Analytical formula getter for the line-of-sight distance"""
+        parallax = sp.symbols("omega")
+        r = 1 / parallax
+        self._formula = r
+        self._variables = [parallax]
+        return self
+
+    def compute(self, data:List[ArrayLike]) -> ArrayLike:
+        """
+        Compute the line-of-sight distance based on parallax.
+
+        Parameters
+        ----------
+        data : List[ArrayLike]
+            The data to use for the computation.
+        
+        Returns
+        -------
+        result : ArrayLike
+            The computed line-of-sight distance.
+        """
+        return _compute(self._formula, self._variables, data)
+    
 def los_distance():
     """
 
@@ -218,6 +251,50 @@ def los_distance():
     r = 1 / parallax
     func = {"f": r, "vars": parallax}
     return func
+
+class RadialDistance2D(BaseFormula):
+    """
+    Class for the analytical 2D-projected radial distance.
+    """
+    def __init__(self, analytical_w=False, **params):
+        """The constructor"""
+        super().__init__()
+        self.analytical_w = analytical_w
+        self.params = params
+        self._get_formula()
+
+    def _get_formula(self):
+        """Analytical formula getter for the 2D-projected radial distance"""
+        rgc = sp.symbols("r_gc")
+        variables = [rgc]
+        if self.analytical_w is False:
+            w = sp.symbols("theta_x0")
+            variables.append(w)
+        else:
+            ww = angular_separation()
+            for var in ww["vars"]:
+                variables.append(var)
+            w = ww["f"]
+        r_2d = rgc * sp.tan(w)
+        self._formula = r_2d
+        self._variables = variables
+        return self
+
+    def compute(self, data:List[ArrayLike]) -> ArrayLike:
+        """
+        Compute the 2D-projected radial distance of a source from the center of a cluster.
+
+        Parameters
+        ----------
+        data : List[ArrayLike]
+            The data to use for the computation.
+        
+        Returns
+        -------
+        result : ArrayLike
+            The computed 2D-projected radial distance.
+        """
+        return _compute(self._formula, self._variables, data)
 
 def radial_distance_2d(analytical_w=False, **params):
     """
