@@ -138,7 +138,7 @@ class GaiaQuery:
     The queries, to work efficiently, require a 'ggcas.cluster.Cluster' object: so,
     let's take an example cluster, ngc104:
 
-        >>> from ggcas.cluster import Cluster
+        >>> from ggcas._cluster import Cluster
         >>> gc = Cluster('ngc104')
         >>> gc
         <ggcas.cluster.Cluster object: NGC104>
@@ -209,7 +209,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         radius : float
             Radius, in degrees, of the scan circle.
         gc : ggcas.cluster.Cluster or str
-            String name or Cluster object created with the G-GCAS module of a globular cluster.
+            String name or Cluster object, created with the G-GCAS module, of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
         **kwargs : additional optional arguments
@@ -245,21 +245,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
             Result of the async query, stored into an astropy table.
 
         """
-        if gc is None:
-            ra = kwargs.get('ra', None)
-            dec = kwargs.get('dec', None)
-            gc = Cluster(ra=ra, dec=dec)
-            savename = kwargs.get('name', 'UntrackedData')
-        else:
-            if isinstance(gc, Cluster):
-                ra = gc.ra
-                dec = gc.dec
-                savename = gc.id
-            elif isinstance(gc, str):
-                gc=Cluster(gc)
-                ra = gc.ra
-                dec = gc.dec
-                savename = gc.id
+        ra,dec,savename=self._get_coordinates(gc)
         self._queryInfo = {
             'Scan Info': {
                 'RA': ra,
@@ -326,21 +312,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         astro_cluster : astropy.Table
             Astropy table with  the query results.
         """
-        if gc is None:
-            ra = kwargs.get('ra', None)
-            dec = kwargs.get('dec', None)
-            gc = Cluster(ra=ra, dec=dec)
-            savename = kwargs.get('name', 'UntrackedData')
-        else:
-            if isinstance(gc, Cluster):
-                ra = gc.ra
-                dec = gc.dec
-                savename = gc.id
-            elif isinstance(gc, str):
-                gc=Cluster(gc)
-                ra = gc.ra
-                dec = gc.dec
-                savename = gc.id
+        ra,dec,savename=self._get_coordinates(gc)
         astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
         self._queryInfo = {
             'Scan Info': {
@@ -407,21 +379,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         photo_cluster : astropy.Table
             Astropy table with the results.
         """
-        if gc is None:
-            ra = kwargs.get('ra', None)
-            dec = kwargs.get('dec', None)
-            gc = Cluster(ra=ra, dec=dec)
-            savename = kwargs.get('name', 'UntrackedData')
-        else:
-            if isinstance(gc, Cluster):
-                ra = gc.ra
-                dec = gc.dec
-                savename = gc.id
-            elif isinstance(gc, str):
-                gc=Cluster(gc)
-                ra = gc.ra
-                dec = gc.dec
-                savename = gc.id
+        ra,dec,savename=self._get_coordinates(gc)
         photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
         self._queryInfo = {
             'Scan Info': {
@@ -486,21 +444,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         rv_cluster : astropy.Table
             Astropy t able with te result.
         """
-        if gc is None:
-            ra = kwargs.get('ra', None)
-            dec = kwargs.get('dec', None)
-            gc = Cluster(ra=ra, dec=dec)
-            savename = kwargs.get('name', 'UntrackedData')
-        else:
-            if isinstance(gc, Cluster):
-                ra = gc.ra
-                dec = gc.dec
-                savename = gc.id
-            elif isinstance(gc, str):
-                gc=Cluster(gc)
-                ra = gc.ra
-                dec = gc.dec
-                savename = gc.id
+        ra,dec,savename=self._get_coordinates(gc)
         rv = 'source_id, radial_velocity, radial_velocity_error'
         self._queryInfo = {
             'Scan Info': {
@@ -694,6 +638,45 @@ Loading it...""")
         self.last_query = query
         return query
 
+    def _get_coordinates(self, gc, **kwargs):
+        """
+        Function to get the coordinates of the cluster, either from the Cluster
+        object or from the kwargs.
+
+        Parameters
+        ----------
+        gc : ggcas.Cluste or str or None
+            The cluster object or the string name of the cluster.
+        **kwargs : dict
+            The optional arguments to pass to the function.
+
+        Returns
+        -------
+        ra : float
+            Right ascension of the center of the scan.
+        dec : float
+            Declination of the center of the scan.
+        savename : str
+            NAme identifier of the objects, for the data path.
+
+        """
+        if gc is None:
+            ra = kwargs.get('ra', None)
+            dec = kwargs.get('dec', None)
+            gc = Cluster(ra=ra, dec=dec)
+            savename = kwargs.get('name', 'UntrackedData')
+        else:
+            if isinstance(gc, Cluster):
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
+            elif isinstance(gc, str):
+                gc=Cluster(gc)
+                ra = gc.ra
+                dec = gc.dec
+                savename = gc.id
+        return ra, dec, savename
+
     def __check_query_exists(self, name):
         """
         Checks wether the requested query already exist saved for the Cluster.
@@ -827,7 +810,7 @@ RA={self.gc.ra:.2f} DEC={self.gc.dec:.2f}
         stxt = stxt[:-3]
         return gctxt+stxt
     
-    def to_pandas(self,overwrite:bool=False, *args, **kwargs):
+    def to_pandas(self, overwrite:bool=False, *args, **kwargs):
         """
         Converts the sample to a pandas DataFrame
 

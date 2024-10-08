@@ -7,7 +7,9 @@ Author(s)
 
 Description
 -----------
-This module provides a set of functions to compute various astronomical and physical quantities such as angular separation, line-of-sight distance, radial distances in 2D and 3D, total velocity, and effective gravitational potential.
+This module provides a set of functions to compute various astronomical and
+physical quantities such as angular separation, line-of-sight distance, radial
+distances in 2D and 3D, total velocity, and effective gravitational potential.
 
 Functions
 ---------
@@ -264,7 +266,6 @@ def total_velocity():
     variables = [vx, vy]
     func = {"f": V, "vars": variables}
     return func
-
 
 def effective_potential(shell: bool = False):
     """

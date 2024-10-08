@@ -48,7 +48,7 @@ class Cluster:
     ----------
     Initialize the class with a cluster's name. As example
 
-    >>> from ggcas.cluster import Cluster
+    >>> from ggcas._cluster import Cluster
     >>> ngc104 = Cluster('ngc104')
     """
 
@@ -179,9 +179,9 @@ class Cluster:
     def __get_repr(self):
         """repr creation"""
         if self.id == "UntrackedData":
-            text = "<ggcas.cluster.Cluster object>"
+            text = "<ggcas._cluster.Cluster object>"
         else:
-            text = f"<ggcas.cluster.Cluster object: {self.id}>"
+            text = f"<ggcas._cluster.Cluster object: {self.id}>"
         return text
 
     def __get_str(self):
