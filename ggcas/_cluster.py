@@ -97,6 +97,8 @@ class Cluster:
             grid  : grid on the plot
         """
         scale = kwargs.get("scale", None)
+        xscale = kwargs.get("xscale", None)
+        yscale = kwargs.get("yscale", None)
         c = kwargs.get("color", "black")
         grid = kwargs.get("grid", False)
         plt.figure(figsize=(8, 6))
@@ -106,7 +108,7 @@ class Cluster:
             [self.model["w"].min() - 1, self.model["w"].max()],
             c="red",
             linestyle="--",
-            label=rf"$W_0$={self.model['w'].max()}",
+            label=rf"$W_0$={self.model['w'].max():.2f}",
         )
         plt.xlabel(r"$\xi$ = $\dfrac{r}{r_t}$", fontdict=label_font)
         plt.ylabel("w", fontdict=label_font)
@@ -115,8 +117,9 @@ class Cluster:
         plt.xlim(-0.05, 1.05)
         if grid:
             plt.grid()
-        if scale is not None:
+        if xscale is not None or scale is not None:
             plt.xscale(scale)
+        if yscale is not None or scale is not None:
             plt.yscale(scale)
         plt.legend(loc="best")
         plt.show()

@@ -1,5 +1,5 @@
 from .osutils import (
-    load_query,
+    load_data,
     get_kwargs,
     get_file_list,
     tnlist,

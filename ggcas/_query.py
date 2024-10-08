@@ -781,9 +781,9 @@ class _Sample:
     sample : astropy.table.Table
         Table containing the retrieve sample's data.
     """
-    def __init__(self, sample, gc:Cluster=None):
+    def __init__(self, sample, gc:Optional[Union[Cluster,str]]=None):
         """The constructor"""
-        self.gc     = gc
+        self.gc     = gc if isinstance(gc, Cluster) else Cluster(gc)
         self.qinfo  = None
         self.sample = sample
 

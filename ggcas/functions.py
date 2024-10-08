@@ -100,7 +100,65 @@ Example usage of `effective_potential` function:
 """
 import numpy as np
 import sympy as sp
+from typing import List, Union, Any
+from numpy.typing import ArrayLike
 from astropy import units as u
+from ggcas._utility.base_formula import BaseFormula
+from ggcas.analyzers.calculus import compute_numerical_function as _compute
+
+class AngularSeparation(BaseFormula):
+
+    def __init__(self, ra0=None, dec0=None):
+        """The constructor"""
+        super().__init__()
+        self.ra0 = ra0 if ra0 is not None else sp.symbols("alpha_0")
+        self.dec0= dec0 if dec0 is not None else sp.symbols("\delta_0")
+        self._get_formula()
+
+    def _get_formula(self):
+        """Analytical formula getter for the angular separation"""
+        ra1, dec1 = sp.symbols("alpha_1 \delta_1")
+        variables = [ra1, dec1]
+        d2r = np.pi / 180
+        if isinstance(self.ra0, u.Quantity):
+            self.ra0 = float(self.ra0 / u.deg)
+        if isinstance(self.dec0, sp.Basic):
+            costerm = sp.cos(self.dec0 * d2r)
+        else:
+            self.dec0 = float(self.dec0 / u.deg) \
+                if isinstance(self.dec0, u.Quantity) else self.dec0
+            costerm = np.cos(self.dec0 * d2r)
+        w = (
+            2
+            * sp.asin(
+                sp.sqrt(
+                    sp.sin((self.dec0 - dec1) * 0.5 * d2r) ** 2
+                    + costerm * sp.cos(dec1 * d2r) * sp.sin((self.ra0 - ra1) * 0.5 * d2r) ** 2
+                )
+            )
+            / d2r
+        )
+        self._formula = w
+        self._variables = variables
+        return self
+
+    def compute(self, data:List[ArrayLike]) -> ArrayLike:
+        """
+        Compute the angular separation between two points in the sky.
+
+        Parameters
+        ----------
+        data : List[ArrayLike]
+            The data to use for the computation.
+        
+        Returns
+        -------
+        result : ArrayLike
+            The computed angular separation.
+        """
+        return _compute(self._formula, self._variables, data)
+
+
 
 def angular_separation(ra0=None, dec0=None):
     """

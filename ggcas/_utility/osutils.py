@@ -20,21 +20,22 @@ from ggcas._utility import folder_paths as fn
 datapath    = fn.BASE_DATA_PATH
 querypath   = fn.QUERY_DATA_FOLDER
 
-def load_query(file):
+def load_data(tn):
     """
     Loads the data found in the file as an astropy quantity table.
 
     Parameters
     ----------
-    file : str
-        Complete file path of the data, obtainable through the 'get_file_list'
-        function.
+    tn : str
+        Tracking number of the data to load.
 
     Returns
     -------
     data : astropy table
         The loaded data of the file.
     """
+    file_path = _findTracknum(tn, complete_path=True)
+    file = os.path.join(file_path, 'query_data.txt')
     data = QTable.read(file, format='ascii.tab')
     return data
 
@@ -163,16 +164,17 @@ def get_kwargs(names:tuple, default, kwargs):
 
 def tnlist(gc_name:str):
     """
-
+    Returns the list of tracking numbers for a given globular cluster.
 
     Parameters
     ----------
     gc_name : str
-        DESCRIPTION.
+        Name of the globular cluster.
 
     Returns
     -------
-    None.
+    tns : list of str
+        List of tracking numbers for the given globular cluster.
 
     """
     basepath = fn.CLUSTER_DATA_FOLDER(gc_name)

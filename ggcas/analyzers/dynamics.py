@@ -15,6 +15,7 @@ Examples
 """
 import numpy as np
 import astropy.units as u
+from ggcas.analyzers import calculus as calc
 
 def velocity_conversion(mu, gc_distance, mu_error = 0, gc_distance_error = 0):
     """
@@ -61,10 +62,25 @@ def compute_Vtot():
     return
 
 #
+def cartesian_conversion(ra, dec):
+
+    return
+
+def polar_conversion(x, y):
+
+    return
+
+def cartesian_pm(pmra, pmdec, ra, dec):
+
+    return
+
+def polar_pm(mux, muy, ra, dec):
+
+    return
 
 def density_profile(data):
     """
-
+    Returns the *observed* radial density profile for the given sample
 
     Parameters
     ----------
