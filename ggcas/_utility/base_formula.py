@@ -8,7 +8,7 @@ Description
 Base class for formulas calsses, used in the 'ggcas.functions' module.
 """
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Union
+from typing import List
 from numpy.typing import ArrayLike
 from sympy import Basic as sb
 
