@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['ggcas/analyzers/calculus.py', 'scripts/debug.py', 'ggcas/functions.py', 'ggcas/analyzers/dynamics.py', 'ggcas/plots.py']
+recent_files = ['ggcas/analyzers/calculus.py', 'ggcas/functions.py', 'ggcas/analyzers/effective_potential.py', 'ggcas/analyzers/dynamics.py', 'scripts/debug.py']
 
 [main]
 version = 0.2.0

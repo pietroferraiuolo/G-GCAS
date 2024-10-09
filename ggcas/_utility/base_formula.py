@@ -10,7 +10,7 @@ Base class for formulas calsses, used in the 'ggcas.functions' module.
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Union
 from numpy.typing import ArrayLike
-import sympy as sp
+from sympy import Basic as sb
 
 class BaseFormula(ABC):
     """
@@ -18,37 +18,42 @@ class BaseFormula(ABC):
     """
     def __init__(self):
         """The constructor"""
-        self._variables:List[sp.Basic]  = []
-        self._formula:sp.Basic          = None
-        self._errFormula:sp.Basic       = None
-        self._errFormula:sp.Basic       = None
-        self._values:ArrayLike          = None
-        self._errors:ArrayLike          = None
+        self._variables:List[sb]    = []
+        self._formula:sb            = None
+        self._errFormula:sb         = None
+        self._errVariables:List[sb] = None
+        self._values:ArrayLike      = None
+        self._errors:ArrayLike      = None
 
     @property
-    def formula(self) -> sp.Basic:
+    def formula(self) -> sb:
         """Return the formula"""
         return self._formula
 
     @property
-    def variables(self) -> List[sp.Basic]:
+    def variables(self) -> List[sb]:
         """Return the variables"""
         return self._variables
 
     @property
     def values(self) -> ArrayLike:
         """Return the values"""
-        return self._values
+        return "Not computed" if self._values is None else self._values
     
     @property
     def errors(self) -> ArrayLike:
         """Return the errors"""
-        return self._errors
+        return "Not computed" if self._errors is None else self._errors
     
     @property
-    def errFormula(self) -> sp.Basic:
+    def errFormula(self) -> sb:
         """Return the error formula"""
         return self._errFormula
+
+    @property
+    def errVariables(self) -> List[sb]:
+        """Return the error variables"""
+        return self._errVariables
 
     @abstractmethod
     def compute(self, values:List[ArrayLike]) -> ArrayLike:
@@ -61,6 +66,6 @@ class BaseFormula(ABC):
         pass
 
     @abstractmethod
-    def _get_formula(self) -> sp.Basic:
+    def _get_formula(self) -> sb:
         """Return the formula"""
         pass

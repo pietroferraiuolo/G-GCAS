@@ -27,7 +27,7 @@ import os, shutil, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.table import Table
-from ggcas._utility import folder_paths as fn
+from ggcas._utility import CLUSTER_DATA_FOLDER, CLUSTER_MODEL_FOLDER, CATALOG_FILE
 from ggcas.analyzers.calculus import king_integrator
 from ggcas.plots import label_font, title_font
 
@@ -56,8 +56,8 @@ class Cluster:
         """The constructor"""
         if name is not None:
             self.id = name.upper()
-            self.data_path = fn.CLUSTER_DATA_FOLDER(self.id)
-            self.model_path = fn.CLUSTER_MODEL_FOLDER(self.id)
+            self.data_path = CLUSTER_DATA_FOLDER(self.id)
+            self.model_path = CLUSTER_MODEL_FOLDER(self.id)
             parms = self._load_cluster_parameters(self.id)
             self.ra = parms.loc["ra"] * u.deg
             self.dec = parms.loc["dec"] * u.deg
@@ -139,7 +139,7 @@ class Cluster:
         cat_row : TYPE
             Pandas Series with all the necessary paramenters to ilitialize the Cluster Class.
         """
-        catalog = pd.read_excel(fn.CATALOG_FILE, index_col=0)
+        catalog = pd.read_excel(CATALOG_FILE, index_col=0)
         cat_row = catalog.loc[name.upper()]
         return cat_row
 
@@ -160,7 +160,7 @@ class Cluster:
         """
         try:
             model = Table()
-            file = os.path.join(fn.CLUSTER_MODEL_FOLDER(self.id), "SM_king.txt")
+            file = os.path.join(CLUSTER_MODEL_FOLDER(self.id), "SM_king.txt")
             model["xi"] = np.loadtxt(file, skiprows=1, usecols=1)
             model["w"] = np.loadtxt(file, skiprows=1, usecols=2)
             model["rho"] = np.loadtxt(file, skiprows=1, usecols=3)

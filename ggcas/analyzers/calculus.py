@@ -16,10 +16,10 @@ import multiprocessing as mp
 from typing import Dict, Any, List
 import numpy as np
 import sympy as sp
-from ggcas._utility import folder_paths as fn, osutils as osu
+from ggcas._utility import KING_INTEGRATOR_FOLDER, get_file_list
 from . import _glpoints
 
-_king_dir = fn.KING_INTEGRATOR_FOLDER
+_king_dir = KING_INTEGRATOR_FOLDER
 _king_exe = os.path.join(_king_dir, 'king_integrator')
 
 def compute_numerical_function(func, variables, var_data):
@@ -58,7 +58,9 @@ def compute_numerical_function(func, variables, var_data):
         computed_func = _multicore_computation(n_cores, func, val_dicts)
     else:
         # lambdify computation
-        print("WARNING: computation time exceeding 30s. Compiling expression with NumPy.")
+        print(
+            "WARNING: computation time exceeding 30s. Compiling expression with NumPy."
+            )
         computed_func = _lambdified_computation(func, variables, var_data)
     return np.array(computed_func)
 
@@ -85,8 +87,7 @@ def compute_error(func, variables, var_data, var_errors, corr_values:list=None):
         The computed numerical error for the input function.
 
     """
-    if corr_values is not None:
-        corr = True
+    corr = True if corr_values is not None else False
     err_func = error_propagation(func, variables, correlation=corr)
     func = err_func['error_formula']
     errors = err_func['error_variables']['errors']
@@ -269,7 +270,7 @@ def king_integrator(w0, output='profile'):
     else:
         print("Calling Fortran90 code executor...\n")
         print(result.stdout)
-    filelist = osu.get_file_list(fold=_king_dir, key='.dat')
+    filelist = get_file_list(fold=_king_dir, key='.dat')
     result = []
     if 'all' in output:
         result = filelist
@@ -332,6 +333,8 @@ def _lambdified_computation(func, variables, var_data):
         The result computed function.
     """
     f_lambdified = sp.lambdify(variables, func, modules="numpy")
+    if not isinstance(var_data, list):
+        var_data = [var_data]
     result = f_lambdified(*var_data)
     computed_func = []
     for x in result:

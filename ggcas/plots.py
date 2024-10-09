@@ -16,11 +16,19 @@ Just import the module
     >>> gplt.scatter_2hist(...) # your data
 
 """
+import os
 from typing import Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import gaussian_kde
+from rpy2.robjects import (
+    pandas2ri as pd2r,
+    numpy2ri as np2r,
+    r as R,
+    globalenv as genv
+)
+from ggcas.analyzers._Rcode import check_packages
 from ggcas._utility import osutils as osu
+from ggcas._utility import R_SOURCE_FOLDER as _RSF
 
 label_font = {'family': 'serif',
         'color':  'black',
@@ -36,7 +44,7 @@ title_font = {'family': 'cursive',
 
 default_figure_size = (6.4, 5.2)
 
-def scatter_2hist(x, y, kde=False, **kwargs):
+def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     """
     Make a 2D scatter plot of two data arrays, with the respective histogram distributions
     projected on each axis. The kde option allows for Gaussian regression on the plotted data.
@@ -80,7 +88,7 @@ def scatter_2hist(x, y, kde=False, **kwargs):
     colorx=kwargs.get('colorx', 'green')
     colory=kwargs.get('colory', 'blue')
     sc=kwargs.get('scatter_color', 'black')
-    s=kwargs.get('size', 5)
+    s=osu.get_kwargs(('size', 's'), 5, kwargs)
     fsize=kwargs.get('figsize', default_figure_size)
     fig = plt.figure(figsize=fsize)
     gs = fig.add_gridspec(2, 2,  width_ratios=(4, 1), height_ratios=(1, 4),
@@ -97,22 +105,17 @@ def scatter_2hist(x, y, kde=False, **kwargs):
     ax_histy.set_xlabel('Counts')
     ax.set_xlabel(xlabel, fontdict=label_font)
     ax.set_ylabel(ylabel, fontdict=label_font)
-    binwidth = 0.25
-    xymax = max(np.max(np.abs(x)), np.max(np.abs(y)))
-    lim = (int(xymax/binwidth) + 1) * binwidth
-    bins = np.arange(-lim, lim + binwidth, binwidth)
+    bins = int(1.5*np.sqrt(len(x)))
     ax_histx.hist(x, bins=bins, color=colorx, alpha=0.6)
     ax_histy.hist(y, bins=bins, orientation='horizontal', color=colory, alpha=0.6)
     plt.suptitle(title, size=21, weight='semibold')
     if kde:
-        kdex = gaussian_kde(x)
-        xk = np.linspace(min(x), max(x), 10000)
-        kdex_values = kdex(xk)*len(x)*binwidth
-        kdey = gaussian_kde(y)
-        yk = np.linspace(min(y), max(y), 10000)
-        kdey_values = kdey(yk)*len(y)*binwidth
-        ax_histx.plot(xk, kdex_values, color='r')
-        ax_histy.plot(kdey_values, yk, color='r')
+        x_kdex, x_kdey,x_c = _kde_estimator(x, kde_kind)
+        y_kdex, y_kdey,y_c = _kde_estimator(y, kde_kind)
+        ax_histx.plot(x_kdex, x_kdey, color='Green', label=f"$\mu$={x_c[1]:.3f}\n$\sigma^2$={x_c[2]:.3f}")
+        ax_histy.plot(y_kdey, y_kdex, color='Blue', label=f"$\mu$={y_c[1]:.3f}\n$\sigma^2$={y_c[2]:.3f}")
+        ax_histx.legend(loc='best', fontsize='small')
+        ax_histy.legend(loc='best', fontsize='small')
     plt.show()
 
 def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
@@ -240,7 +243,7 @@ def spatial(sample, **kwargs):
     plt.scatter(ra, dec, c=col, alpha=alpha, s=size)
     plt.show()
 
-def histogram(data, kde=False, **kwargs):
+def histogram(data, kde=False, kde_kind:str='gaussian', **kwargs):
     """
     Plots the data distribution with a histogram. The number of bins is defined as 1.5*sqrt(N).
     If kde is True, the kernel density estimation will be computed and plotted over the histogram.
@@ -309,21 +312,19 @@ def histogram(data, kde=False, **kwargs):
     title = xlabel+' Distribution'
     plt.title(title, fontdict=label_font)
     bins = h[1][:len(h[0])]
-    binwidth = bins[1] - bins[0]
     counts = h[0]
-    mean=np.mean(data)
-    std=np.std(data)
     res={'h': [bins, counts]}
-    res['kde'] = [mean, std]
     if kde:
-        kde = gaussian_kde(data)
-        xk = np.linspace(min(data), max(data), 10000)
-        kde_values = kde(xk)*len(data)*binwidth
+        x_kde,y_kde,coeffs = _kde_estimator(data, kde_kind)
+        res['kde'] = [coeffs[1], coeffs[2]]
         label=r"""Gaussian KDE
+$A$   ={:.2e}
 $\mu$   = {:.2e}
 $\sigma^2$  = {:.2e}"""
-        plt.plot(xk, kde_values, c=kcolor, label=label.format(mean, std))
-        plt.legend(loc='best', fontsize='large')
+        plt.plot(x_kde, y_kde, c=kcolor, label=label.format(
+            coeffs[0], coeffs[1], coeffs[2])
+        )
+        plt.legend(loc='best', fontsize='medium')
     if xlim is not None:
         plt.xlim(xlim)
     plt.show()
@@ -473,3 +474,19 @@ def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
     plt.ylabel(ylabel, fontdict=label_font)
     plt.title(title, fontdict=title_font)
     plt.show()
+
+def _kde_estimator(data, kind):
+    """
+    Kernel Density Estimation function.
+    """
+    check_packages("minpack.lm")
+    np2r.activate()
+    regression_code=os.path.join(_RSF, 'regression.R')
+    R(f'source("{regression_code}")')
+    reg_func = genv["regression"]
+    r_data = np2r.numpy2rpy(data)
+    r_result = reg_func(r_data, method=kind)
+    x_kde = np.array(r_result.rx2('x'))
+    y_kde = np.array(r_result.rx2('y'))
+    coeffs = np.array(r_result.rx2('coeffs'))
+    return x_kde, y_kde, coeffs

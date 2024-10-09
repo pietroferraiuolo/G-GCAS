@@ -9,7 +9,7 @@ import numpy as np
 class TestOsutils(unittest.TestCase):
 
     @patch('astropy.table.QTable.read')
-    @patch('osutils._findTracknum')
+    @patch('ggcas._utility.osutils._findTracknum')
     def test_load_data(self, mock_findTracknum, mock_read):
         # Mock the _findTracknum function
         mock_findTracknum.return_value = '/mock/path'
