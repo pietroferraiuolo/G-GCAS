@@ -27,7 +27,7 @@ import os, shutil, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.table import Table
-from ggcas._utility import CLUSTER_DATA_FOLDER, CLUSTER_MODEL_FOLDER, CATALOG_FILE
+from ggcas._utility import CLUSTER_DATA_FOLDER, CLUSTER_MODEL_FOLDER, CATALOG_FILE, UNTRACKED_DATA_FOLDER
 from ggcas.analyzers.calculus import king_integrator
 from ggcas.plots import label_font, title_font
 
@@ -71,7 +71,7 @@ class Cluster:
             self.model = self._load_king_model()
         else:
             print("Not a Cluster: no model available")
-            self.data_path = fn.UNTRACKED_DATA_FOLDER
+            self.data_path = UNTRACKED_DATA_FOLDER
             self.id = "UntrackedData"
             self.ra = params.get("ra", None)
             self.dec = params.get("dec", None)
