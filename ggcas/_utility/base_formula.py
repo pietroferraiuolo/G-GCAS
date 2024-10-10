@@ -10,7 +10,10 @@ Base class for formulas calsses, used in the 'ggcas.functions' module.
 from abc import ABC, abstractmethod
 from typing import List
 from numpy.typing import ArrayLike
-from sympy import Basic as sb
+from sympy import (
+    Basic as sb, 
+    pretty_print as pprint
+)
 
 class BaseFormula(ABC):
     """
@@ -24,6 +27,23 @@ class BaseFormula(ABC):
         self._errVariables:List[sb] = None
         self._values:ArrayLike      = None
         self._errors:ArrayLike      = None
+
+    def __str__(self) -> str:
+        """Return the actual formula as a string"""
+        return self._get_str()
+    
+    def __repr__(self) -> str:
+        """Return the analytical formula as a string"""
+        return self._get_str()
+
+    def _get_str(self):
+        formula = self._analitical_formula()
+        computed = (
+            True if self._values is not None else False
+        ) and (
+            True if self._errors is not None else False
+        )
+        return f"{self.__class__.__name__}:\n{formula}\nComputed: {computed}"
 
     @property
     def formula(self) -> sb:
@@ -57,15 +77,15 @@ class BaseFormula(ABC):
 
     @abstractmethod
     def compute(self, values:List[ArrayLike]) -> ArrayLike:
-        """Compute the formula"""
-        pass
-
-    @abstractmethod
-    def compute_error(self, values:List[ArrayLike], errors:List[ArrayLike]) -> ArrayLike:
-        """Compute the error of the formula"""
+        """Compute the numeric values of the formula"""
         pass
 
     @abstractmethod
     def _get_formula(self) -> sb:
-        """Return the formula"""
+        """Return the derived formula of the class"""
+        pass
+
+    @abstractmethod
+    def _analitical_formula(self) -> str:
+        """Return the analitical formula for the class"""
         pass

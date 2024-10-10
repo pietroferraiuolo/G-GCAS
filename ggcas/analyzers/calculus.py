@@ -90,26 +90,12 @@ def compute_error(func, variables, var_data, var_errors, corr_values:list=None):
     corr = True if corr_values is not None else False
     err_func = error_propagation(func, variables, correlation=corr)
     func = err_func['error_formula']
-    errors = err_func['error_variables']['errors']
-    vars_to_pass = []
-    vals_to_pass = []
-    for i, var in enumerate(variables):
-        vars_to_pass.append(var)
-        vals_to_pass.append(var_data[i])
-    for i,_  in enumerate(variables):
-        vars_to_pass.append(errors[i])
-        vals_to_pass.append(var_errors[i])
+    variables = err_func['error_variables']['errors'] + err_func['error_variables']['variables']
+    data = var_data+var_errors
     if corr:
-        corr_values = [corr_values]
-        N = len(corr_values)
-        if N > 1:
-            for i in range(N):
-                vars_to_pass.append(err_func['correlations'][i])
-                vals_to_pass.append(corr_values[i])
-        else:
-            vars_to_pass.append(err_func['correlations'])
-            vals_to_pass.append(corr_values[0])
-    computed_error = compute_numerical_function(func, vars_to_pass, vals_to_pass)
+        variables += err_func['correlations']
+        data += corr_values
+    computed_error = compute_numerical_function(func, variables, data)
     return computed_error
 
 def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]:
@@ -163,15 +149,21 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
         for c in x:
             if c!=0:
                 corrs.append(c)
+    for i in range(0,len(corrs), 2):
+        try:
+            eformula = sp.simplify(error_formula.subs(corrs[i+1], corrs[i]))
+            corrs.pop(i+1)
+        except len(corrs) % 2 is False:
+            raise ValueError("Weird. But let me think about it!")
     erp = {
-        "error_formula": error_formula,
+        "error_formula": eformula,
         "error_variables": {
             'variables': variables,
             'errors': errors
             }
     }
     if correlation:
-        erp["correlations"] = corr
+        erp["correlations"] = corrs
     return erp
 
 def gaus_legendre_integrator(fnc, a, b, points):
