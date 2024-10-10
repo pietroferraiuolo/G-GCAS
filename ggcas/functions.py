@@ -701,3 +701,30 @@ class EffectivePotential(BaseFormula):
         Return the analytical formula for the effective gravitational potential.
         """
         return self._formula
+
+def cartesian_conversion(data:List[ArrayLike], ra0=0, dec0=0) -> list[ArrayLike]:
+    """
+    Convert the proper motion to cartesian velocities.
+
+    Parameters
+    ----------
+    data : List[ArrayLike]
+        The data to use for the computation.
+        The data to provide are:
+        - :math:`\alpha*`: the right ascension coordinate.
+        - :math:`\delta`: the declination coordinate.
+    ra0 : float
+        The right ascension of the source.
+    dec0 : float
+        The declination of the source.
+
+    Returns
+    -------
+    result : list[ArrayLike]
+        The converted cartesian velocities.
+    """
+    ra, dec = data
+    x = np.sin(ra - ra0) * np.cos(dec0)
+    y = np.sin(dec)*np.cos(dec0) - np.cos(dec)*np.sin(dec0)*np.cos(ra - ra0)
+    return [x, y]
+
