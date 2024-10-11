@@ -99,134 +99,71 @@ Example usage of `effective_potential` function:
     ```
 """
 
-import numpy as np
-import sympy as sp
-from typing import List, Union
-from numpy.typing import ArrayLike
-from astropy import units as u
+import numpy as _np
+import sympy as _sp
+from typing import List as _List, Union as _Union
+from numpy.typing import ArrayLike as _ArrayLike
+from astropy import units as _u
 from ggcas._utility.base_formula import BaseFormula
 from ggcas.analyzers.calculus import (
     compute_numerical_function as _compute_numerical,
+    error_propagation as _error_propagation,
     compute_error as _compute_error,
-    error_propagation,
+    _data_dict_creation,
 )
-
 
 class AngularSeparation(BaseFormula):
 
-    def __init__(self, ra0: Union[float, u.Quantity], dec0: Union[float, u.Quantity]):
+    def __init__(self, ra0: _Union[float, _u.Quantity], dec0: _Union[float, _u.Quantity]):
         """The constructor"""
         super().__init__()
-        self.ra0 = ra0 if ra0 is not None else sp.symbols("alpha_0")
-        self.dec0 = dec0 if dec0 is not None else sp.symbols("\delta_0")
+        self.ra0 = ra0
+        self.dec0 = dec0
         self._get_formula()
 
     def _get_formula(self):
         """Analytical formula getter for the angular separation"""
-        ra1, dec1 = sp.symbols("alpha_x \delta_x")
+        ra1, dec1 = _sp.symbols("alpha_x \delta_x")
         variables = [ra1, dec1]
-        d2r = np.pi / 180
-        if isinstance(self.ra0, u.Quantity):
-            self.ra0 = float(self.ra0 / u.deg)
-        if isinstance(self.dec0, u.Quantity):
-            self.dec0 = float(self.dec0 / u.deg)
-        costerm = np.cos(self.dec0 * d2r)
+        d2r = _np.pi / 180
+        if isinstance(self.ra0,_u.Quantity):
+            self.ra0 = float(self.ra0 /_u.deg)
+        if isinstance(self.dec0,_u.Quantity):
+            self.dec0 = float(self.dec0 /_u.deg)
+        costerm = _np.cos(self.dec0 * d2r)
         w = (
             2
-            * sp.asin(
-                sp.sqrt(
-                    sp.sin((self.dec0 - dec1) * 0.5 * d2r) ** 2
+            * _sp.asin(
+                _sp.sqrt(
+                    _sp.sin((self.dec0 - dec1) * 0.5 * d2r) ** 2
                     + costerm
-                    * sp.cos(dec1 * d2r)
-                    * sp.sin((self.ra0 - ra1) * 0.5 * d2r) ** 2
+                    * _sp.cos(dec1 * d2r)
+                    * _sp.sin((self.ra0 - ra1) * 0.5 * d2r) ** 2
                 )
             )
             / d2r
         )
         self._formula = w
         self._variables = variables
-        error = error_propagation(
+        error = _error_propagation(
             self._formula, self._variables, correlation=True
         )
         self._errFormula = error["error_formula"]
         errvars = error["error_variables"]
-        self._errVariables = errvars['errors'] + errvars['correlations']
-        return self
-
-    def compute(
-            self, 
-            data: List[ArrayLike],
-            errors:List[ArrayLike]=None,
-            correlations:List[ArrayLike]=None
-        ) -> ArrayLike:
-        f"""
-        Compute the angular separation between two points in the sky, along with
-        the propagated errors if they are provided.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors: List[ArrayLike], optional
-            If provided, the propagated errors for the {self.__class__.__name__} will be computed.
-            Note: the errors can also be computed separately using the `compute_error` method.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed angular separation.
-        """
-        if errors is None:
-            print(
-                f"WARNING! Be sure that the input data follow this specific order: {self.variables}"
-            )
-            self._values = _compute_numerical(self._formula, self._variables, data)
-        else:
-            print(
-                f"WARNING! Be sure that the input data follow this specific order: {self.errVariables}"
-            )
-            self._values = _compute_numerical(self._formula, self._variables, data)
-            self._errors = _compute_error(
-                self._formula, self._variables, data, errors, corr_values=correlations,
-            )
-        return self
-
-    def compute_error(
-        self, data: List[ArrayLike], errors: List[ArrayLike], corr: ArrayLike = None
-    ) -> ArrayLike:
-        """
-        Compute the error of the angular separation.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors : List[ArrayLike]
-            The errors to use for the computation.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed error of the angular separation.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.errVariables}"
-        )
-        self._errors = _compute_error(
-            self._formula, self._variables, data, errors, corr_values=corr
-        )
+        self._errVariables = errvars['errors'] 
+        self._correlations = errvars['corrs']
         return self
     
     def _analitical_formula(self):
-        ra0, dec0, ra1, dec1 = sp.symbols("alpha_0 \delta_0 alpha_x \delta_x")
+        ra0, dec0, ra1, dec1 = _sp.symbols("alpha_0 \delta_0 alpha_x \delta_x")
         formula = (
             2
-            * sp.asin(
-                sp.sqrt(
-                    sp.sin((dec0 - dec1)/2) ** 2
-                    + sp.cos(dec0)
-                    * sp.cos(dec1)
-                    * sp.sin((ra0 - ra1)/2) ** 2
+            * _sp.asin(
+                _sp.sqrt(
+                    _sp.sin((dec0 - dec1)/2) ** 2
+                    + _sp.cos(dec0)
+                    * _sp.cos(dec1)
+                    * _sp.sin((ra0 - ra1)/2) ** 2
                 )
             )
         )
@@ -245,70 +182,16 @@ class LosDistance(BaseFormula):
 
     def _get_formula(self):
         """Analytical formula getter for the line-of-sight distance"""
-        parallax = sp.symbols("omega")
+        parallax = _sp.symbols("omega")
         r = 1 / parallax
         self._formula = r
         self._variables = [parallax]
-        error = error_propagation(
-            self._formula, self._variables, correlation=True
+        error = _error_propagation(
+            self._formula, self._variables, correlation=False
         )
         self._errFormula = error["error_formula"]
         errvars = error["error_variables"]
-        self._errVariables = errvars['variables'] + errvars['errors'] + errvars['correlations']
-        return self
-
-    def compute(self, data: List[ArrayLike]) -> ArrayLike:
-        f"""
-        Compute the line-of-sight distance based on parallax.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation. In this case, the parallax data needs
-            to be provided.
-        errors: List[ArrayLike], optional
-            If provided, the propagated errors for the {self.__class__.__name__} will be computed.
-            Note: the errors can also be computed separately using the `compute_error` method.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed line-of-sight distance.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.variables}"
-        )
-        self._values =  _compute_numerical(self._formula, self._variables, data)
-        return self
-
-    def compute_error(
-        self, data: List[ArrayLike], errors: List[ArrayLike], corr: ArrayLike = None
-    ) -> ArrayLike:
-        """
-        Compute the error of the line-of-sight distance.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation. In this case, the parallax data needs
-            to be provided.
-        errors : List[ArrayLike]
-            The errors to use for the computation.
-        corr: ArrayLike, optional
-            The correlation values between variables to use for the computation.
-            If not provided, the correlation will be set to False.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed error of the line-of-sight distance.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.errVariables}"
-        )
-        self._errors = _compute_error(
-            self._formula, self._variables, data, errors, corr_values=corr
-        )
+        self._errVariables = errvars['errors']
         return self
     
     def _analitical_formula(self):
@@ -323,7 +206,7 @@ class RadialDistance2D(BaseFormula):
     Class for the analytical 2D-projected radial distance.
     """
 
-    def __init__(self, gc_distance: Union[float, u.Quantity]):
+    def __init__(self, gc_distance: _Union[float,_u.Quantity]):
         """The constructor"""
         self.gc_distance = gc_distance
         super().__init__()
@@ -332,81 +215,30 @@ class RadialDistance2D(BaseFormula):
     def _get_formula(self):
         """Analytical formula getter for the 2D-projected radial distance"""
         variables = []
-        if isinstance(self.gc_distance, u.Quantity):
-            rgc = self.gc_distance.to(u.pc).value
+        if isinstance(self.gc_distance,_u.Quantity):
+            rgc = self.gc_distance.to(_u.pc).value
         else:
             rgc = self.gc_distance
-        w = sp.symbols("vartheta_x0")
+        w = _sp.symbols("vartheta_x0")
         variables.append(w)
-        r_2d = rgc * sp.tan(w)
+        r_2d = rgc * _sp.tan(w)
         self._formula = r_2d
         self._variables = variables
-        error = error_propagation(
+        error = _error_propagation(
             self._formula, self._variables, correlation=True
         )
         self._errFormula = error["error_formula"]
         errvars = error["error_variables"]
-        self._errVariables = errvars['variables'] + errvars['errors'] + errvars['correlations']
-        return self
-
-    def compute(self, data: List[ArrayLike]) -> ArrayLike:
-        f"""
-        Compute the 2D-projected radial distance of a source from the center of a cluster.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-            The data to provide are:
-            - :math:`\theta_x0`: the 2D-projected angular separation from the center of the cluster.
-                Can be computed through the 'AngularSeparation' Class.
-        errors: List[ArrayLike], optional
-            If provided, the propagated errors for the {self.__class__.__name__} will be computed.
-            Note: the errors can also be computed separately using the `compute_error` method.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed 2D-projected radial distance.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.variables}"
-        )
-        self._values = _compute_numerical(self._formula, self._variables, data)
-        return self
-
-    def compute_error(
-        self, data: List[ArrayLike], errors: List[ArrayLike], corr: ArrayLike = None
-    ) -> ArrayLike:
-        """
-        Compute the error of the 2D-projected radial distance.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors : List[ArrayLike]
-            The errors to use for the computation.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed error of the 2D-projected radial distance.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.errVariables}"
-        )
-        self._errors = _compute_error(
-            self._formula, self._variables, data, errors, corr_values=corr
-        )
+        self._errVariables = errvars['errors'] 
+        self._correlations = errvars['corrs']
         return self
     
     def _analitical_formula(self):
         """
         Return the analytical formula for the 2D-projected radial distance.
         """
-        rgc, w = sp.symbols("r_gc, vartheta_x0")
-        formula = rgc * sp.tan(w)
+        rgc, w = _sp.symbols("r_gc, vartheta_x0")
+        formula = rgc * _sp.tan(w)
         return formula
 
 
@@ -416,12 +248,12 @@ class RadialDistance3D(BaseFormula):
     """
 
     def __init__(
-        self, extended: bool = False, gc_distance: Union[float, u.Quantity] = None
+        self, gc_distance:_Union[float,_u.Quantity]=None
     ):
         """The constructor"""
         super().__init__()
         self.gc_distance = gc_distance
-        self.extended = extended
+        self.extended = False if gc_distance is None else True
         self._get_formula()
 
     def _get_formula(self):
@@ -435,76 +267,28 @@ class RadialDistance3D(BaseFormula):
             r2d = RadialDistance2D(self.gc_distance)
             variables = rx.variables + r2d.variables
             D = rx.formula - self.gc_distance
-            r_3d = sp.sqrt(D**2 + r2d.formula**2)
+            r_3d = _sp.sqrt(D**2 + r2d.formula**2)
         else:
-            r2d, d = sp.symbols("r_2d, D")
+            r2d, d = _sp.symbols("r_2d, D")
             variables = [d, r2d]
-            r_3d = sp.sqrt(d**2 + r2d**2)
+            r_3d = _sp.sqrt(d**2 + r2d**2)
         self._formula = r_3d
         self._variables = variables
-        error = error_propagation(
+        error = _error_propagation(
             self._formula, self._variables, correlation=True
         )
         self._errFormula = error["error_formula"]
         errvars = error["error_variables"]
-        self._errVariables = errvars['variables'] + errvars['errors'] + errvars['correlations']
-        return self
-
-    def compute(self, data: List[ArrayLike]) -> ArrayLike:
-        f"""
-        Compute the 3D radial distance of a source from the center of a cluster.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors: List[ArrayLike], optional
-            If provided, the propagated errors for the {self.__class__.__name__} will be computed.
-            Note: the errors can also be computed separately using the `compute_error` method.
-            
-        Returns
-        -------
-        result : ArrayLike
-            The computed 3D radial distance.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.variables}"
-        )
-        self._values = _compute_numerical(self._formula, self._variables, data)
-        return self
-
-    def compute_error(
-        self, data: List[ArrayLike], errors: List[ArrayLike], corr: ArrayLike = None
-    ) -> ArrayLike:
-        """
-        Compute the error of the 3D radial distance.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors : List[ArrayLike]
-            The errors to use for the computation.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed error of the 3D radial distance.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.errVariables}"
-        )
-        self._errors = _compute_error(
-            self._formula, self._variables, data, errors, corr_values=corr
-        )
+        self._errVariables = errvars['errors'] 
+        self._correlations = errvars['corrs']
         return self
     
     def _analitical_formula(self):
         """
         Return the analytical formula for the 3D radial distance.
         """
-        r2d, d = sp.symbols("r_2d, D")
-        formula = sp.sqrt(d**2 + r2d**2)
+        r2d, d = _sp.symbols("r_2d, D")
+        formula = _sp.sqrt(d**2 + r2d**2)
         return formula
 
 
@@ -525,66 +309,18 @@ class TotalVelocity(BaseFormula):
 
     def _get_formula(self):
         """Analytical formula getter for the total velocity"""
-        vx, vy = sp.symbols("v_x, v_y")
+        vx, vy = _sp.symbols("v_x, v_y")
         V = (3/2)*(vx**2 + vy**2)
         variables = [vx, vy]
         self._formula = V
         self._variables = variables
-        error = error_propagation(
+        error = _error_propagation(
             self._formula, self._variables, correlation=True
         )
         self._errFormula = error["error_formula"]
         errvars = error["error_variables"]
-        self._errVariables = errvars['variables'] + errvars['errors'] + errvars['correlations']
-        return self
-
-    def compute(self, data: List[ArrayLike]) -> ArrayLike:
-        f"""
-        Compute the total velocity based on the given velocity components.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors: List[ArrayLike], optional
-            If provided, the propagated errors for the {self.__class__.__name__} will be computed.
-            Note: the errors can also be computed separately using the `compute_error` method.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed total velocity.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.variables}"
-        )
-        self._values = _compute_numerical(self._formula, self._variables, data)
-        return self
-    
-    def compute_error(
-        self, data: List[ArrayLike], errors: List[ArrayLike], corr: ArrayLike = None
-    ) -> ArrayLike:
-        """
-        Compute the error of the total velocity.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors : List[ArrayLike]
-            The errors to use for the computation.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed error of the total velocity.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.errVariables}"
-        )
-        self._errors = _compute_error(
-            self._formula, self._variables, data, errors, corr_values=corr
-        )
+        self._errVariables = errvars['errors'] 
+        self._correlations = errvars['corrs']
         return self
     
     def _analitical_formula(self):
@@ -608,92 +344,75 @@ class EffectivePotential(BaseFormula):
         """The constructor"""
         super().__init__()
         self.shell = shell
+        self._constants = None
         self._get_formula()
 
     def _get_formula(self):
         """Analytical formula getter for the effective gravitational potential"""
         if self.shell:
-            dN, x, lnB = sp.symbols("\Delta\ N, x, lnB")
-            A, a, b, r, m, sigma, dr, dx = sp.symbols(
+            dN, x, lnB = _sp.symbols("\Delta\ N, x, lnB")
+            A, a, b, r, m, sigma, dr, dx = _sp.symbols(
                 "A, alpha, beta, r_*, m, sigma, dr, dx"
             )
             lnb = (
                 16
-                * sp.sqrt(2)
+                * _sp.sqrt(2)
                 * A
-                * (sp.pi * b * r) ** 2
+                * (_sp.pi * b * r) ** 2
                 * a
                 * (m * sigma) ** 3
                 * dr
                 * dx
             )
-            variables = {
-                "x": [dN, x, lnB],
-                "const": [lnb, A, a, b, r, m, sigma, dr, dx],
-            }
-            poteff = lnB - sp.ln(dN / sp.sqrt(x)) - x
+            variables = [dN, x, lnB]
+            self._constants = [lnb, A, a, b, r, m, sigma, dr, dx]
+            poteff = lnB - _sp.ln(dN / _sp.sqrt(x)) - x
         else:
-            x, w = sp.symbols("x, w")
+            x, w = _sp.symbols("x, w")
             variables = [x, w]
-            poteff = -sp.ln(1 - sp.exp(x - w))
+            poteff = -_sp.ln(1 - _sp.exp(x - w))
         self._formula = poteff
         self._variables = variables
-        error = error_propagation(
-            self._formula, self._variables, correlation=True
+        self._bkcVariables = self._variables
+        error = _error_propagation(
+            self._formula, self._variables, correlation=False
         )
         self._errFormula = error["error_formula"]
         errvars = error["error_variables"]
-        self._errVariables = errvars['variables'] + errvars['errors'] + errvars['correlations']
+        self._errVariables = errvars['errors']
         return self
 
-    def compute(self, data: List[ArrayLike]) -> ArrayLike:
-        f"""
-        Compute the effective gravitational potential.
+    @property
+    def constants(self):
+        """
+        Return the constants used in the effective gravitational potential.
+        """
+        return self._constants
+    
+    def set_constants(self, values:_ArrayLike):
+        """
+        Set the constants used in the effective gravitational potential.
 
         Parameters
         ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors: List[ArrayLike], optional
-            If provided, the propagated errors for the {self.__class__.__name__} will be computed.
-            Note: the errors can also be computed separately using the `compute_error` method.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed effective gravitational potential.
-
+        values :_List[ArrayLike]
+            The values of the constants to set.
         """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.variables}"
-        )
-        self._values = _compute_numerical(self._formula, self._variables, data)
-        return self
-
-    def compute_error(
-        self, data: List[ArrayLike], errors: List[ArrayLike], corr: ArrayLike = None
-    ) -> ArrayLike:
-        """
-        Compute the error of the effective gravitational potential.
-
-        Parameters
-        ----------
-        data : List[ArrayLike]
-            The data to use for the computation.
-        errors : List[ArrayLike]
-            The errors to use for the computation.
-
-        Returns
-        -------
-        result : ArrayLike
-            The computed error of the effective gravitational potential.
-        """
-        print(
-            f"WARNING! Be sure that the input data follow this specific order: {self.errVariables}"
-        )
-        self._errors = _compute_error(
-            self._formula, self._variables, data, errors, corr_values=corr
-        )
+        if self.shell:
+            self._variables = self.bkcVariables 
+            print(f"WARNING! Be sure that the input data follow this specific order: {self.constants[1:]}")
+            c = []
+            for x in values:
+                c.append([x])
+            c = _np.array(c)
+            const_dict = _data_dict_creation(self._constants[1:], c)
+            lnb = self._constants[0].subs(const_dict)
+            self._formula = self._formula.subs(self._variables[2], lnb)
+            self._variables.drop(2)
+            self._constants = const_dict
+            self._constants[_sp.symbols('lnB')] = lnb            
+        else:
+            print("No constants to set, as shell={self.shell}")
         return self
     
     def _analitical_formula(self):
@@ -702,13 +421,13 @@ class EffectivePotential(BaseFormula):
         """
         return self._formula
 
-def cartesian_conversion(data:List[ArrayLike], ra0=0, dec0=0) -> list[ArrayLike]:
+def cartesian_conversion(data:_List[_ArrayLike], ra0=0, dec0=0) -> _List[_ArrayLike]:
     """
     Convert the proper motion to cartesian velocities.
 
     Parameters
     ----------
-    data : List[ArrayLike]
+    data :_List[ArrayLike]
         The data to use for the computation.
         The data to provide are:
         - :math:`\alpha*`: the right ascension coordinate.
@@ -720,11 +439,10 @@ def cartesian_conversion(data:List[ArrayLike], ra0=0, dec0=0) -> list[ArrayLike]
 
     Returns
     -------
-    result : list[ArrayLike]
+    result :_List[ArrayLike]
         The converted cartesian velocities.
     """
     ra, dec = data
-    x = np.sin(ra - ra0) * np.cos(dec0)
-    y = np.sin(dec)*np.cos(dec0) - np.cos(dec)*np.sin(dec0)*np.cos(ra - ra0)
+    x = _np.sin(ra - ra0) * _np.cos(dec0)
+    y = _np.sin(dec)*_np.cos(dec0) - _np.cos(dec)*_np.sin(dec0)*_np.cos(ra - ra0)
     return [x, y]
-

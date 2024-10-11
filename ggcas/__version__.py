@@ -7,7 +7,7 @@ Information about the current version of the g-gcas package.
 __title__ = 'ggcas'
 __long_title__ = 'G-GCAS : Gaia Globular Cluster Analysis Software'
 __description__ = 'Software to gather and analyze data retrieved on the Gaia archive'
-__version__ = '0.0.9'
+__version__ = '0.0.10'
 __author__ = 'Pietro Ferraiuolo'
 __author_email__ = 'pietro.ferraiuolo@inaf.it'
 __license__ = 'The Unlicense'

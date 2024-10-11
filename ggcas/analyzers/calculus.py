@@ -64,7 +64,7 @@ def compute_numerical_function(func, variables, var_data):
         computed_func = _lambdified_computation(func, variables, var_data)
     return np.array(computed_func)
 
-def compute_error(func, variables, var_data, var_errors, corr_values:list=None):
+def compute_error(err_func, variables, var_data, var_errors, corr_values:list=None):
     """
     Numerical computation of the error-formula for the input function.
 
@@ -87,15 +87,10 @@ def compute_error(func, variables, var_data, var_errors, corr_values:list=None):
         The computed numerical error for the input function.
 
     """
-    corr = True if corr_values is not None else False
-    err_func = error_propagation(func, variables, correlation=corr)
-    func = err_func['error_formula']
-    variables = err_func['error_variables']['errors'] + err_func['error_variables']['variables']
     data = var_data+var_errors
-    if corr:
-        variables += err_func['correlations']
+    if corr_values is not None:
         data += corr_values
-    computed_error = compute_numerical_function(func, variables, data)
+    computed_error = compute_numerical_function(err_func, variables, data)
     return computed_error
 
 def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]:
@@ -149,12 +144,14 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
         for c in x:
             if c!=0:
                 corrs.append(c)
-    for i in range(0,len(corrs), 2):
-        try:
-            eformula = sp.simplify(error_formula.subs(corrs[i+1], corrs[i]))
+    try:
+        assert len(corrs) % 2 == 0
+        assert len(corrs) != 0
+        for i in range(0,len(corrs), 2):
+            eformula = sp.nsimplify(error_formula.subs(corrs[i+1], corrs[i]))
             corrs.pop(i+1)
-        except len(corrs) % 2 is False:
-            raise ValueError("Weird. But let me think about it!")
+    except AssertionError:
+        eformula = error_formula
     erp = {
         "error_formula": eformula,
         "error_variables": {
@@ -163,7 +160,7 @@ def error_propagation(func, variables, correlation:bool=False) -> Dict[str, Any]
             }
     }
     if correlation:
-        erp["correlations"] = corrs
+        erp['error_variables']["corrs"] = corrs
     return erp
 
 def gaus_legendre_integrator(fnc, a, b, points):
@@ -333,7 +330,7 @@ def _lambdified_computation(func, variables, var_data):
         computed_func.append(float(x))
     return computed_func
 
-def _data_dict_creation(variables, var_data):
+def _data_dict_creation(variables, var_data:np.typing.ArrayLike):
     """
     function which creates the list of dictionaries in the format needed to compute
     sympy functions.

@@ -316,7 +316,7 @@ def histogram(data, kde=False, kde_kind:str='gaussian', **kwargs):
     res={'h': [bins, counts]}
     if kde:
         x_kde,y_kde,coeffs = _kde_estimator(data, kde_kind)
-        res['kde'] = [coeffs[1], coeffs[2]]
+        res['kde'] = coeffs
         label=r"""Gaussian KDE
 $A$   ={:.2e}
 $\mu$   = {:.2e}
