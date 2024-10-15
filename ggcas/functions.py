@@ -421,7 +421,7 @@ class EffectivePotential(BaseFormula):
         """
         return self._formula
     
-class CartesianConversion(BaseFormula):
+class CartesianConversion():
     r"""
     Class for the analytical cartesian conversion.
 
@@ -433,6 +433,9 @@ class CartesianConversion(BaseFormula):
     def __init__(self, ra0=0, dec0=0):
         """The constructor"""
         super().__init__()
+        self._values = None
+        self._formula = None
+        self._variables = None
         self.ra0 = ra0
         self.dec0 = dec0
         self._get_formula()
@@ -457,54 +460,59 @@ class CartesianConversion(BaseFormula):
         Return the r component of the cartesian conversion.
         """
         return self._values[2]
+    
+    @property
+    def theta(self):
+        """
+        Return the theta component of the cartesian conversion.
+        """
+        return self._values[3]
+    
+    @property
+    def mu_x(self):
+        """
+        Return the mu_x component of the cartesian conversion.
+        """
+        return self._values[4]
+    
+    @property
+    def mu_y(self):
+        """
+        Return the mu_y component of the cartesian conversion.
+        """
+        return self._values[5]
+    
+    @property
+    def mu_r(self):
+        """
+        Return the mu_r component of the cartesian conversion.
+        """
+        return self._values[6]
+    
+    @property
+    def mu_theta(self):
+        """
+        Return the mu_theta component of the cartesian conversion.
+        """
+        return self._values[7]
 
     def _get_formula(self):
         """Analytical formula getter for the cartesian conversion"""
         ra, dec = _sp.symbols("alpha \delta")
-        variables = [ra, dec]
+        pmra, pmdec = _sp.symbols("mu_{\\alpha} mu_{\delta}")
+        variables = [ra, dec, pmra, pmdec]
+        # cartesian spatial coordinates
         x = _sp.sin(ra - self.ra0) * _sp.cos(self.dec0)
         y = _sp.sin(dec)*_sp.cos(self.dec0) - _sp.cos(dec)*_sp.sin(self.dec0)*_sp.cos(ra - self.ra0)
+        # polar spatial coordinates
         r = _sp.sqrt(x**2 + y**2)
-        self._formula = [x, y, r]
+        theta = _np.arctan2(x,y)
+        # cartesian velocity components
+        mu_x = pmra*_sp.cos(ra-self.ra0)-pmdec*_sp.sin(dec)*_sp.sin(ra-self.ra0)
+        mu_y = pmra*_sp.sin(self.dec0)*_sp.sin(ra-self.ra0) + pmdec*(_sp.cos(dec)*_sp.cos(self.dec0)+_sp.sin(dec)*_sp.sin(self.dec0)*_sp.cos(ra-self.ra0))
+        # polar velocity components
+        mu_r = (x*mu_x+y*mu_y)/_sp.sqrt(x**2+y**2)
+        mu_theta = (y*mu_x-x*mu_y)/(x**2+y**2)
+        self._formula = [x, y, r, theta, mu_x, mu_y, mu_r, mu_theta]
         self._variables = variables
         return self
-    
-    def _analitical_formula(self):
-        """
-        Return the analytical formula for the cartesian conversion.
-        """
-        ra, dec = _sp.symbols("alpha \delta")
-        x = _sp.sin(ra - ra0) * _sp.cos(dec0)
-        ra0, dec0 = _sp.symbols("alpha_0 \delta_0")
-        y = _sp.sin(dec)*_sp.cos(dec0) - _sp.cos(dec)*_sp.sin(dec0)*_sp.cos(ra - ra0)
-        r = _sp.sqrt(x**2 + y**2)
-        return [x, y, r]
-
-def cartesian_conversion(data:_List[_ArrayLike], ra0=0, dec0=0) -> _List[_ArrayLike]:
-    """
-    Convert the proper motion to cartesian velocities.
-
-    Parameters
-    ----------
-    data :_List[ArrayLike]
-        The data to use for the computation.
-        The data to provide are:
-        - :math:`\alpha*`: the right ascension coordinate.
-        - :math:`\delta`: the declination coordinate.
-    ra0 : float
-        The right ascension of the source.
-    dec0 : float
-        The declination of the source.
-
-    Returns
-    -------
-    result :_List[ArrayLike]
-        The converted cartesian velocities.
-    """
-    ra, dec = data
-    x = _np.sin(ra - ra0) * _np.cos(dec0)
-    y = _np.sin(dec)*_np.cos(dec0) - _np.cos(dec)*_np.sin(dec0)*_np.cos(ra - ra0)
-    r = np.sqrt(x**2 + y**2)
-    return [x, y, r]
-
-
