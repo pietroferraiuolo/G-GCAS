@@ -420,6 +420,65 @@ class EffectivePotential(BaseFormula):
         Return the analytical formula for the effective gravitational potential.
         """
         return self._formula
+    
+class CartesianConversion(BaseFormula):
+    r"""
+    Class for the analytical cartesian conversion.
+
+    The cartesian conversion is defined as :math:`x = \sin(\alpha - \alpha_0) \cos(\delta_0)`,
+    :math:`y = \sin(\delta)\cos(\delta_0) - \cos(\delta)\sin(\delta_0)\cos(\alpha - \alpha_0)`,
+    and :math:`r = \sqrt{x^2 + y^2}`.
+    """
+
+    def __init__(self, ra0=0, dec0=0):
+        """The constructor"""
+        super().__init__()
+        self.ra0 = ra0
+        self.dec0 = dec0
+        self._get_formula()
+
+    @property
+    def x(self):
+        """
+        Return the x component of the cartesian conversion.
+        """
+        return self._values[0]
+    
+    @property
+    def y(self):
+        """
+        Return the y component of the cartesian conversion.
+        """
+        return self._values[1]
+    
+    @property
+    def r(self):
+        """
+        Return the r component of the cartesian conversion.
+        """
+        return self._values[2]
+
+    def _get_formula(self):
+        """Analytical formula getter for the cartesian conversion"""
+        ra, dec = _sp.symbols("alpha \delta")
+        variables = [ra, dec]
+        x = _sp.sin(ra - self.ra0) * _sp.cos(self.dec0)
+        y = _sp.sin(dec)*_sp.cos(self.dec0) - _sp.cos(dec)*_sp.sin(self.dec0)*_sp.cos(ra - self.ra0)
+        r = _sp.sqrt(x**2 + y**2)
+        self._formula = [x, y, r]
+        self._variables = variables
+        return self
+    
+    def _analitical_formula(self):
+        """
+        Return the analytical formula for the cartesian conversion.
+        """
+        ra, dec = _sp.symbols("alpha \delta")
+        x = _sp.sin(ra - ra0) * _sp.cos(dec0)
+        ra0, dec0 = _sp.symbols("alpha_0 \delta_0")
+        y = _sp.sin(dec)*_sp.cos(dec0) - _sp.cos(dec)*_sp.sin(dec0)*_sp.cos(ra - ra0)
+        r = _sp.sqrt(x**2 + y**2)
+        return [x, y, r]
 
 def cartesian_conversion(data:_List[_ArrayLike], ra0=0, dec0=0) -> _List[_ArrayLike]:
     """
@@ -445,4 +504,7 @@ def cartesian_conversion(data:_List[_ArrayLike], ra0=0, dec0=0) -> _List[_ArrayL
     ra, dec = data
     x = _np.sin(ra - ra0) * _np.cos(dec0)
     y = _np.sin(dec)*_np.cos(dec0) - _np.cos(dec)*_np.sin(dec0)*_np.cos(ra - ra0)
-    return [x, y]
+    r = np.sqrt(x**2 + y**2)
+    return [x, y, r]
+
+
