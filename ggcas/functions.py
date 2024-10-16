@@ -104,6 +104,7 @@ import sympy as _sp
 from typing import List as _List, Union as _Union
 from numpy.typing import ArrayLike as _ArrayLike
 from astropy import units as _u
+from astropy.table import _Table
 from ggcas._utility.base_formula import BaseFormula
 from ggcas.analyzers.calculus import (
     compute_numerical_function as _compute_numerical,
@@ -436,6 +437,9 @@ class CartesianConversion():
         self._values = None
         self._formula = None
         self._variables = None
+        self._errFormula = None
+        self._errVariables = None
+        self._corVariables = None
         self.ra0 = ra0
         self.dec0 = dec0
         self._get_formula()
@@ -448,11 +452,25 @@ class CartesianConversion():
         return self._values[0]
     
     @property
+    def x_error(self):
+        """
+        Return the error of the x component of the cartesian conversion.
+        """
+        return self._errFormula[0]['error_formula']
+    
+    @property
     def y(self):
         """
         Return the y component of the cartesian conversion.
         """
         return self._values[1]
+    
+    @property
+    def y_error(self):
+        """
+        Return the error of the y component of the cartesian conversion.
+        """
+        return self._errFormula[1]['error_formula']
     
     @property
     def r(self):
@@ -462,11 +480,25 @@ class CartesianConversion():
         return self._values[2]
     
     @property
+    def r_error(self):
+        """
+        Return the error of the r component of the cartesian conversion.
+        """
+        return self._errFormula[2]['error_formula']
+    
+    @property
     def theta(self):
         """
         Return the theta component of the cartesian conversion.
         """
         return self._values[3]
+    
+    @property
+    def theta_error(self):
+        """
+        Return the error of the theta component of the cartesian conversion.
+        """
+        return self._errFormula[3]['error_formula']
     
     @property
     def mu_x(self):
@@ -476,11 +508,25 @@ class CartesianConversion():
         return self._values[4]
     
     @property
+    def mux_error(self):
+        """
+        Return the error of the mu_x component of the cartesian conversion.
+        """
+        return self._errFormula[4]['error_formula']
+    
+    @property
     def mu_y(self):
         """
         Return the mu_y component of the cartesian conversion.
         """
         return self._values[5]
+    
+    @property
+    def muy_error(self):
+        """
+        Return the error of the mu_y component of the cartesian conversion.
+        """
+        return self._errFormula[5]['error_formula']
     
     @property
     def mu_r(self):
@@ -490,11 +536,25 @@ class CartesianConversion():
         return self._values[6]
     
     @property
+    def mur_error(self):
+        """
+        Return the error of the mu_r component of the cartesian conversion.
+        """
+        return self._errFormula[6]['error_formula']
+    
+    @property
     def mu_theta(self):
         """
         Return the mu_theta component of the cartesian conversion.
         """
         return self._values[7]
+    
+    @property
+    def mutheta_error(self):
+        """
+        Return the error of the mu_theta component of the cartesian conversion.
+        """
+        return self._errFormula[7]['error_formula']
 
     def _get_formula(self):
         """Analytical formula getter for the cartesian conversion"""
@@ -506,7 +566,7 @@ class CartesianConversion():
         y = _sp.sin(dec)*_sp.cos(self.dec0) - _sp.cos(dec)*_sp.sin(self.dec0)*_sp.cos(ra - self.ra0)
         # polar spatial coordinates
         r = _sp.sqrt(x**2 + y**2)
-        theta = _np.arctan2(x,y)
+        theta = _sp.atan2(x,y)
         # cartesian velocity components
         mu_x = pmra*_sp.cos(ra-self.ra0)-pmdec*_sp.sin(dec)*_sp.sin(ra-self.ra0)
         mu_y = pmra*_sp.sin(self.dec0)*_sp.sin(ra-self.ra0) + pmdec*(_sp.cos(dec)*_sp.cos(self.dec0)+_sp.sin(dec)*_sp.sin(self.dec0)*_sp.cos(ra-self.ra0))
@@ -515,4 +575,53 @@ class CartesianConversion():
         mu_theta = (y*mu_x-x*mu_y)/(x**2+y**2)
         self._formula = [x, y, r, theta, mu_x, mu_y, mu_r, mu_theta]
         self._variables = variables
+        # Errors computation
+        xerr = _error_propagation(x, [ra, dec], correlation=True)
+        yerr = _error_propagation(y, [ra, dec], correlation=True)
+        rerr = _error_propagation(r, [ra, dec], correlation=True)
+        thetaerr = _error_propagation(theta, [ra, dec], correlation=True)
+        muxerr = _error_propagation(mu_x, [ra, dec, pmra, pmdec], correlation=True)
+        muyerr = _error_propagation(mu_y, [ra, dec, pmra, pmdec], correlation=True)
+        murerr = _error_propagation(mu_r, [ra, dec, pmra, pmdec], correlation=True)
+        muthetaerr = _error_propagation(mu_theta, [ra, dec, pmra, pmdec], correlation=True)
+        self._errFormula = [xerr, yerr, rerr, thetaerr, muxerr, muyerr, murerr, muthetaerr]
+        self._errVariables = rerr['error_variables']['errors'] + murerr['error_variables']['errors']
+        self._corVariables = rerr['error_variables']['corrs'] + murerr['error_variables']['corrs']
+        return self
+
+    def compute(self, data:_List[_ArrayLike], errors:_List[_ArrayLike]=None, correlations:_List[_ArrayLike]=None):
+        """
+        Compute the cartesian conversion.
+
+        Parameters
+        ----------
+        data :_List[ArrayLike]
+            The data to use for the computation. Needs to be in the order [ra, dec, pmra, pmdec].
+        errors :_List[ArrayLike], optional
+            The errors to use for the computation. Needs to be in the order [ra_err, dec_err, pmra_err, pmdec_err].
+        correlations :_List[ArrayLike], optional
+            The correlations to use for the computation. Needs to be in the order [ra_dec_corr, ra_pmra, ra_pmdec, dec_pmra, dec_pmdec, pmra_pmdec].
+
+        Returns
+        -------
+        self
+            The cartesian conversion computed quantities, stored in the .values method as
+            a pandas DataFrame.
+        """
+        quantities = [self.x, self.y, self.r, self.theta, self.mu_x, self.mu_y, self.mu_r, self.mu_theta]
+        tags = ['x','y','r','theta','mu_x','mu_y','mu_r','mu_theta']
+        var_set = [self._variables[:2]]*4 + [self._variables]*4
+        q_values = _Table()
+        if len(data)==2:
+            for var, eq, name in zip(var_set[:4], quantities, tags):
+                result = _compute_numerical(eq, var, data)
+                q_values[name] = result
+                self.compute_error(data, errors, correlations)
+        else:
+            for var, eq, name in zip(var_set, quantities, tags):
+                result = _compute_numerical(eq, var, data)
+                q_values[name] = result
+            if errors is not None:
+                self.compute_error(data, errors, correlations)
+        self._values = q_values
         return self
