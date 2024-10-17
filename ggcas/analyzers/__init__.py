@@ -6,3 +6,4 @@ __all__ = ['kinematics', 'effective_potential']
 
 from . import dynamics
 from . import effective_potential
+from . import mcluster

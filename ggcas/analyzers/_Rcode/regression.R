@@ -32,6 +32,16 @@ regression <- function(data, method) {
                              start = list(a = 10, b = 1))
     out <- predict(fit_exponential)
     coefficients <- coef(fit_exponential)
+  } else if (method == "king") {
+    king <- function(v, A, sigma, ve) {
+      g <- function(v, A, sigma, ve) {
+        A * (exp(-v^2 / (2 * sigma^2)) - exp(-ve^2 / (2 * sigma^2)))
+      }
+      fit_king <- nlsLM(y ~ g(x, A, sigma, ve),
+                        start = list(s = 1, A = max(y), B = min(y), C = 0))
+      out <- predict(fit_king)
+      coefficients <- coef(fit_king)
+    }
   } else {
     stop("Unknown method")
   }
