@@ -104,15 +104,7 @@ def mcluster_run(SSE:bool=False, **arguments):
         for line in process.stderr:
             print(line, end="")
     else:
-        tn = _timestamp()
-        _os.mkdir(_os.path.join(_SF, tn))
-        output_data = _get_file_list(fold=_SF, key='.txt')
-        output_info = _get_file_list(fold=_SF, key='.info')
-        data_path = _os.path.join(_SF, tn, output_data.split('/')[-1])
-        info_path = _os.path.join(_SF, tn, output_info.split('/')[-1])
-        print(data_path+"\n"+info_path)
-        _sh.move(output_data, data_path)
-        _sh.move(output_info, info_path)
+        data_path = _manage_output_files()
         return _QTable.read(data_path, format='ascii')
 
 def _manage_output_files():
@@ -129,4 +121,5 @@ def _manage_output_files():
     info_path = _os.path.join(_SF, tn, output_info.split('/')[-1])
     _sh.move(output_data, data_path)
     _sh.move(output_info, info_path)
-    return data_path, info_path
+    print(data_path+"\n"+info_path)
+    return data_path
