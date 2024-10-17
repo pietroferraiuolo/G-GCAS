@@ -18,8 +18,15 @@ CATALOG_FILE            = os.path.join(BASE_DATA_PATH, 'Catalogue.xlsx')
 QUERY_DATA_FOLDER       = os.path.join(BASE_DATA_PATH, 'query')
 KING_MODELS_FOLDER      = os.path.join(BASE_DATA_PATH, 'models')
 KING_INTEGRATOR_FOLDER  = os.path.join(BASE_PATH, 'analyzers', '_king')
+SIMULATION_FOLDER       = os.path.join(BASE_DATA_PATH, 'simulations')
 R_SOURCE_FOLDER         = os.path.join(BASE_PATH, 'analyzers', '_Rcode')
+MCLUSTER_SOURCE_CODE    = os.path.join(BASE_PATH, 'analyzers', '_mcluster')
 UNTRACKED_DATA_FOLDER   = os.path.join(BASE_DATA_PATH,'UntrackedData')
+
+paths = [BASE_DATA_PATH, QUERY_DATA_FOLDER, KING_MODELS_FOLDER, SIMULATION_FOLDER, UNTRACKED_DATA_FOLDER]
+for p in paths:
+    if not os.path.exists(p):
+        os.mkdir(p)
 
 def CLUSTER_DATA_FOLDER(name:str):
     """

@@ -133,6 +133,8 @@ def get_file_list(tn=None, fold=None, key:str=None):
         except TypeError as err:
             raise TypeError("'key' argument must be a string") from err
         fl = selected_list
+    if len(fl)==1:
+        fl = fl[0]
     return fl
 
 def get_kwargs(names:tuple, default, kwargs):

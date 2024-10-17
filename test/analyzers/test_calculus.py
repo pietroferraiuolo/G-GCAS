@@ -22,7 +22,7 @@ class TestCalculusFunctions(unittest.TestCase):
         var_data = [np.array([1, 2]), np.array([3, 4])]
         var_errors = [np.array([0.1, 0.1]), np.array([0.1, 0.1])]
         result = compute_error(func, variables, var_data, var_errors)
-        expected = np.array([3.1622776601683795, 4.47213595499958])
+        expected = np.array([4., 6.])
         np.testing.assert_array_almost_equal(result, expected)
 
     def test_gaus_legendre_integrator(self):

@@ -104,7 +104,7 @@ import sympy as _sp
 from typing import List as _List, Union as _Union
 from numpy.typing import ArrayLike as _ArrayLike
 from astropy import units as _u
-from astropy.table import _Table
+from astropy.table import Table as _Table
 from ggcas._utility.base_formula import BaseFormula
 from ggcas.analyzers.calculus import (
     compute_numerical_function as _compute_numerical,
