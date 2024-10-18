@@ -19,7 +19,11 @@ from ._utility import (
     get_file_list,
     tnlist
 )
-dr3 = GaiaQuery()
+from . import (
+    analyzers,
+    statistics,
+    plots
+)
 
 print("""
 GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE

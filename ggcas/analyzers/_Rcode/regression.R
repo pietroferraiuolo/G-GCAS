@@ -1,10 +1,16 @@
 library("minpack.lm")
 
-regression <- function(data, method) {
-  N <- seq(min(data), max(data), length.out=ceiling(1.5*sqrt(length(data))))
+regression <- function(data, method, verb = FALSE) {
+  N <- seq(min(data), max(data), length.out = ceiling(1.5 * sqrt(length(data))))
   hist_data <- hist(data, breaks = N, plot = FALSE)
   x <- hist_data$mids  # The midpoint of histogram bins
   y <- hist_data$counts  # The count in each bin
+  maxiter <-  nls.lm.control(
+    maxiter = 1000,   # Increase iterations to 1000
+    ftol = 1e-12,     # Stricter tolerance on function changes (RSS)
+    ptol = 1e-10,     # Stricter tolerance on parameter changes
+    gtol = 1e-8       # Adjust gradient tolerance
+  )
   if (method == "gaussian") {
     # Define Gaussian function
     gaussian <- function(x, a, mean, sd) {
@@ -12,7 +18,11 @@ regression <- function(data, method) {
     }
     # Fit the Gaussian function to the histogram data
     fit_gaussian <- nlsLM(y ~ gaussian(x, a, mean, sd),
-                          start = list(a = max(y), mean = mean(data), sd = sd(data)))
+                          start = list(a = max(y),
+                                       mean = mean(x),
+                                       sd = sd(x)),
+                          control = maxiter,
+                          trace = verb)
     out <- predict(fit_gaussian)
     coefficients <- coef(fit_gaussian)
   } else if (method == "boltzmann") {
@@ -21,7 +31,12 @@ regression <- function(data, method) {
       (A1 - A2) / (1 + exp((x - x0) / dx)) + A2
     }
     fit_boltzmann <- nlsLM(y ~ boltzmann(x, A1, A2, x0, dx),
-                           start = list(A1 = max(y), A2 = min(y), x0 = 0, dx = 1))
+                           start = list(A1 = max(y),
+                                        A2 = min(y),
+                                        x0 = 0,
+                                        dx = 1),
+                           control = maxiter,
+                           trace = verb)
     out <- predict(fit_boltzmann)
     coefficients <- coef(fit_boltzmann)
   } else if (method == "exponential") {
@@ -29,21 +44,83 @@ regression <- function(data, method) {
       a * exp(-b * x)
     }
     fit_exponential <- nlsLM(y ~ exponential(x, a, b),
-                             start = list(a = 10, b = 1))
+                             start = list(a = max(y), b = 0),
+                             control = maxiter,
+                             trace = verb)
     out <- predict(fit_exponential)
     coefficients <- coef(fit_exponential)
   } else if (method == "king") {
     king <- function(v, A, sigma, ve) {
-      g <- function(v, A, sigma, ve) {
-        A * (exp(-v^2 / (2 * sigma^2)) - exp(-ve^2 / (2 * sigma^2)))
-      }
-      fit_king <- nlsLM(y ~ g(x, A, sigma, ve),
-                        start = list(s = 1, A = max(y), B = min(y), C = 0))
-      out <- predict(fit_king)
-      coefficients <- coef(fit_king)
+      ifelse(v <= ve,
+             A * (exp(-v^2 / (2 * sigma^2)) - exp(-ve^2 / (2 * sigma^2))),
+             0)
     }
+    fit_king <- nlsLM(y ~ king(x, A, sigma, ve),
+                      start = list(A = max(y),
+                                   sigma = sd(x),
+                                   ve = min(x)),
+                      control = maxiter,
+                      trace = verb)
+    out <- predict(fit_king)
+    coefficients <- coef(fit_king)
+  } else if (method == "maxwell") {
+    maxwell <- function(v, A, sigma) {
+      A * v^2 * exp(-v^2 / (2 * sigma^2))
+    }
+    fit_maxwell <- nlsLM(y ~ maxwell(x, A, sigma),
+                         start = list(A = max(y),
+                                      sigma = sd(x)),
+                         control = maxiter,
+                         trace = verb)
+    out <- predict(fit_maxwell)
+    coefficients <- coef(fit_maxwell)
+  } else if (method == "rayleigh") {
+    rayleigh <- function(v, A, sigma) {
+      A * v * exp(-v^2 / (2 * sigma^2))
+    }
+    fit_rayleigh <- nlsLM(y ~ rayleigh(x, A, sigma),
+                          start = list(A = max(y),
+                                       sigma = sd(x)),
+                          control = maxiter,
+                          trace = verb)
+    out <- predict(fit_rayleigh)
+    coefficients <- coef(fit_rayleigh)
+  } else if (method == "lorentzian") {
+    lorentzian <- function(x, A, x0, gamma) {
+      A * gamma / (2 * pi) / ((x - x0)^2 + (gamma / 2)^2)
+    }
+    fit_lorentzian <- nlsLM(y ~ lorentzian(x, A, x0, gamma),
+                            start = list(A = max(y),
+                                         x0 = mean(x),
+                                         gamma = sd(x)),
+                            control = maxiter,
+                            trace = verb)
+    out <- predict(fit_lorentzian)
+    coefficients <- coef(fit_lorentzian)
+  } else if (method == "power") {
+    power <- function(x, a, b) {
+      a * x^b
+    }
+    fit_power <- nlsLM(y ~ power(x, a, b),
+                      start = list(a = max(y), b = 1),
+                      control = maxiter,
+                      trace = verb)
+    out <- predict(fit_power)
+    coefficients <- coef(fit_power)
+  } else if (method == "lognormal") {
+    lognormal <- function(x, A, mu, sigma) {
+      A / (x * sigma * sqrt(2 * pi)) * exp(-(log(x) - mu)^2 / (2 * sigma^2))
+    }
+    fit_lognormal <- nlsLM(y ~ lognormal(x, A, mu, sigma),
+                           start = list(A = max(y),
+                                        mu = mean(x),
+                                        sigma = sd(x)),
+                           control = maxiter,
+                           trace = verb)
+    out <- predict(fit_lognormal)
+    coefficients <- coef(fit_lognormal)
   } else {
     stop("Unknown method")
   }
-  return(list(x=x, y=out, coeffs=coefficients))
+  return(list(x = x, y = out, coeffs = coefficients))
 }

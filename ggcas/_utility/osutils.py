@@ -20,7 +20,7 @@ from ggcas._utility import folder_paths as fn
 datapath    = fn.BASE_DATA_PATH
 querypath   = fn.QUERY_DATA_FOLDER
 
-def load_data(tn):
+def load_data(tn, name:str=None, format='ascii.tab'):
     """
     Loads the data found in the file as an astropy quantity table.
 
@@ -28,15 +28,22 @@ def load_data(tn):
     ----------
     tn : str
         Tracking number of the data to load.
+    name : str, optional
+        Name of the specific data file to load. If not specified, the default
+        name is 'query_data.txt'.
+    format : str, optional
+        The format of the file to load. Default is 'ascii.tab'. (see astropy.table.QTable.read
+        documentation for the options).
 
     Returns
     -------
     data : astropy table
         The loaded data of the file.
     """
+    file_name = 'query_data.txt' if name is None else name
     file_path = _findTracknum(tn, complete_path=True)
-    file = os.path.join(file_path, 'query_data.txt')
-    data = QTable.read(file, format='ascii.tab')
+    file = os.path.join(file_path, file_name)
+    data = QTable.read(file, format=format)
     return data
 
 def get_file_list(tn=None, fold=None, key:str=None):
@@ -218,13 +225,15 @@ def _findTracknum(tn, complete_path:bool=False):
 
     """
     tn_path = []
-    for fold in os.listdir(querypath):
-        search_fold = os.path.join(querypath, fold)
-        if tn in os.listdir(search_fold):
-            if complete_path:
-                tn_path.append(os.path.join(search_fold, tn))
-            else:
-                tn_path.append(fold)
+    for data_type in os.listdir(datapath):
+        querypath = os.path.join(datapath, data_type)    
+        for fold in os.listdir(querypath):
+            search_fold = os.path.join(querypath, fold)
+            if tn in os.listdir(search_fold):
+                if complete_path:
+                    tn_path.append(os.path.join(search_fold, tn))
+                else:
+                    tn_path.append(fold)
     path_list = sorted(tn_path)
     if len(path_list)==1:
         path_list = path_list[0]

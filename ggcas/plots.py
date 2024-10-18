@@ -17,18 +17,11 @@ Just import the module
 
 """
 import os
-from typing import Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
-from rpy2.robjects import (
-    pandas2ri as pd2r,
-    numpy2ri as np2r,
-    r as R,
-    globalenv as genv
-)
-from ggcas.analyzers._Rcode import check_packages
+from typing import Optional, Union
 from ggcas._utility import osutils as osu
-from ggcas._utility import R_SOURCE_FOLDER as _RSF
+from ggcas.statistics import kde_estimator as _kde_estimator
 
 label_font = {'family': 'serif',
         'color':  'black',
@@ -110,8 +103,8 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     ax_histy.hist(y, bins=bins, orientation='horizontal', color=colory, alpha=0.6)
     plt.suptitle(title, size=21, weight='semibold')
     if kde:
-        x_kdex, x_kdey,x_c = _kde_estimator(x, kde_kind)
-        y_kdex, y_kdey,y_c = _kde_estimator(y, kde_kind)
+        x_kdex,x_kdey,x_c = _kde_estimator(x, kde_kind)
+        y_kdex,y_kdey,y_c = _kde_estimator(y, kde_kind)
         ax_histx.plot(x_kdex, x_kdey, color='Green', label=f"$\mu$={x_c[1]:.3f}\n$\sigma^2$={x_c[2]:.3f}")
         ax_histy.plot(y_kdey, y_kdex, color='Blue', label=f"$\mu$={y_c[1]:.3f}\n$\sigma^2$={y_c[2]:.3f}")
         ax_histx.legend(loc='best', fontsize='small')
@@ -254,10 +247,19 @@ def histogram(data, kde=False, kde_kind:str='gaussian', **kwargs):
         Input dataset for the histogram.
     kde : bool, optional
         Option for the computation of the Gaussian Kernel density estimation of the histogram. The default is False.
+    kde_kind : str, optional
+        Kind of kernel density estimation to be computed. The default is 'gaussian'.
+        Options:
+            'gaussian'
+            'exponential'
+            'boltzmann'
+            'king'
 
     Other Parameters
     ----------------
     **kwargs : Additional parameters for customizing the plot.
+        kde_verbose : bool
+            If True, the kde iteration will be printed.
         xlabel : str
             Label of the plot's x-axis.
         alpha : float
@@ -296,7 +298,9 @@ def histogram(data, kde=False, kde_kind:str='gaussian', **kwargs):
     alpha  = kwargs.get('alpha', 1)
     hcolor = kwargs.get('hcolor','gray')
     kcolor = kwargs.get('kcolor', 'red')
+    title  = kwargs.get('title', xlabel+' Distribution')
     fsize  = kwargs.get('figsize', default_figure_size)
+    verbose= osu.get_kwargs(('kde_verbose', 'verbose', 'v'), False, kwargs)
     if 'xlim' in kwargs :
         if isinstance(kwargs['xlim'], tuple):
             xlim = kwargs['xlim']
@@ -309,21 +313,15 @@ def histogram(data, kde=False, kde_kind:str='gaussian', **kwargs):
     h = plt.hist(data, bins=n_bin, color=hcolor, alpha=alpha)
     plt.ylabel('counts')
     plt.xlabel(xlabel, fontdict=label_font)
-    title = xlabel+' Distribution'
     plt.title(title, fontdict=label_font)
     bins = h[1][:len(h[0])]
     counts = h[0]
     res={'h': [bins, counts]}
     if kde:
-        x_kde,y_kde,coeffs = _kde_estimator(data, kde_kind)
+        x_kde,y_kde,coeffs = _kde_estimator(data, kde_kind, verbose=verbose)
         res['kde'] = coeffs
-        label=r"""Gaussian KDE
-$A$   ={:.2e}
-$\mu$   = {:.2e}
-$\sigma^2$  = {:.2e}"""
-        plt.plot(x_kde, y_kde, c=kcolor, label=label.format(
-            coeffs[0], coeffs[1], coeffs[2])
-        )
+        label=_kde_labels(kde_kind)
+        plt.plot(x_kde, y_kde, c=kcolor, label=label.format(*coeffs))
         plt.legend(loc='best', fontsize='medium')
     if xlim is not None:
         plt.xlim(xlim)
@@ -475,18 +473,29 @@ def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
     plt.title(title, fontdict=title_font)
     plt.show()
 
-def _kde_estimator(data, kind):
+def _kde_labels(kind:str):
     """
-    Kernel Density Estimation function.
+    Return the labels for the KDE plot.
     """
-    check_packages("minpack.lm")
-    np2r.activate()
-    regression_code=os.path.join(_RSF, 'regression.R')
-    R(f'source("{regression_code}")')
-    reg_func = genv["regression"]
-    r_data = np2r.numpy2rpy(data)
-    r_result = reg_func(r_data, method=kind)
-    x_kde = np.array(r_result.rx2('x'))
-    y_kde = np.array(r_result.rx2('y'))
-    coeffs = np.array(r_result.rx2('coeffs'))
-    return x_kde, y_kde, coeffs
+    if kind == 'gaussian':
+        label=r"""Gaussian KDE
+$A$   ={:.2e}
+$\mu$   = {:.2e}
+$\sigma^2$  = {:.2e}"""
+    elif kind == 'exponential':
+        label=r"""Exponential KDE"""
+    elif kind == 'boltzmann':
+        label=r"""Boltzmann KDE"""
+    elif kind == 'king':
+        label=r"""King KDE"""
+    elif kind == 'maxwell':
+        label=r"""Maxwell KDE"""
+    elif kind == 'lognormal':
+        label=r"""Lognormal KDE"""
+    elif kind == 'rayleigh':
+        label=r"""Rayleigh KDE"""
+    elif kind == 'power':
+        label=r"""Power KDE"""
+    elif kind == 'lorentzian':
+        label=r"""Lorentzian KDE"""
+    return label

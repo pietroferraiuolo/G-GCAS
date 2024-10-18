@@ -1,4 +1,6 @@
 docs/build/
 ggcas/data/query/
+ggcas/data/simulations/
 ggcas.egg-info/
 .spyproject/
+

@@ -60,13 +60,15 @@ object:
     150 ebpminrp_gspphot_upper
     151 libname_gspphot
 """
-from typing import Optional, Union
-import os, configparser, numpy as np
-from astropy.table import Table
+import os 
+import numpy as np
+import configparser
+from ggcas._utility import *
 from astropy import units as u
+from astropy.table import Table
 from astroquery.gaia import Gaia
 from ggcas._cluster import Cluster
-from ggcas._utility import folder_paths as fn, osutils as osu
+from typing import Optional, Union
 from ggcas._utility.osutils import _timestamp
 _QDATA = 'query_data.txt'
 _QINFO = 'query_info.ini'
@@ -174,7 +176,7 @@ class GaiaQuery:
         Gaia.MAIN_GAIA_TABLE = gaia_table
         Gaia.ROW_LIMIT = -1
         self._table     = gaia_table
-        self._path      = fn.BASE_DATA_PATH
+        self._path      = BASE_DATA_PATH
         self._fold      = None
         self._queryInfo = {}
         self._baseQ     = \
@@ -254,9 +256,9 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
                 },
             'Flag': {'Query': 'free'}
             }
-        dat = osu.get_kwargs(('data', 'dat','params', 'parameters'), 'source_id', kwargs)
+        dat = get_kwargs(('data', 'dat','params', 'parameters'), 'source_id', kwargs)
         self._queryInfo['Scan Info']['Data Acquired'],_ = self._formatCheck(dat, 'None')
-        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
+        cond = get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -323,7 +325,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
                 },
             'Flag': {'Query': 'astrometry'}
             }
-        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
+        cond = get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -390,7 +392,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
                 },
             'Flag': {'Query': 'photometry'}
             }
-        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
+        cond = get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -455,7 +457,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
                 },
             'Flag': {'Query': 'radvel'}
             }
-        cond = osu.get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
+        cond = get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
         if isinstance(cond, list):
             ccond = ''
             for c in range(len(cond)-1):
@@ -505,7 +507,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
             print(f"""Found data with the same conditions for object {gc_id} in
 {check[1]}.
 Loading it...""")
-            sample = osu.load_query(check[1])
+            sample = load_data(check[1])
             self.last_result = check[1]
             print(f"Sample number of sources: {len(sample):d}")
         return sample
@@ -550,7 +552,7 @@ Loading it...""")
             the path to check.
 
         """
-        self._fold = fn.CLUSTER_DATA_FOLDER(dest)
+        self._fold = CLUSTER_DATA_FOLDER(dest)
         if not os.path.exists(self._fold):
             os.makedirs(self._fold)
             print(f"Path '{self._fold}' did not exist. Created.")
@@ -695,7 +697,7 @@ Loading it...""")
         """
         config = configparser.ConfigParser()
         try:
-            tns = osu.tnlist(name)
+            tns = tnlist(name)
         except FileNotFoundError:
             return False
         check = False
