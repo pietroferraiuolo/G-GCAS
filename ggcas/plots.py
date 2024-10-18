@@ -236,7 +236,7 @@ def spatial(sample, **kwargs):
     plt.scatter(ra, dec, c=col, alpha=alpha, s=size)
     plt.show()
 
-def histogram(data, kde=False, kde_kind:str='gaussian', **kwargs):
+def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs):
     """
     Plots the data distribution with a histogram. The number of bins is defined as 1.5*sqrt(N).
     If kde is True, the kernel density estimation will be computed and plotted over the histogram.
@@ -326,7 +326,8 @@ def histogram(data, kde=False, kde_kind:str='gaussian', **kwargs):
     if xlim is not None:
         plt.xlim(xlim)
     plt.show()
-    return res
+    if out:
+        return res
 
 def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     """
