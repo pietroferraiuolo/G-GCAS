@@ -8,13 +8,12 @@ Description
 """
 import os
 
-
 try:
     BASE_PATH = os.getenv('GCASDATA')
 except KeyError as exc:
     raise KeyError("Environment variable not found! Define the GCASDATA env variable that points to '.../G-GCAS/ggcas/data") from exc
 BASE_DATA_PATH          = os.path.join(BASE_PATH, 'data')
-CATALOG_FILE            = os.path.join(BASE_DATA_PATH, 'static', 'Catalogue.xlsx')
+CATALOG_FILE            = os.path.join(BASE_PATH, '_Catalogue.xlsx')
 QUERY_DATA_FOLDER       = os.path.join(BASE_DATA_PATH, 'query')
 KING_MODELS_FOLDER      = os.path.join(BASE_DATA_PATH, 'models')
 KING_INTEGRATOR_FOLDER  = os.path.join(BASE_PATH, 'analyzers', '_king')
