@@ -27,7 +27,7 @@ def gaussian_mixture_estimator(data, n_components=1, verbose=False):
     """
     check_packages("mclust")
     np2r.activate()
-    regression_code=os.path.join(_RSF, 'regression.R')
+    regression_code=os.path.join(_RSF, 'gaussian_mixture.R')
     R(f'source("{regression_code}")')
     reg_func = genv["regression"]
     r_data = np2r.numpy2rpy(data)
