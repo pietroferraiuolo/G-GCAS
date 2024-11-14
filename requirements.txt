@@ -7,3 +7,4 @@ astroquery
 sympy
 scikit-learn
 rpy2
+astroML

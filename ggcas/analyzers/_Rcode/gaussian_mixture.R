@@ -1,7 +1,8 @@
 library(mclust)
 
-GaussianMixture <- function(
-  data,
+GaussianMixtureModel <- function(
+  train_data,
+  fit_data,
   n_clusters = 2,
   model_name = "VII",
   n_init = 10,
@@ -10,13 +11,41 @@ GaussianMixture <- function(
   verbose = FALSE
 ) {
   # Fit the model
-  model <- Mclust(data,
+  model <- Mclust(train_data,
                   G = n_clusters,
                   modelNames = model_name,
                   nstart = n_init,
                   maxiter = max_iter,
                   tol = tol,
                   verbose = verbose)
-  # Return the model
+  # Predict the cluster membership probabilities
+  cluster <- predict.Mclust(model, fit_data)
+  return (list(model = model, cluster = cluster))
+}
+
+GM_model <- function(
+  train_data,
+  n_clusters = 2,
+  model_name = "VII",
+  n_init = 10,
+  max_iter = 1000,
+  tol = 1e-6,
+  verbose = FALSE
+) {
+  # Fit the model
+  model <- Mclust(train_data,
+                  G = n_clusters,
+                  modelNames = model_name,
+                  nstart = n_init,
+                  maxiter = max_iter,
+                  tol = tol,
+                  verbose = verbose)
+  # Return the model and its parameters
   return(model)
+}
+
+GM_classification <- function(gmm_model, data) {
+  # Predict the cluster membership probabilities
+  cluster <- predict.Mclust(gmm_model, data)
+  return(cluster)
 }
