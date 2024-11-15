@@ -301,7 +301,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
                 save was True, the data will be stored in the 'UntrackedData'
                 folder.
             conditions : str or list of str
-                Listo of conditions on the parameters to apply upon scanning the
+                List of conditions on the parameters to apply upon scanning the
                 archive. If no conditions are supplied, no conditions are applied.
                 Aliases:
                     'cond'
@@ -469,7 +469,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
         rv_sample = _Sample(rv_cluster, gc=gc)
         rv_sample.qinfo = self._queryInfo['Scan Info']
-        return rv_cluster
+        return rv_sample
 
     def _run_query(self, gc_id, ra, dec, radius, data, cond, save):
         """

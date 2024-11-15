@@ -76,6 +76,8 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     """
     xlabel=kwargs.get('xlabel','')
     ylabel=kwargs.get('ylabel','')
+    xlim=kwargs.get('xlim', None)
+    ylim=kwargs.get('ylim', None)
     title=kwargs.get('title','')
     alpha=kwargs.get('alpha', 0.7)
     colorx=kwargs.get('colorx', 'green')
@@ -94,6 +96,8 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     ax_histy.tick_params(axis="y", labelleft=False)
     # the scatter plot:
     ax.scatter(x, y, color=sc, alpha=alpha, s=s)
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
     ax_histx.set_ylabel('Counts')
     ax_histy.set_xlabel('Counts')
     ax.set_xlabel(xlabel, fontdict=label_font)
@@ -101,14 +105,16 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     bins = int(1.5*np.sqrt(len(x)))
     ax_histx.hist(x, bins=bins, color=colorx, alpha=0.6)
     ax_histy.hist(y, bins=bins, orientation='horizontal', color=colory, alpha=0.6)
-    plt.suptitle(title, size=21, weight='semibold')
+    plt.suptitle(title, size=20, style='italic', family='cursive')
     if kde:
         x_kdex,x_kdey,x_c = _kde_estimator(x, kde_kind)
         y_kdex,y_kdey,y_c = _kde_estimator(y, kde_kind)
-        ax_histx.plot(x_kdex, x_kdey, color='Green', label=f"$\mu$={x_c[1]:.3f}\n$\sigma^2$={x_c[2]:.3f}")
-        ax_histy.plot(y_kdey, y_kdex, color='Blue', label=f"$\mu$={y_c[1]:.3f}\n$\sigma^2$={y_c[2]:.3f}")
+        ax_histx.plot(x_kdex, x_kdey, color=colorx, label=f"$\mu$={x_c[1]:.3f}\n$\sigma^2$={x_c[2]:.3f}")
+        ax_histy.plot(y_kdey, y_kdex, color=colory, label=f"$\mu$={y_c[1]:.3f}\n$\sigma^2$={y_c[2]:.3f}")
         ax_histx.legend(loc='best', fontsize='small')
         ax_histy.legend(loc='best', fontsize='small')
+    ax_histx.set_xlim(xlim)
+    ax_histy.set_ylim(ylim)
     plt.show()
 
 def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
@@ -361,6 +367,8 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     list
         List containing the mean and error of x.
     """
+    # to do: add title, remove unit (if present) to mean text and automatic title
+    # change the text in a legend, so that size is fixed
     xlabel = kwargs.get('xlabel', 'x')
     ylabel = kwargs.get('ylabel', 'y')
     color  = osu.get_kwargs(('c','color'), 'gray', kwargs)

@@ -20,6 +20,10 @@ from astroML.density_estimation import XDGMM
 from rpy2.robjects import pandas2ri as pd2r, numpy2ri as np2r, r as R, globalenv as genv
 
 
+def _seed():
+    return int(_time.time())
+
+
 def XD_estimator(data, errors, correlations=None, *xdargs):
     """
     Extreme Deconvolution Estimation function.
@@ -50,41 +54,12 @@ def XD_estimator(data, errors, correlations=None, *xdargs):
         covariance_matrix = _construct_covariance_matrices(errors, correlations)
     else:
         covariance_matrix = _np.array([_np.diag(e**2) for e in errors])
-    model = XDGMM(*xdargs, random_state=_seed())
+    model = XDGMM(random_state=_seed(), *xdargs)
     model.fit(x_data, covariance_matrix)
     return model
 
 
-def GMM_estimator(model, data):
-    """
-    Gaussian Mixture Estimation function.
-
-    Parameters
-    ----------
-    model : rpy2.robjects
-    data : numpy.ndarray
-        The data to be fitted with a gaussian mixture model.
-    *gargs : optional
-        Gaussian Mixture hyper-parameters for model tuning. See
-        <a href="https://www.astroml.org/modules/generated/astroML.clustering.GMM.html">
-        astroML</a> documentation for more information.
-
-    Returns
-    -------
-    model : astroML.clustering.GMM
-        The fitted gaussia mixture model.
-    """
-    check_packages("mclust")
-    np2r.activate()
-    code = _os.path.join(_RSF, "gaussian_mixture.R")
-    R(f'source("{code}")')
-    gme = genv["GM_classification"]
-    r_data = np2r.numpy2rpy(data)
-    clusters = gme(model, r_data)
-    return clusters
-
-
-def gaussian_mixture_model(data, **kwargs):
+def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
     """
     Gaussian Mixture Estimation function.
 
@@ -106,25 +81,23 @@ def gaussian_mixture_model(data, **kwargs):
     np2r.activate()
     code = _os.path.join(_RSF, "gaussian_mixture.R")
     R(f'source("{code}")')
-    gmm = genv["GM_model"]
-    r_data = np2r.numpy2rpy(data)
-    # Convert kwargs to R list
-    r_kwargs = _ro.vectors.ListVector(kwargs)
-    # Call the R function with the data and additional arguments
-    fitted_model = gmm(r_data, **dict(r_kwargs.items()))
-    return fitted_model
-
-
-def _convert_r_object(r_obj):
-    """
-    Recursively convert R objects to Python objects.
-    """
-    if isinstance(r_obj, _ro.vectors.ListVector):
-        return {name: _convert_r_object(r_obj.rx2(name)) for name in r_obj.names}
-    elif isinstance(r_obj, _ro.vectors.Vector):
-        return _np.array(r_obj)
+    if fit_data is not None:
+        r_data = np2r.numpy2rpy(train_data)
+        r_fit_data = np2r.numpy2rpy(fit_data)
+        # Convert kwargs to R list
+        r_kwargs = _ro.vectors.ListVector(kwargs)
+        # Call the R function with the data and additional arguments
+        fitted_model = genv["GaussianMixtureModel"](r_data, r_fit_data, **dict(r_kwargs.items()))
+        clusters = fitted_model.rx2("cluster")
+        fitted_model = fitted_model.rx2("model")
     else:
-        return r_obj
+        r_data = np2r.numpy2rpy(train_data)
+        # Convert kwargs to R list
+        r_kwargs = _ro.vectors.ListVector(kwargs)
+        # Call the R function with the data and additional arguments
+        fitted_model = genv["GM_model"](r_data, **dict(r_kwargs.items()))
+        clusters = None
+    return _RGMModel(fitted_model, clusters)
 
 
 def kde_estimator(data, kind="gaussian", verbose=False):
@@ -144,14 +117,21 @@ def kde_estimator(data, kind="gaussian", verbose=False):
     return x_kde, y_kde, coeffs
 
 
-def _seed():
-    return int(_time.time())
-
-
 def _data_format_check(data):
     """
     Function which checks and formats the input data to be ready
     for the XDGMM model fit.
+
+    Parameters:
+    ----------
+    data : numpy.ndarray, list, astropy.table.Table, pandas.DataFrame
+        The data whose format has to be checked.
+    
+    Returns:
+    -------
+    data : numpy.ndarray
+        The data in the correct format for the XDGMM model.
+        Rturned in shape (n_samples, n_features).
     """
     if isinstance(data, (_Table, _pd.DataFrame)):
         data = data.to_numpy()
@@ -204,10 +184,40 @@ class _RGMModel:
     Class to convert an R model to a Python dictionary.
     """
 
-    def __init__(self, r_model):
+    def __init__(self, r_model, predictions=None):
         """The Constructor"""
-        self.rmodel = r_model
-        self.model = self._convert_R_model()
+        self.rmodel         = r_model
+        self.model          = self._listvector_to_dict(r_model)
+        self.classification = predictions
+        self._predicted     = False if predictions is None else True
+
+    def __str__(self):
+        str_ = \
+f"""----------------------------------------------------
+Gaussian finite mixture model fitted by EM algorithm
+----------------------------------------------------
+
+Mclust {self.model['modelName']} model fitted with {self.ndG[2]} components:
+
+log-likelihood : {self.loglik}
+n : {self.ndG[0]}
+df : {self.ndG[1]}
+BIC : {self.bic['BIC']}
+ICL : {self.model['icl']}
+
+Predicted : {self._predicted}
+"""
+        return str_
+    
+    def __repr__(self):
+        repr_ = \
+f"""Python wrapper for R Mclust Gaussian Mixture Model
+--------------------------------------------------
+.rmodel : R model object as rpy2.robjects
+.model  : R Model translation into py dict
+
+"""
+        return repr_
 
     @property
     def data(self):
@@ -241,13 +251,14 @@ class _RGMModel:
         return self.model["loglik"]
 
     @property
-    def z_classification(self):
+    def train_classification(self):
         """
         Array containing in order:
             z: the membership probability of each data point to each component
             classification: the classification of the data points
         """
         return _np.array([self.model["z"], self.model["classification"]])
+    
 
     @property
     def parameters(self):
@@ -275,7 +286,8 @@ class _RGMModel:
         """
         return self.model["uncertainty"]
 
-    def _listvector_to_dict(self, r_listvector):
+    @staticmethod
+    def _listvector_to_dict(r_listvector):
         """
         Recursively converts an R ListVector (from rpy2) to a nested Python dictionary.
         """
@@ -296,7 +308,7 @@ class _RGMModel:
                 py_dict[key] = pd2r.rpy2py(value)
             # Handle nested ListVectors
             elif isinstance(value, _ro.vectors.ListVector):
-                py_dict[key] = self._listvector_to_dict(value)
+                py_dict[key] = _RGMModel._listvector_to_dict(value)
             # Handle other lists
             elif isinstance(value, _ro.vectors.Vector):
                 py_dict[key] = list(value)

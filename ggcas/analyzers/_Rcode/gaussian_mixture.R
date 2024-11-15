@@ -20,7 +20,7 @@ GaussianMixtureModel <- function(
                   verbose = verbose)
   # Predict the cluster membership probabilities
   cluster <- predict.Mclust(model, fit_data)
-  return (list(model = model, cluster = cluster))
+  return(list(model = model, cluster = cluster))
 }
 
 GM_model <- function(
@@ -42,10 +42,4 @@ GM_model <- function(
                   verbose = verbose)
   # Return the model and its parameters
   return(model)
-}
-
-GM_classification <- function(gmm_model, data) {
-  # Predict the cluster membership probabilities
-  cluster <- predict.Mclust(gmm_model, data)
-  return(cluster)
 }
