@@ -135,7 +135,7 @@ def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
     **kwargs : dict
         bgc : tuple
             A tuple with three float values, indicating the RGB gradient which define a color (placeholder for the ax.set_facecolor function).
-            Aliases: 'bgc', 'bgcolor'.
+            Aliases: 'bgc', 'bgcolor', 'background_color'.
         alpha : float
             Transparency of the scatter points.
         cmap : str
@@ -144,7 +144,7 @@ def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
             Size of the figure.
 
     """
-    bgc = osu.get_kwargs(('bgc', 'bgcolor'), (0.9,0.9,0.9), kwargs)
+    bgc = osu.get_kwargs(('bgc', 'bgcolor', 'background_color'), (0.9,0.9,0.9), kwargs)
     a = kwargs.get('alpha', 0.8)
     cmap = kwargs.get('cmap', 'rainbow_r')
     fsize = kwargs.get('figsize', default_figure_size)
@@ -302,8 +302,8 @@ def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs
     """
     xlabel = kwargs.get('xlabel','')
     alpha  = kwargs.get('alpha', 1)
-    hcolor = kwargs.get('hcolor','gray')
-    kcolor = kwargs.get('kcolor', 'red')
+    hcolor = osu.get_kwargs(('hist_color','hcolor', 'hc'),'gray', kwargs)
+    kcolor = osu.get_kwargs(('kde_color','kcolor', 'kc'),'gray', kwargs)
     title  = kwargs.get('title', xlabel+' Distribution')
     fsize  = kwargs.get('figsize', default_figure_size)
     verbose= osu.get_kwargs(('kde_verbose', 'verbose', 'v'), False, kwargs)
@@ -326,8 +326,8 @@ def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs
     if kde:
         x_kde,y_kde,coeffs = _kde_estimator(data, kde_kind, verbose=verbose)
         res['kde'] = coeffs
-        label=_kde_labels(kde_kind)
-        plt.plot(x_kde, y_kde, c=kcolor, label=label.format(*coeffs))
+        label=_kde_labels(kde_kind, *coeffs)
+        plt.plot(x_kde, y_kde, c=kcolor, label=label)
         plt.legend(loc='best', fontsize='medium')
     if xlim is not None:
         plt.xlim(xlim)
@@ -462,17 +462,17 @@ def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
             Size of the figure.
 
     """
-    ec     = osu.get_kwargs(('ecolor', 'ec', 'errc', 'errcolor','errorcolor'), 'red', kwargs)
-    sc     = osu.get_kwargs(('color', 'scolor', 'sc', 'scatcol'), 'black', kwargs)
-    ms     = osu.get_kwargs(('markersize', 'ms', 's'), 2, kwargs)
-    cs     = kwargs.get('capsize', 1.5)
-    ba     = kwargs.get('barsabove', False)
+    ec     = osu.get_kwargs(('ecolor', 'ec', 'errc', 'errcolor','error_color'), 'red', kwargs)
+    sc     = osu.get_kwargs(('color', 'scolor', 'sc', 'scatter_col'), 'black', kwargs)
     elw    = osu.get_kwargs(('elinewidth', 'elw', 'errlinew'), 1, kwargs)
-    fmt    = kwargs.get('fmt', 'x')
-    title  = kwargs.get('title', '')
+    ms     = osu.get_kwargs(('markersize', 'ms', 's'), 2, kwargs)
+    fsize  = kwargs.get('figsize', default_figure_size)
+    ba     = kwargs.get('barsabove', False)
+    cs     = kwargs.get('capsize', 1.5)
     xlabel = kwargs.get('xlabel', '')
     ylabel = kwargs.get('ylabel', '')
-    fsize  = kwargs.get('figsize', default_figure_size)
+    title  = kwargs.get('title', '')
+    fmt    = kwargs.get('fmt', 'x')
     x = np.linspace(0, 1, len(data)) if x is None else x
     plt.figure(figsize=fsize)
     plt.errorbar(x, data, yerr=dataerr, xerr=xerr, fmt=fmt, capsize=cs, ecolor=ec, \
@@ -482,29 +482,47 @@ def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
     plt.title(title, fontdict=title_font)
     plt.show()
 
-def _kde_labels(kind:str):
+
+def _kde_labels(kind: str, *coeffs):
     """
     Return the labels for the KDE plot.
     """
     if kind == 'gaussian':
-        label=r"""Gaussian KDE
-$A$   ={:.2e}
-$\mu$   = {:.2e}
-$\sigma^2$  = {:.2e}"""
+        A, mu, sigma2 = coeffs
+        label = f"""Gaussian KDE
+$A$   = {_format_number(A)}
+$\mu$   = {_format_number(mu)}
+$\sigma^2$  = {_format_number(sigma2)}"""
     elif kind == 'exponential':
-        label=r"""Exponential KDE"""
+        A, lmbda = coeffs
+        label = f"""Exponential KDE
+$A$   = {_format_number(A)}
+$\lambda$ = {_format_number(lmbda)}"""
     elif kind == 'boltzmann':
-        label=r"""Boltzmann KDE"""
+        A1, A2, x0, dx = coeffs
+        label = f"""Boltzmann KDE
+$A1$   = {_format_number(A1)}
+$A2$   = {_format_number(A2)}
+$x_0$   = {_format_number(x0)}
+$dx$   = {_format_number(dx)}"""
     elif kind == 'king':
-        label=r"""King KDE"""
+        A, ve, sigma = coeffs
+        label = f"""King KDE
+$A$   = {_format_number(A)}
+$v_e$   = {_format_number(ve)}
+$\sigma$  = {_format_number(sigma)}"""
     elif kind == 'maxwell':
-        label=r"""Maxwell KDE"""
-    elif kind == 'lognormal':
-        label=r"""Lognormal KDE"""
-    elif kind == 'rayleigh':
-        label=r"""Rayleigh KDE"""
-    elif kind == 'power':
-        label=r"""Power KDE"""
-    elif kind == 'lorentzian':
-        label=r"""Lorentzian KDE"""
+        A, sigma = coeffs
+        label = f"""Maxwell KDE
+$A$   = {_format_number(A)}
+$\sigma$  = {_format_number(sigma)}"""
     return label
+
+def _format_number(num):
+    """
+    Format the number using scientific notation if it is too large or too small.
+    """
+    if abs(num) < 1e-3 or abs(num) > 1e3:
+        return f"{num:.2e}"
+    else:
+        return f"{num:.2f}"

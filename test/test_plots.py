@@ -46,7 +46,7 @@ class TestPlots(unittest.TestCase):
 
     def test_histogram(self):
         try:
-            result = gplt.histogram(self.data, kde=True, xlabel='Data')
+            result = gplt.histogram(self.data, kde=True, xlabel='Data', out=True)
             self.assertIn('h', result)
             self.assertIn('kde', result)
         except Exception as e:
