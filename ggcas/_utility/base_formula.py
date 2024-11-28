@@ -18,7 +18,7 @@ from ggcas.analyzers.calculus import (
 
 class BaseFormula(ABC):
     """
-    Base class for formulas calsses
+    Base class for the vrious formula calsses
     """
     def __init__(self):
         """The constructor"""
@@ -58,22 +58,22 @@ class BaseFormula(ABC):
         return self._variables
 
     @property
-    def values(self) -> ArrayLike:
+    def computed_values(self) -> ArrayLike:
         """Return the values"""
         return "Not computed" if self._values is None else self._values
     
     @property
-    def errors(self) -> ArrayLike:
+    def computed_errors(self) -> ArrayLike:
         """Return the errors"""
         return "Not computed" if self._errors is None else self._errors
     
     @property
-    def errFormula(self) -> sb:
+    def error_formula(self) -> sb:
         """Return the error formula"""
         return self._errFormula
 
     @property
-    def errVariables(self) -> List[sb]:
+    def error_variables(self) -> List[sb]:
         """Return the error variables"""
         return self._errVariables
     
