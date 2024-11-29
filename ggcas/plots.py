@@ -17,11 +17,12 @@ Just import the module
 
 """
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-from typing import Optional, Union
-from ggcas._utility import osutils as osu
-from ggcas.statistics import kde_estimator as _kde_estimator
+import numpy as _np
+import matplotlib.pyplot as _plt
+from typing import Optional as _Optional, Union as _Union
+from ggcas._utility import osutils as _osu
+from ggcas.statistics import regression as _kde_estimator
+from ggcas.analyzers._Rcode.r2py_models import _kde_labels
 
 label_font = {'family': 'serif',
         'color':  'black',
@@ -40,7 +41,7 @@ default_figure_size = (6.4, 5.2)
 def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     """
     Make a 2D scatter plot of two data arrays, with the respective histogram distributions
-    projected on each axis. The kde option allows for Gaussian regression on the plotted data.
+    projected on each axis. The kde option allows for regression on the plotted data.
 
     Parameters
     ----------
@@ -49,7 +50,19 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     y : ArrayLike
         Data to be scattered on y-axis.
     kde : bool, optional
-        Option to show the Gaussian regression on the data. Default is False.
+        Option to show the regression on the data. Default is False.
+    kde_kind : str, optional
+        Kind of kernel density estimation to be computed. The default is 'gaussian'.
+        Options:
+            'gaussian'
+            'boltzmann'
+            'exponential'
+            'king'
+            'rayleigh'
+            'maxwell'
+            'lorentzian'
+            'lognormal'
+            'power'
 
     Other Parameters
     ----------------
@@ -83,9 +96,9 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     colorx=kwargs.get('colorx', 'green')
     colory=kwargs.get('colory', 'blue')
     sc=kwargs.get('scatter_color', 'black')
-    s=osu.get_kwargs(('size', 's'), 5, kwargs)
+    s=_osu.get_kwargs(('size', 's'), 5, kwargs)
     fsize=kwargs.get('figsize', default_figure_size)
-    fig = plt.figure(figsize=fsize)
+    fig = _plt.figure(figsize=fsize)
     gs = fig.add_gridspec(2, 2,  width_ratios=(4, 1), height_ratios=(1, 4),
                             left=0.1, right=0.9, bottom=0.1, top=0.9,
                             wspace=0.025, hspace=0.025)
@@ -102,11 +115,12 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     ax_histy.set_xlabel('Counts')
     ax.set_xlabel(xlabel, fontdict=label_font)
     ax.set_ylabel(ylabel, fontdict=label_font)
-    bins = int(1.5*np.sqrt(len(x)))
+    bins = int(1.5*_np.sqrt(len(x)))
     ax_histx.hist(x, bins=bins, color=colorx, alpha=0.6)
     ax_histy.hist(y, bins=bins, orientation='horizontal', color=colory, alpha=0.6)
-    plt.suptitle(title, size=20, style='italic', family='cursive')
+    _plt.suptitle(title, size=20, style='italic', family='cursive')
     if kde:
+        # TODO : add the kde labels modifications and model output
         x_kdex,x_kdey,x_c = _kde_estimator(x, kde_kind)
         y_kdex,y_kdey,y_c = _kde_estimator(y, kde_kind)
         ax_histx.plot(x_kdex, x_kdey, color=colorx, label=f"$\mu$={x_c[1]:.3f}\n$\sigma^2$={x_c[2]:.3f}")
@@ -115,7 +129,7 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
         ax_histy.legend(loc='best', fontsize='small')
     ax_histx.set_xlim(xlim)
     ax_histy.set_ylim(ylim)
-    plt.show()
+    _plt.show()
 
 def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
     """
@@ -144,19 +158,19 @@ def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
             Size of the figure.
 
     """
-    bgc = osu.get_kwargs(('bgc', 'bgcolor', 'background_color'), (0.9,0.9,0.9), kwargs)
+    bgc = _osu.get_kwargs(('bgc', 'bgcolor', 'background_color'), (0.9,0.9,0.9), kwargs)
     a = kwargs.get('alpha', 0.8)
     cmap = kwargs.get('cmap', 'rainbow_r')
     fsize = kwargs.get('figsize', default_figure_size)
-    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=fsize)
+    fig, ax = _plt.subplots(nrows=1, ncols=1, figsize=fsize)
     ax.set_facecolor(bgc)
-    plt.scatter(b_r, g, c=teff_gspphot, alpha=a, cmap=cmap)
-    plt.colorbar(label=r'$T_{eff}$')
-    plt.ylim(max(g)+0.51, min(g)-0.51)
-    plt.xlabel(r"$G_{BP} - G_{RP}$", fontdict=label_font)
-    plt.ylabel(r"$G$", fontdict=label_font)
-    plt.title("Color-Magnitude Diagram", fontsize=17)
-    plt.show()
+    _plt.scatter(b_r, g, c=teff_gspphot, alpha=a, cmap=cmap)
+    _plt.colorbar(label=r'$T_{eff}$')
+    _plt.ylim(max(g)+0.51, min(g)-0.51)
+    _plt.xlabel(r"$G_{BP} - G_{RP}$", fontdict=label_font)
+    _plt.ylabel(r"$G$", fontdict=label_font)
+    _plt.title("Color-Magnitude Diagram", fontsize=17)
+    _plt.show()
 
 def properMotion(sample, **kwargs):
     """
@@ -180,8 +194,8 @@ def properMotion(sample, **kwargs):
             Size of the figure.
 
     """
-    col  = osu.get_kwargs(('color','c'), 'black', kwargs)
-    size = osu.get_kwargs(('s','size'), 3, kwargs)
+    col  = _osu.get_kwargs(('color','c'), 'black', kwargs)
+    size = _osu.get_kwargs(('s','size'), 3, kwargs)
     alpha= kwargs.get('alpha', 0.5)
     fsize = kwargs.get('figsize', default_figure_size)
     from ._query import _Sample
@@ -192,13 +206,13 @@ def properMotion(sample, **kwargs):
     else:
         pmra = sample['pmra']
         pmdec = sample['pmdec']
-    fig, ax = plt.subplots(figsize=fsize)
-    plt.xlabel(r'$\mu_{\alpha*}$ [deg]', fontdict=label_font)
-    plt.ylabel(r'$\mu_\delta$ [deg]', fontdict=label_font)
-    plt.title('Proper Motion Distribution', fontdict=title_font)
+    fig, ax = _plt.subplots(figsize=fsize)
+    _plt.xlabel(r'$\mu_{\alpha*}$ [deg]', fontdict=label_font)
+    _plt.ylabel(r'$\mu_\delta$ [deg]', fontdict=label_font)
+    _plt.title('Proper Motion Distribution', fontdict=title_font)
     ax.axis('equal')
-    plt.scatter(pmra, pmdec, c=col, alpha=alpha, s=size)
-    plt.show()
+    _plt.scatter(pmra, pmdec, c=col, alpha=alpha, s=size)
+    _plt.show()
 
 def spatial(sample, **kwargs):
     """
@@ -222,9 +236,9 @@ def spatial(sample, **kwargs):
             Size of the figure.
 
     """
-    col  = osu.get_kwargs(('color','c'), 'black', kwargs)
+    col  = _osu.get_kwargs(('color','c'), 'black', kwargs)
     fsize= kwargs.get('figsize', default_figure_size)
-    size = osu.get_kwargs(('s','size'), 5, kwargs)
+    size = _osu.get_kwargs(('s','size'), 5, kwargs)
     alpha= kwargs.get('alpha', 0.5)
     from ._query import _Sample
     if isinstance(sample, _Sample):
@@ -234,13 +248,13 @@ def spatial(sample, **kwargs):
     else:
         ra = sample['ra']
         dec = sample['dec']
-    fig, ax = plt.subplots(figsize=fsize)
-    plt.xlabel(r'$DEC$ [deg]', fontdict=label_font)
-    plt.ylabel(r'$RA$ [deg]', fontdict=label_font)
-    plt.title('Spatial Distribution', fontdict=title_font)
+    fig, ax = _plt.subplots(figsize=fsize)
+    _plt.xlabel(r'$DEC$ [deg]', fontdict=label_font)
+    _plt.ylabel(r'$RA$ [deg]', fontdict=label_font)
+    _plt.title('Spatial Distribution', fontdict=title_font)
     ax.axis('equal')
-    plt.scatter(ra, dec, c=col, alpha=alpha, s=size)
-    plt.show()
+    _plt.scatter(ra, dec, c=col, alpha=alpha, s=size)
+    _plt.show()
 
 def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs):
     """
@@ -302,11 +316,11 @@ def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs
     """
     xlabel = kwargs.get('xlabel','')
     alpha  = kwargs.get('alpha', 1)
-    hcolor = osu.get_kwargs(('hist_color','hcolor', 'hc'),'gray', kwargs)
-    kcolor = osu.get_kwargs(('kde_color','kcolor', 'kc'),'gray', kwargs)
+    hcolor = _osu.get_kwargs(('hist_color','hcolor', 'hc'),'gray', kwargs)
+    kcolor = _osu.get_kwargs(('kde_color','kcolor', 'kc'),'gray', kwargs)
     title  = kwargs.get('title', xlabel+' Distribution')
     fsize  = kwargs.get('figsize', default_figure_size)
-    verbose= osu.get_kwargs(('kde_verbose', 'verbose', 'v'), False, kwargs)
+    verbose= _osu.get_kwargs(('kde_verbose', 'verbose', 'v'), False, kwargs)
     if 'xlim' in kwargs :
         if isinstance(kwargs['xlim'], tuple):
             xlim = kwargs['xlim']
@@ -314,28 +328,28 @@ def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs
             raise TypeError("'xlim' arg must be a tuple")
     else:
         xlim = None
-    n_bin = int(1.5*np.sqrt(len(data)))
-    plt.figure(figsize=fsize)
-    h = plt.hist(data, bins=n_bin, color=hcolor, alpha=alpha)
-    plt.ylabel('counts')
-    plt.xlabel(xlabel, fontdict=label_font)
-    plt.title(title, fontdict=label_font)
+    n_bin = int(1.5*_np.sqrt(len(data)))
+    _plt.figure(figsize=fsize)
+    h = _plt.hist(data, bins=n_bin, color=hcolor, alpha=alpha)
+    _plt.ylabel('counts')
+    _plt.xlabel(xlabel, fontdict=label_font)
+    _plt.title(title, fontdict=label_font)
     bins = h[1][:len(h[0])]
     counts = h[0]
     res={'h': [bins, counts]}
     if kde:
         x_kde,y_kde,coeffs = _kde_estimator(data, kde_kind, verbose=verbose)
         res['kde'] = coeffs
-        label=_kde_labels(kde_kind, *coeffs)
-        plt.plot(x_kde, y_kde, c=kcolor, label=label)
-        plt.legend(loc='best', fontsize='medium')
+        label=_kde_labels(kde_kind, coeffs)
+        _plt.plot(x_kde, y_kde, c=kcolor, label=label)
+        _plt.legend(loc='best', fontsize='medium')
     if xlim is not None:
-        plt.xlim(xlim)
-    plt.show()
+        _plt.xlim(xlim)
+    _plt.show()
     if out:
         return res
 
-def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
+def scat_xhist(x, y, xerr: _Optional[_Union[float, _np.ndarray]] = None, **kwargs):
     """
     Make a scatter plot of a quantity 'x', with its projected histogram, relative to a quantity 'y'.
 
@@ -371,23 +385,23 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     # change the text in a legend, so that size is fixed
     xlabel = kwargs.get('xlabel', 'x')
     ylabel = kwargs.get('ylabel', 'y')
-    color  = osu.get_kwargs(('c','color'), 'gray', kwargs)
-    s      = osu.get_kwargs(('s','size'), 7.5, kwargs)
+    color  = _osu.get_kwargs(('c','color'), 'gray', kwargs)
+    s      = _osu.get_kwargs(('s','size'), 7.5, kwargs)
     fsize  = kwargs.get('figsize', default_figure_size)
-    nb2    = int(1.5*np.sqrt(len(x)))
-    mean_x = np.mean(x)
-    fig, (ax0, ax1) = plt.subplots(nrows=2, ncols=1, height_ratios=[1,3.5], \
+    nb2    = int(1.5*_np.sqrt(len(x)))
+    mean_x = _np.mean(x)
+    fig, (ax0, ax1) = _plt.subplots(nrows=2, ncols=1, height_ratios=[1,3.5], \
                                     figsize=fsize, sharex=True)
     fig.subplots_adjust(hspace=0)
     if xerr is not None:
         if isinstance(xerr, float):
-            xerr = np.full(len(x), xerr)
+            xerr = _np.full(len(x), xerr)
         ax1.errorbar(x, y, xerr=xerr, fmt='x', color=color, linewidth=1.,\
                         markersize=3, alpha=0.8)
-        err_xm = np.sqrt(sum(i*i for i in xerr)/len(x))
+        err_xm = _np.sqrt(sum(i*i for i in xerr)/len(x))
     else:
         ax1.scatter(x, y, c=color, alpha=0.8, s=s)
-        err_xm = np.std(x)/np.sqrt(len(x))
+        err_xm = _np.std(x)/_np.sqrt(len(x))
     ax1.set_ylim(y.min()*0.8, y.max()*1.2)
     #Media scritta
     ax1.text(x.max()*0.1, y.max(),
@@ -412,8 +426,8 @@ def scat_xhist(x, y, xerr: Optional[Union[float, np.ndarray]] = None, **kwargs):
     ax1.tick_params(axis="both",direction="in", size=6)
     ax1.tick_params(which="minor",direction="in", size=3)
     title = xlabel+' distribution '
-    fig = plt.suptitle(title, fontsize=23.5)
-    plt.show()
+    fig = _plt.suptitle(title, size=20, style='italic', family='cursive')
+    _plt.show()
     return [mean_x, err_xm]
 
 def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
@@ -462,10 +476,10 @@ def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
             Size of the figure.
 
     """
-    ec     = osu.get_kwargs(('ecolor', 'ec', 'errc', 'errcolor','error_color'), 'red', kwargs)
-    sc     = osu.get_kwargs(('color', 'scolor', 'sc', 'scatter_col'), 'black', kwargs)
-    elw    = osu.get_kwargs(('elinewidth', 'elw', 'errlinew'), 1, kwargs)
-    ms     = osu.get_kwargs(('markersize', 'ms', 's'), 2, kwargs)
+    ec     = _osu.get_kwargs(('ecolor', 'ec', 'errc', 'errcolor','error_color'), 'red', kwargs)
+    sc     = _osu.get_kwargs(('color', 'scolor', 'sc', 'scatter_col'), 'black', kwargs)
+    elw    = _osu.get_kwargs(('elinewidth', 'elw', 'errlinew'), 1, kwargs)
+    ms     = _osu.get_kwargs(('markersize', 'ms', 's'), 2, kwargs)
     fsize  = kwargs.get('figsize', default_figure_size)
     ba     = kwargs.get('barsabove', False)
     cs     = kwargs.get('capsize', 1.5)
@@ -473,56 +487,80 @@ def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
     ylabel = kwargs.get('ylabel', '')
     title  = kwargs.get('title', '')
     fmt    = kwargs.get('fmt', 'x')
-    x = np.linspace(0, 1, len(data)) if x is None else x
-    plt.figure(figsize=fsize)
-    plt.errorbar(x, data, yerr=dataerr, xerr=xerr, fmt=fmt, capsize=cs, ecolor=ec, \
+    x = _np.linspace(0, 1, len(data)) if x is None else x
+    _plt.figure(figsize=fsize)
+    _plt.errorbar(x, data, yerr=dataerr, xerr=xerr, fmt=fmt, capsize=cs, ecolor=ec, \
                 elinewidth=elw, markersize=ms, color=sc, barsabove=ba)
-    plt.xlabel(xlabel, fontdict=label_font)
-    plt.ylabel(ylabel, fontdict=label_font)
-    plt.title(title, fontdict=title_font)
-    plt.show()
+    _plt.xlabel(xlabel, fontdict=label_font)
+    _plt.ylabel(ylabel, fontdict=label_font)
+    _plt.title(title, fontdict=title_font)
+    _plt.show()
 
-
-def _kde_labels(kind: str, *coeffs):
+def regression(regression_model, **kwargs):
     """
-    Return the labels for the KDE plot.
+    Plot the regression model with the data and residuals.
+    
+    Parameters
+    ----------
+    regression_model : ggcas.r2py_models.RegressionModel
+        The regression model to be plotted.
+    
+    Other Parameters
+    ----------------
+    **kwargs : Additional parameters for customizing the plot.
+        figsize : tuple
+            Size of the figure.
+        xlim : tuple
+            Limits for the x-axis.
+        xlabel : str
+            Label of the x-axis.
+        title : str
+            Title of the figure.
+        size : int or float
+            Size of the scattered data points. Alias: 's'.
+        plot_color : str
+            Color of the data plot. Aliases:
+            - 'pcolor'
+            - 'plotcolor'
+            - 'pc'
+        fit_color : str
+            Color of the regression plot. Aliases:
+            - 'fcolor'
+            - 'fitcolor'
+            - 'fc'
+        residuals_color : str
+            Color of the residuals. Aliases:
+            - 'rcolor'
+            - 'rescolor'
+            - 'rc'        
+    
     """
-    if kind == 'gaussian':
-        A, mu, sigma2 = coeffs
-        label = f"""Gaussian KDE
-$A$   = {_format_number(A)}
-$\mu$   = {_format_number(mu)}
-$\sigma^2$  = {_format_number(sigma2)}"""
-    elif kind == 'exponential':
-        A, lmbda = coeffs
-        label = f"""Exponential KDE
-$A$   = {_format_number(A)}
-$\lambda$ = {_format_number(lmbda)}"""
-    elif kind == 'boltzmann':
-        A1, A2, x0, dx = coeffs
-        label = f"""Boltzmann KDE
-$A1$   = {_format_number(A1)}
-$A2$   = {_format_number(A2)}
-$x_0$   = {_format_number(x0)}
-$dx$   = {_format_number(dx)}"""
-    elif kind == 'king':
-        A, ve, sigma = coeffs
-        label = f"""King KDE
-$A$   = {_format_number(A)}
-$v_e$   = {_format_number(ve)}
-$\sigma$  = {_format_number(sigma)}"""
-    elif kind == 'maxwell':
-        A, sigma = coeffs
-        label = f"""Maxwell KDE
-$A$   = {_format_number(A)}
-$\sigma$  = {_format_number(sigma)}"""
-    return label
-
-def _format_number(num):
-    """
-    Format the number using scientific notation if it is too large or too small.
-    """
-    if abs(num) < 1e-3 or abs(num) > 1e3:
-        return f"{num:.2e}"
-    else:
-        return f"{num:.2f}"
+    rm      = regression_model
+    xlim    = kwargs.get('xlim', (rm.x.min(), rm.x.max()))
+    s       = _osu.get_kwargs(('size', 's'), 2.5, kwargs)
+    fsize   = kwargs.get('figsize', default_figure_size)
+    xlabel  = kwargs.get('xlabel', '')
+    title   = kwargs.get('title', '')
+    pc      = _osu.get_kwargs(('plot_color', 'pcolor', 'plotcolor', 'pc'), 'black', kwargs)
+    fc      = _osu.get_kwargs(('fit_color', 'fcolor', 'fitcolor', 'fc'), 'red', kwargs)
+    rc      = _osu.get_kwargs(('residuals_color', 'rcolor', 'rescolor', 'rc'), 'red', kwargs)
+    fig, (fax, rax) = _plt.subplots(
+        nrows=2, ncols=1, height_ratios=[2.75,1], figsize=fsize, sharex=True
+    )
+    fig.subplots_adjust(hspace=0)
+    # data & fit plots
+    fax.hist(rm.data, bins=len(rm.y), color=pc, histtype='step',alpha=0.85, label='Data')
+    fax.plot(rm.x, rm.y, c=fc, linestyle='dashed', label=_kde_labels(rm.kind, rm.coeffs))
+    fax.set_ylabel('counts')
+    fax.set_xlim(xlim)
+    fax.legend(loc='best', fontsize='medium')
+    # residuals plot
+    rax.set_ylabel('Residuals')
+    rax.yaxis.set_label_position("right")
+    rax.yaxis.tick_right()
+    rax.set_xlabel(xlabel)
+    rax.set_xlim(xlim)
+    rax.plot([rm.x.min()*1.1, rm.x.max()*1.1], [0,0], c='gray', alpha=0.8, linestyle='--')
+    rax.plot(rm.x, rm.residuals, 'o-', c=rc, markersize=s, linewidth=1., alpha=0.8)
+    fig.suptitle(title, size=20, style='italic', family='cursive')
+    fig.show()

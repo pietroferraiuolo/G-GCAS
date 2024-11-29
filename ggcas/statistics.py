@@ -100,10 +100,10 @@ def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
         # Call the R function with the data and additional arguments
         fitted_model = genv["GM_model"](r_data, **dict(r_kwargs.items()))
         clusters = None
-    return _rm.RGMModel(fitted_model, clusters)
+    return _rm.GMModel(fitted_model, clusters)
 
 
-def kde_estimator(data, kind="gaussian", verbose=False):
+def regression(data, kind="gaussian", verbose=False):
     """
     Kernel Density Estimation function.
     """
@@ -113,11 +113,9 @@ def kde_estimator(data, kind="gaussian", verbose=False):
     R(f'source("{regression_code}")')
     reg_func = genv["regression"]
     r_data = np2r.numpy2rpy(data)
-    r_result = reg_func(r_data, method=kind, verb=verbose)
-    x_kde = _np.array(r_result.rx2("x"))
-    y_kde = _np.array(r_result.rx2("y"))
-    coeffs = _np.array(r_result.rx2("coeffs"))
-    return x_kde, y_kde, coeffs
+    regression_model = reg_func(r_data, method=kind, verb=verbose)
+    model = _rm.RegressionModel(regression_model, type=kind)
+    return model
 
 
 def _data_format_check(data):

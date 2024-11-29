@@ -122,5 +122,6 @@ regression <- function(data, method, verb = FALSE) {
   } else {
     stop("Unknown method")
   }
-  return(list(x = x, y = out, coeffs = coefficients))
+  residuals <- y - out
+  return(list(data = data, x = x, y = out, coeffs = coefficients, residuals = residuals))
 }

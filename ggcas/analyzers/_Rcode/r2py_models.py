@@ -15,8 +15,7 @@ import rpy2.robjects as ro
 from rpy2.robjects import (
     pandas2ri as pd2r, 
     numpy2ri as np2r, 
-    r as R, 
-    globalenv as genv
+    r as R,
 )
 
 class GMModel:
@@ -129,20 +128,55 @@ f"""Python wrapper for R Mclust Gaussian Mixture Model
 
 class RegressionModel:
     """
-    Class to convert the R lm Regression Model into a Python dictionary.
+    Class to convert the R LM Regression Model into a Python dictionary.
     """
 
-    def __init__(self, r_model):
+    def __init__(self, r_model, type:str='Unknown Model'):
         """The Constructor"""
         self.rmodel = r_model
         self.model  = _listvector_to_dict(r_model)
+        self._model_kind = type
+
+
+    def __repr__(self):
+        """The representation of the model."""
+        repr_ = \
+f"""----------------------------------------------------
+Python wrapper for R Levenberg-Marquardt Nonlinear 
+              Least-Squares Algorithm            
+----------------------------------------------------
+.rmodel : R model object as rpy2.robjects
+.model  : R Model translation into py dict
+
+"""
+        return repr_
+    
+    def __str__(self):
+        """The string representation of the model."""
+        txt = _kde_labels(self._model_kind, self.coeffs).splitlines()
+        txt.pop(0)
+        txt = '\n'.join(txt)
+        str_ = \
+f"""----------------------------------------------------------
+{self._model_kind.upper()} Regression Model fitted by LM algorithm
+----------------------------------------------------------
+{txt}
+"""
+        return str_
     
     @property
-    def coefficients(self):
+    def coeffs(self):
         """
         The coefficients of the regression model.
         """
         return self.model["coeffs"]
+    
+    @property
+    def data(self):
+        """
+        The data used to fit the model.
+        """
+        return self.model["data"]
     
     @property
     def x(self):
@@ -163,8 +197,14 @@ class RegressionModel:
         """
         The residuals of the model.
         """
-        
+        return self.model["residuals"]
 
+    @property
+    def kind(self):
+        """
+        The kind of model fitted to the data.
+        """
+        return self._model_kind
 
 
 def _listvector_to_dict(r_listvector):
@@ -195,4 +235,79 @@ def _listvector_to_dict(r_listvector):
         # Other R objects could be added as necessary
         else:
             py_dict[key] = value
-    return py_dict    
+    return py_dict
+
+def _kde_labels(kind: str, coeffs):
+    """
+    Return the labels for the KDE plot.
+    """
+    def _format_number(num):
+        """
+        Format the number using scientific notation if it is too large or too small.
+        """
+        if abs(num) < 1e-3 or abs(num) > 1e3:
+            return f"{num:.2e}"
+        else:
+            return f"{num:.2f}"
+    
+    if kind == 'gaussian':
+        A, mu, sigma2 = coeffs
+        label = f"""Gaussian
+$A$   = {_format_number(A)}
+$\mu$   = {_format_number(mu)}
+$\sigma^2$  = {_format_number(sigma2)}"""
+        
+    elif kind == 'boltzmann':
+        A1, A2, x0, dx = coeffs
+        label = f"""Boltzmann
+$A1$   = {_format_number(A1)}
+$A2$   = {_format_number(A2)}
+$x_0$   = {_format_number(x0)}
+$dx$   = {_format_number(dx)}"""
+        
+    elif kind == 'exponential':
+        A, lmbda = coeffs
+        label = f"""Exponential
+$A$   = {_format_number(A)}
+$\lambda$ = {_format_number(lmbda)}"""
+        
+    elif kind == 'king':
+        A, ve, sigma = coeffs
+        label = f"""King
+$A$   = {_format_number(A)}
+$v_e$   = {_format_number(ve)}
+$\sigma$  = {_format_number(sigma)}"""
+        
+    elif kind == 'maxwell':
+        A, sigma = coeffs
+        label = f"""Maxwell
+$A$   = {_format_number(A)}
+$\sigma$  = {_format_number(sigma)}"""
+        
+    elif kind == 'rayleigh':
+        A, sigma = coeffs
+        label = f"""Rayleigh
+$A$   = {_format_number(A)}
+$\sigma$  = {_format_number(sigma)}"""
+        
+    elif kind == 'lorentzian':
+        A, x0, gamma = coeffs
+        label = f"""Lorentzian
+$A$   = {_format_number(A)}
+$x_0$   = {_format_number(x0)}
+$\gamma$  = {_format_number(gamma)}"""
+    
+    elif kind == 'power':
+        A, n = coeffs
+        label = f"""Power
+$A$   = {_format_number(A)}
+$n$   = {_format_number(n)}"""
+        
+    elif kind == 'lognormal':
+        A, mu, sigma = coeffs
+        label = f"""Lognormal
+$A$   = {_format_number(A)}
+$\mu$   = {_format_number(mu)}
+$\sigma$  = {_format_number(sigma)}"""
+    
+    return label
