@@ -102,9 +102,9 @@ regression <- function(data, method, verb = FALSE) {
       a * x^b
     }
     fit_power <- nlsLM(y ~ power(x, a, b),
-                      start = list(a = max(y), b = 1),
-                      control = maxiter,
-                      trace = verb)
+                       start = list(a = max(y), b = 1),
+                       control = maxiter,
+                       trace = verb)
     out <- predict(fit_power)
     coefficients <- coef(fit_power)
   } else if (method == "lognormal") {
@@ -123,5 +123,11 @@ regression <- function(data, method, verb = FALSE) {
     stop("Unknown method")
   }
   residuals <- y - out
-  return(list(data = data, x = x, y = out, coeffs = coefficients, residuals = residuals))
+  return(
+    list(data = data,
+         x = x,
+         y = out,
+         coeffs = coefficients,
+         residuals = residuals)
+  )
 }
