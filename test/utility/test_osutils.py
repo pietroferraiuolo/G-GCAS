@@ -47,7 +47,7 @@ class TestOsutils(unittest.TestCase):
 
         # Test with tn and key
         result = osu.get_file_list(tn='tn1', key='_data')
-        expected = ['/basepath/folder1/tn1/file2_data.txt']
+        expected = '/basepath/folder1/tn1/file2_data.txt'
         self.assertEqual(result, expected)
 
         # Test with fold and no key

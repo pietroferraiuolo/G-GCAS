@@ -19,11 +19,7 @@ from ._utility import (
     get_file_list,
     tnlist
 )
-from . import (
-    analyzers,
-    statistics,
-    plots
-)
+from .analyzers import _Rcode
 
 print("""
 GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE

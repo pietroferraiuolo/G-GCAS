@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import pandas as pd
 from ggcas import plots as gplt
+from ggcas.statistics import regression
 
 class TestPlots(unittest.TestCase):
 
@@ -19,10 +20,12 @@ class TestPlots(unittest.TestCase):
         self.data = np.random.randn(100)
         self.dataerr = np.random.uniform(0.1, 0.5, 100)
         self.sample = pd.DataFrame({'ra': self.ra, 'dec': self.dec, 'pmra': self.pmra, 'pmdec': self.pmdec})
+        self.data = np.random.randn(1000)
+
 
     def test_scatter_2hist(self):
         try:
-            gplt.scatter_2hist(self.x, self.y, kde=True, xlabel='X Axis', ylabel='Y Axis', title='Scatter 2Hist')
+            gplt.scatter_2hist(self.x, self.y, kde=True, kde_kind='gaussian', xlabel='X Axis', ylabel='Y Axis', title='Scatter 2Hist')
         except Exception as e:
             self.fail(f"scatter_2hist raised an exception: {e}")
 
@@ -46,7 +49,7 @@ class TestPlots(unittest.TestCase):
 
     def test_histogram(self):
         try:
-            result = gplt.histogram(self.data, kde=True, xlabel='Data', out=True)
+            result = gplt.histogram(self.data, kde=True, kde_kind='gaussian', xlabel='Data', out=True)
             self.assertIn('h', result)
             self.assertIn('kde', result)
         except Exception as e:
@@ -61,9 +64,16 @@ class TestPlots(unittest.TestCase):
 
     def test_errorbar(self):
         try:
-            gplt.errorbar(self.data, self.dataerr, x=self.x, xerr=0.1, fmt='o', color='green', ecolor='black')
+            gplt.errorbar(self.y, np.abs(self.y*0.1435), x=self.x, xerr=0.1, fmt='o', color='green', ecolor='black', xlabel='X Axis', ylabel='Y Axis', title='Errorbar Plot')
         except Exception as e:
             self.fail(f"errorbar raised an exception: {e}")
+
+    def test_regression(self):
+        self.regression_model = regression(self.data, kind='gaussian')
+        try:
+            gplt.regression(self.regression_model, xlabel='X Axis', title='Regression Plot')
+        except Exception as e:
+            self.fail(f"regression raised an exception: {e}")
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,99 +3,116 @@ Module: functions.py
 
 Author(s)
 ---------
-    - Pietro Ferraiuolo : Written in 2024
+- Pietro Ferraiuolo : Written in 2024
 
 Description
 -----------
-This module provides a set of functions to compute various astronomical and
+This module provides a set of classes to compute various astronomical and
 physical quantities such as angular separation, line-of-sight distance, radial
-distances in 2D and 3D, total velocity, and effective gravitational potential.
+distances in 2D and 3D, total velocity, effective gravitational potential, and
+cartesian conversion.
 
-Functions
----------
-- angular_separation(ra0=None, dec0=None)
+Classes
+-------
+- AngularSeparation(ra0, dec0)
     Computes the angular separation between two points in the sky.
 
-- los_distance()
+- LosDistance()
     Computes the line-of-sight distance based on parallax.
 
-- radial_distance_2d(analytical_w=False, **params)
+- RadialDistance2D(gc_distance)
     Computes the 2D-projected radial distance of a source from the center of a cluster or given RA/DEC coordinates.
 
-- radial_distance_3d(gc_distance=None, analytical_r2d: bool = False, analytical_w: bool = False)
+- RadialDistance3D(gc_distance=None)
     Computes the 3D radial distance of a source from the center of a cluster or given RA/DEC coordinates.
 
-- total_velocity()
+- TotalVelocity()
     Computes the total velocity based on the given velocity components.
 
-- effective_potential(shell: bool = False)
+- EffectivePotential(shell=False)
     Computes the effective gravitational potential, optionally considering a shell model.
+
+- CartesianConversion(ra0=0, dec0=0)
+    Computes the cartesian conversion of coordinates and velocities.
 
 How to Use
 ----------
 1. Import the module:
     ```python
-    import functions
+    from ggcas import functions
     ```
 
-2. Call the desired function with appropriate parameters:
+2. Create an instance of the desired class and call the appropriate methods:
     ```python
-    result = functions.angular_separation(ra0=10.0, dec0=20.0)
+    angular_sep = functions.AngularSeparation(ra0=10.0, dec0=20.0)
+    # Say we have some data
+    data = [ra, dec]
+    result = angular_sep.compute(data)
     ```
 
 Examples
 --------
-Example usage of `angular_separation` function:
+Example usage of `AngularSeparation` class:
     ```python
-    import functions
+    from ggcas import functions
     from astropy import units as u
 
     ra0 = 10.0 * u.deg
     dec0 = 20.0 * u.deg
-    result = functions.angular_separation(ra0, dec0)
-    print(result)
+    angular_sep = functions.AngularSeparation(ra0, dec0)
+    print(angular_sep)
     ```
 
-Example usage of `los_distance` function:
+Example usage of `LosDistance` class:
     ```python
-    import functions
+    from ggcas import functions
 
-    result = functions.los_distance()
-    print(result)
+    los_dist = functions.LosDistance()
+    print(los_dist)
     ```
 
-Example usage of `radial_distance_2d` function:
+Example usage of `RadialDistance2D` class:
     ```python
-    import functions
-
-    result = functions.radial_distance_2d(analytical_w=True, ra0=10.0, dec0=20.0)
-    print(result)
-    ```
-
-Example usage of `radial_distance_3d` function:
-    ```python
-    import functions
+    from ggcas import functions
     from astropy import units as u
 
     gc_distance = 1000 * u.pc
-    result = functions.radial_distance_3d(gc_distance=gc_distance, analytical_r2d=True, analytical_w=True)
-    print(result)
+    radial_dist_2d = functions.RadialDistance2D(gc_distance)
+    print(radial_dist_2d)
     ```
 
-Example usage of `total_velocity` function:
+Example usage of `RadialDistance3D` class:
     ```python
-    import functions
+    from ggcas import functions
+    from astropy import units as u
 
-    result = functions.total_velocity()
-    print(result)
+    gc_distance = 1000 * u.pc
+    radial_dist_3d = functions.RadialDistance3D(gc_distance=gc_distance)
+    print(radial_dist_3d)
     ```
 
-Example usage of `effective_potential` function:
+Example usage of `TotalVelocity` class:
     ```python
-    import functions
+    from ggcas import functions
 
-    result = functions.effective_potential(shell=True)
-    print(result)
+    total_vel = functions.TotalVelocity()
+    print(total_vel)
+    ```
+
+Example usage of `EffectivePotential` class:
+    ```python
+    from ggcas import functions
+
+    eff_pot = functions.EffectivePotential(shell=True)
+    print(eff_pot)
+    ```
+
+Example usage of `CartesianConversion` class:
+    ```python
+    from ggcas import functions
+
+    cart_conv = functions.CartesianConversion(ra0=10.0, dec0=20.0)
+    print(cart_conv)
     ```
 """
 
@@ -351,12 +368,12 @@ class EffectivePotential(BaseFormula):
     def _get_formula(self):
         """Analytical formula getter for the effective gravitational potential"""
         if self.shell:
-            dN, x, lnB = _sp.symbols("\Delta\ N, x, lnB")
+            dN, x, lnB = _sp.symbols("\Delta\-N, x, lnB")
             A, a, b, r, m, sigma, dr, dx = _sp.symbols(
                 "A, alpha, beta, r_*, m, sigma, dr, dx"
             )
             lnb = (
-                16
+                  16
                 * _sp.sqrt(2)
                 * A
                 * (_sp.pi * b * r) ** 2

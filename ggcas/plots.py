@@ -121,10 +121,10 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     _plt.suptitle(title, size=20, style='italic', family='cursive')
     if kde:
         # TODO : add the kde labels modifications and model output
-        x_kdex,x_kdey,x_c = _kde_estimator(x, kde_kind)
-        y_kdex,y_kdey,y_c = _kde_estimator(y, kde_kind)
-        ax_histx.plot(x_kdex, x_kdey, color=colorx, label=f"$\mu$={x_c[1]:.3f}\n$\sigma^2$={x_c[2]:.3f}")
-        ax_histy.plot(y_kdey, y_kdex, color=colory, label=f"$\mu$={y_c[1]:.3f}\n$\sigma^2$={y_c[2]:.3f}")
+        reg_x = _kde_estimator(x, kde_kind)
+        reg_y = _kde_estimator(y, kde_kind)
+        ax_histx.plot(reg_x.x, reg_x.y, color=colorx, label=f"$\mu$={reg_x.coeffs[1]:.3f}\n$\sigma^2$={reg_x.coeffs[2]:.3f}")
+        ax_histy.plot(reg_y.x, reg_y.x, color=colory, label=f"$\mu$={reg_y.coeffs[1]:.3f}\n$\sigma^2$={reg_y.coeffs[2]:.3f}")
         ax_histx.legend(loc='best', fontsize='small')
         ax_histy.legend(loc='best', fontsize='small')
     ax_histx.set_xlim(xlim)
@@ -338,10 +338,10 @@ def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs
     counts = h[0]
     res={'h': [bins, counts]}
     if kde:
-        x_kde,y_kde,coeffs = _kde_estimator(data, kde_kind, verbose=verbose)
-        res['kde'] = coeffs
-        label=_kde_labels(kde_kind, coeffs)
-        _plt.plot(x_kde, y_kde, c=kcolor, label=label)
+        regression = _kde_estimator(data, kde_kind, verbose=verbose)
+        res['kde'] = regression.coeffs
+        label=_kde_labels(kde_kind, regression.coeffs)
+        _plt.plot(regression.x, regression.y, c=kcolor, label=label)
         _plt.legend(loc='best', fontsize='medium')
     if xlim is not None:
         _plt.xlim(xlim)
