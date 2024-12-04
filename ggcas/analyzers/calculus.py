@@ -15,6 +15,7 @@ import subprocess
 import multiprocessing as mp
 from typing import Dict, Any, List
 import numpy as np
+from numpy.typing import ArrayLike
 import sympy as sp
 from ggcas._utility import KING_INTEGRATOR_FOLDER, get_file_list
 from . import _glpoints
@@ -330,7 +331,7 @@ def _lambdified_computation(func, variables, var_data):
         computed_func.append(float(x))
     return computed_func
 
-def _data_dict_creation(variables, var_data:np.typing.ArrayLike):
+def _data_dict_creation(variables, var_data:ArrayLike):
     """
     function which creates the list of dictionaries in the format needed to compute
     sympy functions.

@@ -80,6 +80,7 @@ class TestOsutils(unittest.TestCase):
         mock_join.side_effect = lambda basepath, folder: f"{basepath}/{folder}"
         def mock_listdir_res():
             mock_listdir.side_effect = [
+                ['query'],
                 ['gc_folder1', 'gc_folder2', 'gc_folder3'],  # First call to os.listdir
                 ['tn_1', 'tn_2'],  # Second call to os.listdir for gc_folder1
                 ['tn_2'],  # Second call to os.listdir for gc_folder2
