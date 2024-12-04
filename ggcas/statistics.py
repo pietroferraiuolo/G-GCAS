@@ -1,10 +1,15 @@
 """
 Author(s)
 ---------
-    - Pietro Ferraiuolo : Written in 2024
+- Pietro Ferraiuolo : Written in 2024
 
 Description
 -----------
+This module provides a series of functions for the statistical analysis of 
+(astronomical) data. The functions are designed to be used in the context of
+the GGCAS software. The module comes with a related sub-module, `r2py_models.py`,
+which handles the conversion of R objects to Python objects, since the majority 
+of the statistical analysis is done through R scripts. 
 
 """
 
@@ -30,6 +35,11 @@ from rpy2.robjects import (
 def XD_estimator(data, errors, correlations=None, *xdargs):
     """
     Extreme Deconvolution Estimation function.
+
+    This function fits an eXtreme Deconvolution Gaussian Mixture Model (XDGMM)
+    to the input data. The XDGMM, part of the astroML package, is a probabilistic
+    model that can be used to estimate the underlying distribution of a dataset, 
+    taking into account measurement errors and correlations between features.
 
     Parameters
     ----------
@@ -65,6 +75,11 @@ def XD_estimator(data, errors, correlations=None, *xdargs):
 def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
     """
     Gaussian Mixture Estimation function.
+
+    This function fits a Gaussian Mixture Model (GMM) to the input data.
+    The GMM is a probabilistic model that can be used to estimate the underlying
+    distribution of a dataset. The function uses the `mclust` R package to fit the
+    model.
 
     Parameters
     ----------
@@ -105,7 +120,36 @@ def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
 
 def regression(data, kind="gaussian", verbose=False):
     """
-    Kernel Density Estimation function.
+    Regression model estimation function.
+
+    This function fits the input data to an analythical function. The regression model
+    can be of different types, such as linear, or gaussian regression.
+    The function uses the `minpack.lm` R package to fit the model.
+
+    Parameters
+    ----------
+    data : numpy.ndarray
+        The data to be analyzed.
+    kind : str, optional
+        The type of regression model to be fitted. Options are:
+        - "linear",
+        - "power",
+        - "gaussian",
+        - "poisson",
+        - "lognormal",
+        - "exponential",
+        - "boltzmann",
+        - "king",
+        - "maxwell",
+        - "lorentzian",
+        - "rayleigh",
+    verbose : bool, optional
+        If True, print verbose output from the fitting routine.
+
+    Returns
+    -------
+    model : ggcas.analyzers._Rcode.RegressionModel
+        The fitted regression model, translated from R to Py.
     """
     check_packages("minpack.lm")
     np2r.activate()

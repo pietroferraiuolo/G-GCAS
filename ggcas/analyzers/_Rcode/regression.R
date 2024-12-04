@@ -119,6 +119,27 @@ regression <- function(data, method, verb = FALSE) {
                            trace = verb)
     out <- predict(fit_lognormal)
     coefficients <- coef(fit_lognormal)
+  } else if (method == "poisson") {
+    poisson <- function(x, A, lambda) {
+      A * exp(-lambda) * lambda^x / factorial(x)
+    }
+    fit_poisson <- nlsLM(y ~ poisson(x, A, lambda),
+                         start = list(A = max(y),
+                                      lambda = mean(x)),
+                         control = maxiter,
+                         trace = verb)
+    out <- predict(fit_poisson)
+    coefficients <- coef(fit_poisson)
+  } else if (method == "linear") {
+    linear <- function(x, a, b) {
+      a * x + b
+    }
+    fit_linear <- nlsLM(y ~ linear(x, a, b),
+                        start = list(a = max(y), b = 0),
+                        control = maxiter,
+                        trace = verb)
+    out <- predict(fit_linear)
+    coefficients <- coef(fit_linear)
   } else {
     stop("Unknown method")
   }

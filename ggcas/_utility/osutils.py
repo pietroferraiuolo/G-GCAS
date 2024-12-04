@@ -204,7 +204,7 @@ def _timestamp():
     tn = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
     return tn
 
-def _findTracknum(tn, complete_path:bool=False):
+def _findTracknum(tn, complete_path:bool=True):
 
     """
     Search for the tracking number given in input within all the data path subfolders.

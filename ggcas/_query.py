@@ -715,12 +715,12 @@ Loading it...""")
                 if (data_acquired == self._queryInfo['Scan Info']['Data Acquired'] and
                     conditions_applied == self._queryInfo['Scan Info']['Conditions Applied'] and
                     scan_radius == str(self._queryInfo['Scan Info']['Scan Radius'])):
-                    check = (True, os.path.join(tn, _QDATA))
+                    check = (True, tn.split('/')[-1])
                     break
         return check
 
     def __load_table(self):
-        """Load The table instanced table(s)"""
+        """Loads the instanced table(s)"""
         if isinstance(self._table, list):
             table = np.zeros(len(self._table), dtype=object)
             for i, t in enumerate(self._table):
@@ -833,7 +833,7 @@ RA={self.gc.ra:.2f} DEC={self.gc.dec:.2f}
             self._table = self.sample
             self.sample = pandas_df
             return self.sample.head(5)
-        print(pandas_df.head(5))
+        #print(pandas_df.head(5))
         return pandas_df
     
     def to_table(self, *args):

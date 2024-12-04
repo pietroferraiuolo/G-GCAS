@@ -131,16 +131,19 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     ax_histy.set_ylim(ylim)
     _plt.show()
 
-def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
+def colorMagnitude(sample=None, g=None, b_r=None, teff_gspphot=None, **kwargs):
     """
     Make a scatter plot to create a color-magnitude diagram of the sample, using BP and RP photometry and temperature information.
 
     Parameters
     ----------
+    sample : _Sample or dict
+        The sample data containing 'phot_g_mean_mag', 'bp_rp' and 'teff_gspphot' fields.
     g : float | ArrayLike
-        Gaia mean magnitude in the G band.
+        Gaia mean magnitude in the G band. For gaia samples it is the 'phot_g_mean_mag' field.
     b_r : float | ArrayLike
-        Gaia color, defined as the BP mean magnitude minus the RP mean magnitude.
+        Gaia color, defined as the BP mean magnitude minus the RP mean magnitude. 
+        For gaia samples it is the 'bp_rp' field.
     teff_gspphot : float | ArrayLike
         Gaia computed effective surface temperature.
 
@@ -164,6 +167,19 @@ def colorMagnitude(g, b_r, teff_gspphot, **kwargs):
     fsize = kwargs.get('figsize', default_figure_size)
     fig, ax = _plt.subplots(nrows=1, ncols=1, figsize=fsize)
     ax.set_facecolor(bgc)
+    if sample is not None:
+        from ._query import _Sample
+        if isinstance(sample, _Sample):
+            data = sample.sample
+            g = data['phot_g_mean_mag']
+            b_r = data['bp_rp']
+            teff_gspphot = data['teff_gspphot']
+        else:
+            g = sample['phot_g_mean_mag']
+            b_r = sample['bp_rp']
+            teff_gspphot = sample['teff_gspphot']
+    elif g is None or b_r is None or teff_gspphot is not None:
+        raise ValueError("You must provide a sample or the data fields.")
     _plt.scatter(b_r, g, c=teff_gspphot, alpha=a, cmap=cmap)
     _plt.colorbar(label=r'$T_{eff}$')
     _plt.ylim(max(g)+0.51, min(g)-0.51)

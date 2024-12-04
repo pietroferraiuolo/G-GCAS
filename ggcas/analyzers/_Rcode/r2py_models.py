@@ -310,4 +310,16 @@ $A$   = {_format_number(A)}
 $\mu$   = {_format_number(mu)}
 $\sigma$  = {_format_number(sigma)}"""
     
+    elif kind == 'poisson':
+        A, lmbda = coeffs
+        label = f"""Poisson
+$A$   = {_format_number(A)}
+$\lambda$ = {_format_number(lmbda)}"""
+        
+    elif kind == 'linear':
+        A, B = coeffs
+        label = f"""Linear
+$A$   = {_format_number(A)}
+$B$   = {_format_number(B)}"""
+    
     return label
