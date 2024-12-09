@@ -20,10 +20,10 @@ ggcas.analyzers.dynamics module
    :undoc-members:
    :show-inheritance:
 
-ggcas.analyzers.effective\_potential module
--------------------------------------------
+ggcas.analyzers._Rcode module
+-----------------------------
 
-.. automodule:: ggcas.analyzers.effective_potential
+.. automodule:: ggcas.analyzers._Rcode
    :members:
    :undoc-members:
    :show-inheritance:

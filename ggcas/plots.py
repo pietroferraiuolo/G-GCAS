@@ -120,7 +120,6 @@ def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     ax_histy.hist(y, bins=bins, orientation='horizontal', color=colory, alpha=0.6)
     _plt.suptitle(title, size=20, style='italic', family='cursive')
     if kde:
-        # TODO : add the kde labels modifications and model output
         reg_x = _kde_estimator(x, kde_kind)
         reg_y = _kde_estimator(y, kde_kind)
         ax_histx.plot(reg_x.x, reg_x.y, color=colorx, label=f"$\mu$={reg_x.coeffs[1]:.3f}\n$\sigma^2$={reg_x.coeffs[2]:.3f}")
@@ -168,7 +167,7 @@ def colorMagnitude(sample=None, g=None, b_r=None, teff_gspphot=None, **kwargs):
     fig, ax = _plt.subplots(nrows=1, ncols=1, figsize=fsize)
     ax.set_facecolor(bgc)
     if sample is not None:
-        from ._query import _Sample
+        from ._utility.sample import Sample as _Sample
         if isinstance(sample, _Sample):
             data = sample.sample
             g = data['phot_g_mean_mag']
@@ -214,7 +213,7 @@ def properMotion(sample, **kwargs):
     size = _osu.get_kwargs(('s','size'), 3, kwargs)
     alpha= kwargs.get('alpha', 0.5)
     fsize = kwargs.get('figsize', default_figure_size)
-    from ._query import _Sample
+    from ._utility.sample import Sample as _Sample    
     if isinstance(sample, _Sample):
         data = sample.sample
         pmra = data['pmra']
@@ -256,7 +255,7 @@ def spatial(sample, **kwargs):
     fsize= kwargs.get('figsize', default_figure_size)
     size = _osu.get_kwargs(('s','size'), 5, kwargs)
     alpha= kwargs.get('alpha', 0.5)
-    from ._query import _Sample
+    from ._utility.sample import Sample as _Sample
     if isinstance(sample, _Sample):
         data = sample.sample
         ra = data['ra']
@@ -333,7 +332,7 @@ def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs
     xlabel = kwargs.get('xlabel','')
     alpha  = kwargs.get('alpha', 1)
     hcolor = _osu.get_kwargs(('hist_color','hcolor', 'hc'),'gray', kwargs)
-    kcolor = _osu.get_kwargs(('kde_color','kcolor', 'kc'),'gray', kwargs)
+    kcolor = _osu.get_kwargs(('kde_color','kcolor', 'kc'),'red', kwargs)
     title  = kwargs.get('title', xlabel+' Distribution')
     fsize  = kwargs.get('figsize', default_figure_size)
     verbose= _osu.get_kwargs(('kde_verbose', 'verbose', 'v'), False, kwargs)

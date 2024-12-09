@@ -62,8 +62,10 @@ object:
 """
 import os 
 import numpy as np
+import pandas as _pd
 import configparser
 from ggcas._utility import *
+from ggcas._utility.sample import Sample
 from astropy import units as u
 from astropy.table import Table
 from astroquery.gaia import Gaia
@@ -268,7 +270,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         samp = self._run_query(savename, ra, dec, radius, dat, cond, save)
-        sample = _Sample(samp, gc=gc)
+        sample = Sample(samp, gc=gc)
         sample.qinfo = self._queryInfo['Scan Info']
         return sample
 
@@ -335,7 +337,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         astro_cluster = self._run_query(savename, ra, dec, radius, astrometry, cond, save)
-        astro_sample = _Sample(astro_cluster, gc=gc)
+        astro_sample = Sample(astro_cluster, gc=gc)
         astro_sample.qinfo = self._queryInfo['Scan Info']
         return astro_sample
 
@@ -402,7 +404,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         photo_cluster = self._run_query(savename, ra, dec, radius, photometry, cond, save)
-        phot_sample = _Sample(photo_cluster, gc=gc)
+        phot_sample = Sample(photo_cluster, gc=gc)
         phot_sample.qinfo = self._queryInfo['Scan Info']
         return phot_sample
 
@@ -467,7 +469,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         else:
             self._queryInfo['Scan Info']['Conditions Applied'] = cond
         rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
-        rv_sample = _Sample(rv_cluster, gc=gc)
+        rv_sample = Sample(rv_cluster, gc=gc)
         rv_sample.qinfo = self._queryInfo['Scan Info']
         return rv_sample
 
@@ -772,83 +774,3 @@ Loading it...""")
                 i+=1
         return text
 
-class _Sample:
-    """
-    Class for better handling the query result sample.
-
-    Parameters
-    ----------
-    gc : ggcas.cluster.Cluster
-        Globular cluster object used for the query.
-    sample : astropy.table.Table
-        Table containing the retrieve sample's data.
-    """
-    def __init__(self, sample, gc:Optional[Union[Cluster,str]]=None):
-        """The constructor"""
-        self.gc     = gc if isinstance(gc, Cluster) else Cluster(gc)
-        self.qinfo  = None
-        self.sample = sample
-
-    def __str__(self):
-        """The string representation"""
-        return self.gc.__str__()+'\n'+self.sample.__str__()
-
-    def __repr__(self):
-        """The representation"""
-        return self.__get_repr()
-
-    def __get_repr(self):
-        """Gets the str representation"""
-        if self.gc.id=='UntrackedData':
-            gctxt=f"""Gaia data retrieved at coordinates
-RA={self.gc.ra:.2f} DEC={self.gc.dec:.2f}
-"""
-        else:
-            gctxt=f"""Data sample for cluster {self.gc.id}
-"""
-        stxt = '\nData Columns:\n'
-        for name in self.sample.colnames:
-            stxt += name.lower()+' - '
-        stxt = stxt[:-3]
-        return gctxt+stxt
-    
-    def to_pandas(self, overwrite:bool=False, *args, **kwargs):
-        """
-        Converts the sample to a pandas DataFrame
-
-        Parameters
-        ----------
-        *args : tuple
-            Positional arguments to pass to the astropy.Table to_pandas method.
-        **kwargs : dict
-            Keyword arguments to pass to the astropy.Table to_pandas method.
-
-        Returns
-        -------
-        df : pandas.DataFrame
-            The DataFrame containing the sample data.
-        """
-        pandas_df = self.sample.to_pandas(*args, **kwargs)
-        if overwrite:
-            self._table = self.sample
-            self.sample = pandas_df
-            return self.sample.head(5)
-        #print(pandas_df.head(5))
-        return pandas_df
-    
-    def to_table(self, *args):
-        """
-        Converts the sample to an astropy Table.
-
-        Parameters
-        ----------
-        *args : tuple
-            Positional arguments to pass to the astropy.Table constructor.
-
-        Returns
-        -------
-        table : astropy.Table
-            The table containing the sample data.
-        """
-        self.sample = self._table
-        return self.sample

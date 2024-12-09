@@ -52,7 +52,8 @@ def compute_numerical_function(func, variables, var_data):
     """
     n_cores = mp.cpu_count()
     N = np.array(var_data).shape[-1]
-    if N<(2000*n_cores):
+    Nf= len(var_data)
+    if N<(2000*n_cores) and Nf<3:
         # Multicore computation
         print(f"Computation using all {n_cores} cores.")
         val_dicts = _data_dict_creation(variables, var_data)

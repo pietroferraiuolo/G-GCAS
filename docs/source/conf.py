@@ -36,6 +36,7 @@ release = '0.9.1'
 extensions = [
         'sphinx.ext.autodoc',
         'sphinx.ext.napoleon',
+        'sphinx.ext.mathjax',
 ]
 autodoc_mock_imports=['setup']
 

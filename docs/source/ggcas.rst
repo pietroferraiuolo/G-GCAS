@@ -8,15 +8,15 @@ Subpackages
    :maxdepth: 4
 
    ggcas.analyzers
-   ggcas.utility
+   ggcas._utility
 
 Submodules
 ----------
 
-ggcas.cluster module
---------------------
+ggcas._cluster module
+---------------------
 
-.. automodule:: ggcas.cluster
+.. automodule:: ggcas._cluster
    :members:
    :undoc-members:
    :show-inheritance:
@@ -29,14 +29,6 @@ ggcas.functions module
    :undoc-members:
    :show-inheritance:
 
-ggcas.initGGCAS module
-----------------------
-
-.. automodule:: ggcas.initGGCAS
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ggcas.plots module
 ------------------
 
@@ -45,10 +37,18 @@ ggcas.plots module
    :undoc-members:
    :show-inheritance:
 
-ggcas.query module
-------------------
+ggcas._query module
+-------------------
 
-.. automodule:: ggcas.query
+.. automodule:: ggcas._query
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   
+ggcas.statistics module
+-----------------------
+
+.. automodule:: ggcas.statistics
    :members:
    :undoc-members:
    :show-inheritance:

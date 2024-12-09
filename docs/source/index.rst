@@ -14,7 +14,8 @@ G-GCAS: Gaia Globular Clusters Analysis Software's documentation!
    functions
    plots
    query
-   utils
+   statistics
+   utility
    analyzers
 
 

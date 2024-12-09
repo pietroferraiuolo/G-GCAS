@@ -108,17 +108,14 @@ class BaseFormula(ABC):
         result : ArrayLike
             The computed values.
         """
-        if errors is None:
-            w_msg = f"""WARNING! Be sure that the input data follow this specific order: 
-Data: {self.variables}
-"""
-        else:
-            w_msg = f"""WARNING! Be sure that the input data follow this specific order: 
-Data: {self._variables}
-Errors: {self._errVariables}
+        print(f"""WARNING! Be sure that the input data follow this specific order: 
+Data:         {self.variables}""")
+        if errors is not None:
+            print(f"""Errors:       {self._errVariables}
 Correlations: {self._correlations}
-"""
+"""+'-'*30)
             variables = self._variables + self._errVariables
+            print("Errors:")
             if self._correlations is None:
                 self._errors = _compute_error(self._errFormula, variables, data, errors)
             else:
@@ -130,7 +127,7 @@ Correlations: {self._correlations}
                 self._errors = _compute_error(
                     self._errFormula, variables, data, errors, corr_values=correlations
                 )
-        print(w_msg)
+        print("Data:")
         self._values = _compute_numerical(self._formula, self._variables, data)
         return self
 

@@ -11,6 +11,7 @@ Description
 """
 from . import statistics as stat
 from . import plots as plt
+from . import functions as fnc
 from ._query import (
     GaiaQuery, 
     available_tables
@@ -21,9 +22,9 @@ from ._utility import (
     get_file_list,
     tnlist
 )
-from .analyzers import calculus as calc
-from .analyzers import dynamics as dyn
-from .analyzers import mcluster as mcl
+from .analyzers import (
+    calc, dyn, mcl
+)
 
 print("""
 GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE
