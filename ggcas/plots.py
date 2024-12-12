@@ -138,6 +138,7 @@ def colorMagnitude(sample=None, g=None, b_r=None, teff_gspphot=None, **kwargs):
     ----------
     sample : _Sample or dict
         The sample data containing 'phot_g_mean_mag', 'bp_rp' and 'teff_gspphot' fields.
+        If no sample is provided, the data fields must be provided.
     g : float | ArrayLike
         Gaia mean magnitude in the G band. For gaia samples it is the 'phot_g_mean_mag' field.
     b_r : float | ArrayLike
@@ -167,16 +168,9 @@ def colorMagnitude(sample=None, g=None, b_r=None, teff_gspphot=None, **kwargs):
     fig, ax = _plt.subplots(nrows=1, ncols=1, figsize=fsize)
     ax.set_facecolor(bgc)
     if sample is not None:
-        from ._utility.sample import Sample as _Sample
-        if isinstance(sample, _Sample):
-            data = sample.sample
-            g = data['phot_g_mean_mag']
-            b_r = data['bp_rp']
-            teff_gspphot = data['teff_gspphot']
-        else:
-            g = sample['phot_g_mean_mag']
-            b_r = sample['bp_rp']
-            teff_gspphot = sample['teff_gspphot']
+        g = sample['phot_g_mean_mag']
+        b_r = sample['bp_rp']
+        teff_gspphot = sample['teff_gspphot']
     elif g is None or b_r is None or teff_gspphot is not None:
         raise ValueError("You must provide a sample or the data fields.")
     _plt.scatter(b_r, g, c=teff_gspphot, alpha=a, cmap=cmap)
@@ -213,14 +207,8 @@ def properMotion(sample, **kwargs):
     size = _osu.get_kwargs(('s','size'), 3, kwargs)
     alpha= kwargs.get('alpha', 0.5)
     fsize = kwargs.get('figsize', default_figure_size)
-    from ._utility.sample import Sample as _Sample    
-    if isinstance(sample, _Sample):
-        data = sample.sample
-        pmra = data['pmra']
-        pmdec = data['pmdec']
-    else:
-        pmra = sample['pmra']
-        pmdec = sample['pmdec']
+    pmra = sample['pmra']
+    pmdec = sample['pmdec']
     fig, ax = _plt.subplots(figsize=fsize)
     _plt.xlabel(r'$\mu_{\alpha*}$ [deg]', fontdict=label_font)
     _plt.ylabel(r'$\mu_\delta$ [deg]', fontdict=label_font)
@@ -255,14 +243,8 @@ def spatial(sample, **kwargs):
     fsize= kwargs.get('figsize', default_figure_size)
     size = _osu.get_kwargs(('s','size'), 5, kwargs)
     alpha= kwargs.get('alpha', 0.5)
-    from ._utility.sample import Sample as _Sample
-    if isinstance(sample, _Sample):
-        data = sample.sample
-        ra = data['ra']
-        dec = data['dec']
-    else:
-        ra = sample['ra']
-        dec = sample['dec']
+    ra = sample['ra']
+    dec = sample['dec']
     fig, ax = _plt.subplots(figsize=fsize)
     _plt.xlabel(r'$DEC$ [deg]', fontdict=label_font)
     _plt.ylabel(r'$RA$ [deg]', fontdict=label_font)

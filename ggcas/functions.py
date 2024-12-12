@@ -131,7 +131,11 @@ from ggcas.analyzers.calculus import (
 )
 
 class AngularSeparation(BaseFormula):
-
+    """
+    Class for the analytical angular separation between two points in the sky, following
+    the equation:
+    :math:`\\vartheta_{2d}=2\,\\arcsin{\sqrt{\sin^2{\\bigg(\\frac{\delta_x-\delta_c}{2}\\bigg)} + \cos{\delta_x}\cos{\delta_c}\sin^2{\\bigg(\\frac{\\alpha_x-\\alpha_c}{2}\\bigg)} }}`
+    """
     def __init__(self, ra0: _Union[float, _u.Quantity], dec0: _Union[float, _u.Quantity]):
         """The constructor"""
         super().__init__()
@@ -190,7 +194,8 @@ class AngularSeparation(BaseFormula):
 
 class LosDistance(BaseFormula):
     """
-    Class for the analytical line-of-sight distance.
+    Class for the analytical line-of-sight distance from earth using a source's parallax.
+    :math:`r = 1/\\bar{\omega}`
     """
 
     def __init__(self):
@@ -221,7 +226,8 @@ class LosDistance(BaseFormula):
 
 class RadialDistance2D(BaseFormula):
     """
-    Class for the analytical 2D-projected radial distance.
+    Class for the analytical 2D-projected radial distance from a centre point.
+    :math:`r_{2D} = r_{gc} \\tan(\\vartheta_{2d})`
     """
 
     def __init__(self, gc_distance: _Union[float,_u.Quantity]):
@@ -243,12 +249,11 @@ class RadialDistance2D(BaseFormula):
         self._formula = r_2d
         self._variables = variables
         error = _error_propagation(
-            self._formula, self._variables, correlation=True
+            self._formula, self._variables, correlation=False
         )
         self._errFormula = error["error_formula"]
         errvars = error["error_variables"]
         self._errVariables = errvars['errors'] 
-        self._correlations = errvars['corrs']
         return self
     
     def _analitical_formula(self):
@@ -262,7 +267,8 @@ class RadialDistance2D(BaseFormula):
 
 class RadialDistance3D(BaseFormula):
     """
-    Class for the analytical 3D radial distance.
+    Class for the analytical 3D radial distance of a source from the centre of the cluster.
+    :math:`R_{3D} = \sqrt{d^2 + r_{2D}^2} = \sqrt{(r_{los}-r_{gc})^2 + (r_{gc} \\tan(\\theta_{x0}))^2}`
     """
 
     def __init__(
@@ -316,7 +322,7 @@ class TotalVelocity(BaseFormula):
 
     For cartesian velocities we intend converted ones from proper motion,
     using a simple geometrical conversion. Also, the total velocity, which is
-    :math:`v^2 = v_x^2 + v_y^2 + v_z^2`, is computed as :math:`1.5(v_x^2 + v_y^2)`,
+    :math:`v^2 = v_x^2 + v_y^2 + v_z^2`, is computed as :math:`\\dfrac{3}{2}(v_x^2 + v_y^2)`,
     i.e. in the assumption of isotropic distribution of velocities.
     """
 
@@ -352,10 +358,14 @@ class EffectivePotential(BaseFormula):
     r"""
     Class for the analytical effective gravitational potential.
 
-    The effective potential is defined as :math:`\Phi_{\text{eff}} = \ln B - \ln \left(\frac{\Delta N}{\sqrt{x}}\right) - x`,
-    where :math:`\ln B = 16\sqrt{2} A (\pi b r)^2 a (m\sigma)^3 \delta r \delta x`.
+    The (dimentionless) effective potential is defined as :math:`\Sigma = -\\ln{(1 - e^{x - w})}`.
 
-    The shell model is also considered, where the effective potential is defined as :math:`\ln B - \ln \left(\frac{\Delta N}{\sqrt{x}}\right) - x`.
+    The shell model is also considered, where the effective potential is defined as 
+    
+    :math:`\Phi_{eff} = \ln B - \ln \left(\frac{\Delta N}{\sqrt{x}}\right) - x`,
+
+
+    where :math:`\ln B = 16\sqrt{2} A a (\pi b r)^2 (m\sigma)^3 \delta r \delta x`.
     """
 
     def __init__(self, shell: bool = False):
@@ -443,9 +453,13 @@ class CartesianConversion():
     r"""
     Class for the analytical cartesian conversion.
 
-    The cartesian conversion is defined as :math:`x = \sin(\alpha - \alpha_0) \cos(\delta_0)`,
-    :math:`y = \sin(\delta)\cos(\delta_0) - \cos(\delta)\sin(\delta_0)\cos(\alpha - \alpha_0)`,
-    and :math:`r = \sqrt{x^2 + y^2}`.
+    The cartesian conversion is defined as
+
+    :math:`x = \sin(\alpha - \alpha_0) \cos(\delta_0)`
+
+    :math:`y = \sin(\delta)\cos(\delta_0) - \cos(\delta)\sin(\delta_0)\cos(\alpha - \alpha_0)`
+
+    :math:`r = \sqrt{x^2 + y^2}`.
     """
 
     def __init__(self, ra0=0, dec0=0):

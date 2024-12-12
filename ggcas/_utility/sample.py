@@ -1,7 +1,8 @@
 import pandas as _pd
+from typing import List
 from ggcas._cluster import Cluster
 from typing import Optional, Union
-from astropy.table import QTable
+from astropy.table import QTable, Table
 from astropy import units as u
 
 class Sample:
@@ -70,21 +71,6 @@ class Sample:
     def sample(self):
         """Returns the sample data"""
         return self._sample
-    
-    def reset_sample(self):
-        """Resets the sample to its original state"""
-        self._sample = self._bckupSample.copy()
-
-    def drop_columns(self, columns:list):
-        """
-        Drops the specified columns from the sample data.
-
-        Parameters
-        ----------
-        columns : list
-            List of column names to drop.
-        """
-        self._sample.remove_columns(columns)
 
     def computeDistance(self):
         """
@@ -97,6 +83,7 @@ class Sample:
         los = LosDistance()
         data = [self._sample['parallax']]
         errs = [self._sample['parallax_error']]
+        print('\nComputing Line-of-Sight Distance...\n')
         los.compute(data, errs)
         print('-'*30)
         self._sample['rlos'] = los.computed_values
@@ -118,6 +105,7 @@ class Sample:
             corr = self._sample['ra_dec_corr']
         else:
             corr = None
+        print('\nComputing Angular Separation...\n')
         angsep.compute(data, errs, corr)
         print('-'*30)
         self._sample['angsep'] = angsep.computed_values
@@ -138,6 +126,7 @@ class Sample:
             self.computeAngularSeparation()
         data = [self._sample['angsep']]
         errs = [self._sample['angsep_errors']]
+        print('\nComputing Projected Distance...\n')
         r2d.compute(data, errs)
         print('-'*30)
         self._sample['r2d'] = r2d.computed_values
@@ -150,14 +139,13 @@ class Sample:
         center of the cluster, using it's coordinates.
 
         For this computation, which follows the formula:
-        .. math:: 
-            R_{3D} = \sqrt{R_{los}^2 + R_{2D}^2} = \sqrt{R_{los}^2 + (R_{gc} \tan(\theta_{x0}))^2}
+        :math:`R_{3D} = \sqrt{R_{los}^2 + R_{2D}^2} = \sqrt{R_{los}^2 + (R_{gc} \\tan(\\theta_{x0}))^2}`
 
-        where \(R_{los}\) is the line-of-sight distance, \(R_{2D}\) is the projected distance
-        from the center of the cluster, \(R_{gc}\) is the distance of the cluster from the Sun,
-        and \(\theta_{x0}\) is the angular separation of the source from the center of the cluster.
-
-        If any of these quantities are not been computed yet, they will be computed first.
+        where :math:`R_{los}` is the line-of-sight distance, :math:`R_{2D}` is 
+        the projected distance from the center of the cluster, :math:`R_{gc}` is 
+        the distance of the cluster from the Sun, and :math:`\\theta_{x0}` is 
+        the angular separation of the source from the center of the cluster, if
+        any of these quantities are not been computed yet, they will be computed first.
 
         In any case, the results are stored in the 'r3d' and 'r3d_errors' columns, as for the 
         additional needed quantities, if here computed, will be stored in the 'rlos'
@@ -167,33 +155,57 @@ class Sample:
         if 'rlos' not in self._sample.colnames:
             self.computeDistance()
         if  'r2d' not in self._sample.colnames:
-            if 'angsep' not in self._sample.colnames:
-                self.computeAngularSeparation()
             self.computeProjectedDistance()
         data = [self._sample['rlos'], self._sample['r2d']]
         errs = [self._sample['rlos_errors'], self._sample['r2d_errors']]
         r3d = RadialDistance3D()
+        print('\nComputing Radial Distance...\n')
         r3d.compute(data, errs)
         print('-'*30)
         self._sample['r3d'] = r3d.computed_values
         self._sample['r3d_errors'] = r3d.computed_errors
         return self._sample['r3d', 'r3d_errors'].info()
 
-    def update_gc_params(self, **kwargs):
+    def drop_columns(self, columns:list):
         """
-        Updates the parameters of the cluster object.
+        Drops the specified columns from the sample data.
 
         Parameters
         ----------
-        **kwargs : dict
-            The parameters to update.
+        columns : list
+            List of column names to drop.
         """
-        for key in kwargs:
-            if hasattr(self.gc, key):
-                setattr(self.gc, key, kwargs[key])
-            else:
-                raise AttributeError(f"'Cluster' object has no attribute '{key}'")
-        return self.gc.__str__()
+        self._sample.remove_columns(columns)
+    
+    def info(self, *args):
+        """Returns the info of the sample"""
+        return self._sample.info(*args)
+
+    def join(self, other, inplace:bool=False):
+        """
+        Joins the sample data with another sample data.
+
+        Parameters
+        ----------
+        other : ggcas.Sample
+            The other sample data to join with.
+        inplace : bool
+            If True, the operation is done in place, otherwise a new object is returned.
+
+        Returns
+        -------
+        sample : ggcas.Sample
+            The sample object containing the joined data.
+        """
+        sample = self._sample.to_pandas()
+        other_sample = other.to_pandas()
+        merged = sample.merge(other_sample, how='outer', indicator=True)
+        merged_qtable = QTable.from_pandas(merged)
+        if inplace:
+            self._sample = merged_qtable
+            return merged_qtable
+        else:
+            return Sample(merged_qtable, self.gc)
 
     def to_pandas(self, overwrite:bool=False, *args, **kwargs):
         """
@@ -211,7 +223,7 @@ class Sample:
         df : pandas.DataFrame
             The DataFrame containing the sample data.
         """
-        if isinstance(self._sample, QTable):
+        if isinstance(self._sample, (QTable, Table)):
             pandas_df = self._sample.to_pandas(*args, **kwargs)
             if overwrite:
                 self._table = self._sample
@@ -235,7 +247,7 @@ class Sample:
         table : astropy.Table
             The table containing the sample data.
         """
-        if not isinstance(self._sample, QTable):
+        if not isinstance(self._sample, (QTable, Table)):
             if self._table is not None:
                 if self._table.columns==self._sample.columns:
                     self._sample = self._table
@@ -246,6 +258,46 @@ class Sample:
                     self._sample = QTable.from_pandas(self._sample, *args)
             return self._sample
         else: pass
+
+    def to_numpy(self, columns:List[str]=None):
+        """
+        Converts the sample data to a numpy array.
+
+        Returns
+        -------
+        arr : numpy.ndarray
+            The numpy array containing the sample data.
+        """
+        if columns is not None:
+            return self._sample[columns].to_pandas().to_numpy()
+        else:
+            return self._sample.to_pandas().to_numpy()
+    
+    def reset_sample(self):
+        """Resets the sample to its original state"""
+        self._sample = self._bckupSample.copy()
+
+    def update_gc_params(self, **kwargs):
+        """
+        Updates the parameters of the cluster object.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            The parameters to update.
+        """
+        for key in kwargs:
+            if hasattr(self.gc, key):
+                setattr(self.gc, key, kwargs[key])
+            else:
+                if not self.gc.id=='UntrackedData':
+                    text = self.__get_repr()
+                    text = text.split('\n')[5:]
+                    ptxt = '\n'.join(text)
+                else:
+                    ptxt = ''
+                raise AttributeError(f"'Cluster' object has no attribute '{key}'\n{ptxt}")
+        return self.gc.__str__()
 
 
     def __get_repr(self):

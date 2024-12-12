@@ -54,15 +54,14 @@ class TestRadialDistance2D(unittest.TestCase):
         result = self.radial_distance_2d.compute(data)
         self.assertIsInstance(result, f.RadialDistance2D)
         self.assertNotEqual(result.computed_values, None)
-        #np.testing.assert_array_almost_equal(result.values, np.array([100.33467209]))
 
     def test_compute_error(self):
-        data = [np.array([1.]), np.array([1.])]
-        errors = [np.array([0.01]), np.array([0.01])]
+        data = [np.array([1., 2])]
+        errors = [np.array([0.01, 0.02])]
         result = self.radial_distance_2d.compute(data, errors)
         self.assertIsInstance(result, f.RadialDistance2D)
-        self.assertNotEqual(result.computed_errors, None)
-        #np.testing.assert_array_almost_equal(result.errors, np.array([10.10067046]))
+        assert result.computed_errors is not None
+        #self.assertNotEqual(result.computed_errors, None)
 
 class TestRadialDistance3D(unittest.TestCase):
     def setUp(self):

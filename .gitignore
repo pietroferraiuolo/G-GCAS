@@ -3,4 +3,7 @@ ggcas/data/query/
 ggcas/data/simulations/
 ggcas.egg-info/
 .spyproject/
-
+ggcas/__pycache__
+ggcas/analyzers/__pycache__
+ggcas/analyzers/_Rcode/__pycache__
+ggcas/_utility/__pycache__

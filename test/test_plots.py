@@ -4,6 +4,7 @@ import pandas as pd
 from ggcas import plots as gplt
 from ggcas.statistics import regression
 
+
 class TestPlots(unittest.TestCase):
 
     def setUp(self):
@@ -19,61 +20,98 @@ class TestPlots(unittest.TestCase):
         self.dec = np.random.uniform(-90, 90, 100)
         self.data = np.random.randn(100)
         self.dataerr = np.random.uniform(0.1, 0.5, 100)
-        self.sample = pd.DataFrame({'ra': self.ra, 'dec': self.dec, 'pmra': self.pmra, 'pmdec': self.pmdec})
+        self.sample = pd.DataFrame(
+            {
+                "ra": self.ra,
+                "dec": self.dec,
+                "pmra": self.pmra,
+                "pmdec": self.pmdec,
+                "phot_g_mean_mag": self.g,
+                "bp_rp": self.b_r,
+                "teff_gspphot": self.teff_gspphot,
+            }
+        )
         self.data = np.random.randn(1000)
-
 
     def test_scatter_2hist(self):
         try:
-            gplt.scatter_2hist(self.x, self.y, kde=True, kde_kind='gaussian', xlabel='X Axis', ylabel='Y Axis', title='Scatter 2Hist')
+            gplt.scatter_2hist(
+                self.x,
+                self.y,
+                kde=True,
+                kde_kind="gaussian",
+                xlabel="X Axis",
+                ylabel="Y Axis",
+                title="Scatter 2Hist",
+            )
         except Exception as e:
             self.fail(f"scatter_2hist raised an exception: {e}")
 
     def test_colorMagnitude(self):
         try:
-            gplt.colorMagnitude(self.g, self.b_r, self.teff_gspphot, alpha=0.5, cmap='viridis')
+            gplt.colorMagnitude(
+                self.sample, alpha=0.5, cmap="viridis"
+            )
         except Exception as e:
             self.fail(f"colorMagnitude raised an exception: {e}")
 
     def test_properMotion(self):
         try:
-            gplt.properMotion(self.sample, color='blue', s=10, alpha=0.7)
+            gplt.properMotion(self.sample, color="blue", s=10, alpha=0.7)
         except Exception as e:
             self.fail(f"properMotion raised an exception: {e}")
 
     def test_spatial(self):
         try:
-            gplt.spatial(self.sample, color='red', s=15, alpha=0.6)
+            gplt.spatial(self.sample, color="red", s=15, alpha=0.6)
         except Exception as e:
             self.fail(f"spatial raised an exception: {e}")
 
     def test_histogram(self):
         try:
-            result = gplt.histogram(self.data, kde=True, kde_kind='gaussian', xlabel='Data', out=True)
-            self.assertIn('h', result)
-            self.assertIn('kde', result)
+            result = gplt.histogram(
+                self.data, kde=True, kde_kind="gaussian", xlabel="Data", out=True
+            )
+            self.assertIn("h", result)
+            self.assertIn("kde", result)
         except Exception as e:
             self.fail(f"histogram raised an exception: {e}")
 
     def test_scat_xhist(self):
         try:
-            result = gplt.scat_xhist(self.x, self.y, xerr=0.1, xlabel='X Axis', ylabel='Y Axis')
+            result = gplt.scat_xhist(
+                self.x, self.y, xerr=0.1, xlabel="X Axis", ylabel="Y Axis"
+            )
             self.assertEqual(len(result), 2)
         except Exception as e:
             self.fail(f"scat_xhist raised an exception: {e}")
 
     def test_errorbar(self):
         try:
-            gplt.errorbar(self.y, np.abs(self.y*0.1435), x=self.x, xerr=0.1, fmt='o', color='green', ecolor='black', xlabel='X Axis', ylabel='Y Axis', title='Errorbar Plot')
+            gplt.errorbar(
+                self.y,
+                np.abs(self.y * 0.1435),
+                x=self.x,
+                xerr=0.1,
+                fmt="o",
+                color="green",
+                ecolor="black",
+                xlabel="X Axis",
+                ylabel="Y Axis",
+                title="Errorbar Plot",
+            )
         except Exception as e:
             self.fail(f"errorbar raised an exception: {e}")
 
     def test_regression(self):
-        self.regression_model = regression(self.data, kind='gaussian')
+        self.regression_model = regression(self.data, kind="gaussian")
         try:
-            gplt.regression(self.regression_model, xlabel='X Axis', title='Regression Plot')
+            gplt.regression(
+                self.regression_model, xlabel="X Axis", title="Regression Plot"
+            )
         except Exception as e:
             self.fail(f"regression raised an exception: {e}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

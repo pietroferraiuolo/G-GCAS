@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import sympy as sp
-from ggcas.analyzers.calculus import compute_numerical_function, compute_error, gaus_legendre_integrator, king_integrator
+from ggcas.analyzers.calculus import compute_numerical_function, compute_error, gaus_legendre_integrator
 
 class TestCalculusFunctions(unittest.TestCase):
 
@@ -16,9 +16,9 @@ class TestCalculusFunctions(unittest.TestCase):
         np.testing.assert_array_almost_equal(result, expected)
 
     def test_compute_error(self):
-        x, y = sp.symbols('x y')
+        x, y, e_x, e_y = sp.symbols('x y e_x e_y')
         func = x + y
-        variables = [x, y]
+        variables = [x, y, e_x, e_y]
         var_data = [np.array([1, 2]), np.array([3, 4])]
         var_errors = [np.array([0.1, 0.1]), np.array([0.1, 0.1])]
         result = compute_error(func, variables, var_data, var_errors)
@@ -35,13 +35,6 @@ class TestCalculusFunctions(unittest.TestCase):
         expected = 1/3  # Integral of x^2 from 0 to 1
         self.assertAlmostEqual(result, expected, places=5)
 
-    def test_king_integrator(self):
-        # This test assumes the Fortran90 code and required files are correctly set up.
-        # It will not run correctly in this isolated environment.
-        w0 = 5.0
-        output = 'profile'
-        result = king_integrator(w0, output)
-        self.assertIsInstance(result, str)
 
 if __name__ == '__main__':
     unittest.main()
