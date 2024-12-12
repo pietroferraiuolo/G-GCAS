@@ -115,6 +115,7 @@ def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
         # Call the R function with the data and additional arguments
         fitted_model = genv["GM_model"](r_data, **dict(r_kwargs.items()))
         clusters = None
+    np2r.deactivate()
     return _rm.GMModel(fitted_model, clusters)
 
 
@@ -159,6 +160,7 @@ def regression(data, kind="gaussian", verbose=False):
     r_data = np2r.numpy2rpy(data)
     regression_model = reg_func(r_data, method=kind, verb=verbose)
     model = _rm.RegressionModel(regression_model, type=kind)
+    np2r.deactivate()
     return model
 
 
