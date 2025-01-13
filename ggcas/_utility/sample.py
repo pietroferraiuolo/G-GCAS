@@ -102,7 +102,7 @@ class Sample:
         data = [self._sample['ra'], self._sample['dec']]
         errs = [self._sample['ra_error'], self._sample['dec_error']]
         if 'ra_dec_corr' in self._sample.colnames:
-            corr = self._sample['ra_dec_corr']
+            corr = [self._sample['ra_dec_corr']]
         else:
             corr = None
         print('\nComputing Angular Separation...\n')
@@ -110,7 +110,7 @@ class Sample:
         print('-'*30)
         self._sample['angsep'] = angsep.computed_values
         self._sample['angsep_errors'] = angsep.computed_errors
-        return self._sample[['angsep', 'angsep_errors']].info
+        return self._sample[['angsep', 'angsep_errors']].info()
     
     def computeProjectedDistance(self):
         """

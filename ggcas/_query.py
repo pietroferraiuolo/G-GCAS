@@ -3,7 +3,7 @@ Module: query.py
 
 Author(s)
 ---------
-    - Pietro Ferraiuolo : Written in 2024
+- Pietro Ferraiuolo : Written in 2024
 
 Description
 -----------
