@@ -203,9 +203,14 @@ class Sample:
         merged_qtable = QTable.from_pandas(merged)
         if inplace:
             self._sample = merged_qtable
+            self._merge_info = merged[['SOURCE_ID','_merge']]
+            self.drop_columns(['_merge'])
             return merged_qtable
         else:
-            return Sample(merged_qtable, self.gc)
+            new_sample = Sample(merged_qtable, self.gc)
+            new_sample._merge_info = merged[['SOURCE_ID','_merge']]
+            new_sample.drop_columns(['_merge'])
+            return new_sample
 
     def to_pandas(self, overwrite:bool=False, *args, **kwargs):
         """

@@ -16,11 +16,11 @@ Just import the module
     >>> gplt.scatter_2hist(...) # your data
 
 """
-import os
 import numpy as _np
+import seaborn as sns
 import matplotlib.pyplot as _plt
-from typing import Optional as _Optional, Union as _Union
 from ggcas._utility import osutils as _osu
+from typing import Optional as _Optional, Union as _Union
 from ggcas.statistics import regression as _kde_estimator
 from ggcas.analyzers._Rcode.r2py_models import _kde_labels
 
@@ -38,7 +38,7 @@ title_font = {'family': 'cursive',
 
 default_figure_size = (6.4, 5.2)
 
-def scatter_2hist(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
+def doubleHistScatter(x, y, kde=False, kde_kind:str='gaussian', **kwargs):
     """
     Make a 2D scatter plot of two data arrays, with the respective histogram distributions
     projected on each axis. The kde option allows for regression on the plotted data.
@@ -346,7 +346,7 @@ def histogram(data, kde=False, kde_kind:str='gaussian', out:bool=False, **kwargs
     if out:
         return res
 
-def scat_xhist(x, y, xerr: _Optional[_Union[float, _np.ndarray]] = None, **kwargs):
+def scatterXHist(x, y, xerr: _Optional[_Union[float, _np.ndarray]] = None, **kwargs):
     """
     Make a scatter plot of a quantity 'x', with its projected histogram, relative to a quantity 'y'.
 
@@ -561,3 +561,24 @@ def regression(regression_model, **kwargs):
     rax.plot(rm.x, rm.residuals, 'o-', c=rc, markersize=s, linewidth=1., alpha=0.8)
     fig.suptitle(title, size=20, style='italic', family='cursive')
     fig.show()
+
+def seaborn(type:str, *args, **kwargs):
+    """
+    Wrapper to make a seaborn plot.
+
+    Check seaborn 
+    <a href="https://seaborn.pydata.org/index.html">documentation</a>
+    for more info on plot types and parameters.
+
+    Parameters
+    ----------
+    type : str
+        The type of seaborn plot to be made.
+    
+    Other Parameters
+    ----------------
+    *args : Additional arguments for the seaborn plot.
+    **kwargs : Additional parameters for customizing the plot.
+    """
+    plot_call = getattr(sns, type)
+    plot_call(*args, **kwargs)
