@@ -2,6 +2,8 @@ docs/build/
 ggcas/data/query/
 ggcas/data/simulations/
 ggcas.egg-info/
+ggcas.egg-info/PKG-INFO
+ggcas.egg-info/SOURCES.txt
 .spyproject/
 ggcas/__pycache__
 ggcas/analyzers/__pycache__
