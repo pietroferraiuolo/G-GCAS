@@ -1,3 +1,24 @@
+"""
+::module..ggcas._utility.sample
+
+sample.py
+=========
+
+
+Author(s):
+----------
+- Pietro Ferraiuolo : Written in 2024
+
+Description:
+------------
+This module provides a class for handling the query result sample. The class
+unifies the Cluster object and the sample data obtained, in order to have a
+compact object which has everything and from which quantities can be computed
+easily.
+
+
+"""
+
 import pandas as _pd
 from typing import List
 from ggcas._cluster import Cluster
@@ -9,7 +30,7 @@ class Sample:
     """
     Class for handling the query result sample.
 
-    it is an object with unifies the Cluster object and the sample data obtained,
+    It is an object with unifies the Cluster object and the sample data obtained,
     in order to have a compact object which has everythin and from which quantities
     can be computed easily.
 
@@ -18,7 +39,7 @@ class Sample:
     gc : ggcas.cluster.Cluster
         Globular cluster object used for the query.
     sample : astropy.table.Table
-        Table containing the retrieve sample's data.
+        Table containing the retrieved sample's data.
     """
     def __init__(self, sample, gc:Optional[Union[Cluster,str]]=None):
         """The constructor"""
