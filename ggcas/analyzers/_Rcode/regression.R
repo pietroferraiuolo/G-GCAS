@@ -130,16 +130,6 @@ regression <- function(data, method, verb = FALSE) {
                          trace = verb)
     out <- predict(fit_poisson)
     coefficients <- coef(fit_poisson)
-  } else if (method == "linear") {
-    linear <- function(x, a, b) {
-      a * x + b
-    }
-    fit_linear <- nlsLM(y ~ linear(x, a, b),
-                        start = list(a = max(y), b = 0),
-                        control = maxiter,
-                        trace = verb)
-    out <- predict(fit_linear)
-    coefficients <- coef(fit_linear)
   } else {
     stop("Unknown method")
   }
@@ -149,6 +139,19 @@ regression <- function(data, method, verb = FALSE) {
          x = x,
          y = out,
          coeffs = coefficients,
+         residuals = residuals)
+  )
+}
+
+linear_regression <- function(data, method = "linear", verb = FALSE) {
+  # method is a dummy argument for the python interface
+  fit <- lm(data ~ 1)
+  residuals <- residuals(fit)
+  return(
+    list(data = data,
+         x = data,
+         y = fitted(fit),
+         coeffs = coef(fit),
          residuals = residuals)
   )
 }

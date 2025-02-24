@@ -153,7 +153,10 @@ def regression(data, kind="gaussian", verbose: bool = True):
     np2r.activate()
     regression_code = _os.path.join(_RSF, "regression.R")
     R(f'source("{regression_code}")')
-    reg_func = genv["regression"]
+    if not kind=='linear':
+        reg_func = genv["regression"]
+    else:
+        reg_func = genv["linear_regression"]
     r_data = np2r.numpy2rpy(data)
     regression_model = reg_func(r_data, method=kind, verb=verbose)
     model = _rm.RegressionModel(regression_model, type=kind)
