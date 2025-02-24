@@ -33,19 +33,19 @@ class TestPlots(unittest.TestCase):
         )
         self.data = np.random.randn(1000)
 
-    def test_scatter_2hist(self):
+    def test_doubleHistScatter(self):
         try:
-            gplt.scatter_2hist(
+            gplt.doubleHistScatter(
                 self.x,
                 self.y,
                 kde=True,
                 kde_kind="gaussian",
                 xlabel="X Axis",
                 ylabel="Y Axis",
-                title="Scatter 2Hist",
+                title="doubleHistScatter",
             )
         except Exception as e:
-            self.fail(f"scatter_2hist raised an exception: {e}")
+            self.fail(f"doubleHistScatter raised an exception: {e}")
 
     def test_colorMagnitude(self):
         try:
@@ -77,14 +77,14 @@ class TestPlots(unittest.TestCase):
         except Exception as e:
             self.fail(f"histogram raised an exception: {e}")
 
-    def test_scat_xhist(self):
+    def test_scatXHist(self):
         try:
-            result = gplt.scat_xhist(
+            result = gplt.scatterXHist(
                 self.x, self.y, xerr=0.1, xlabel="X Axis", ylabel="Y Axis"
             )
             self.assertEqual(len(result), 2)
         except Exception as e:
-            self.fail(f"scat_xhist raised an exception: {e}")
+            self.fail(f"scatXHist raised an exception: {e}")
 
     def test_errorbar(self):
         try:
