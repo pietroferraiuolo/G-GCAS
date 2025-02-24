@@ -620,9 +620,12 @@ def regression(regression_model, **kwargs):
     )
     fig.subplots_adjust(hspace=0)
     # data & fit plots
-    fax.hist(
-        rm.data, bins=len(rm.y), color=pc, histtype="step", alpha=0.85, label="Data"
-    )
+    if rm.kind=='linear':
+        fax.plot(rm.data, c=pc, markersize=s, linewidth=1.0, alpha=0.8, label='Data')
+    else:
+        fax.hist(
+            rm.data, bins=len(rm.y), color=pc, histtype="step", alpha=0.85, label="Data"
+        )
     fax.plot(
         rm.x, rm.y, c=fc, linestyle="dashed", label=_kde_labels(rm.kind, rm.coeffs)
     )

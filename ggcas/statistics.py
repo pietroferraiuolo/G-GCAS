@@ -114,7 +114,9 @@ def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
     return _rm.GMModel(fitted_model, clusters)
 
 
-def regression(data, kind="gaussian", verbose=False):
+# TODO
+# FIX THE REGRESSION R FUNCTION FOR BETTER HANDLING THE LINEAR CASE
+def regression(data, kind="gaussian", verbose: bool = True):
     """
     Regression model estimation function.
 
