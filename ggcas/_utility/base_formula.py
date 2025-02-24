@@ -91,7 +91,7 @@ class BaseFormula(ABC):
         correlations: List[ArrayLike] = None,
     ) -> ArrayLike:
         """
-        Compute the values of the formula, along with the propagated errors if 
+        Compute the values of the formula, along with the propagated errors if
         variables errors (and correlation) are provided.
 
         Parameters
@@ -108,12 +108,17 @@ class BaseFormula(ABC):
         result : ArrayLike
             The computed values.
         """
-        print(f"""WARNING! Be sure that the input data follow this specific order: 
-Data:         {self.variables}""")
+        print(
+            f"""WARNING! Be sure that the input data follow this specific order: 
+Data:         {self.variables}"""
+        )
         if errors is not None:
-            print(f"""Errors:       {self._errVariables}
+            print(
+                f"""Errors:       {self._errVariables}
 Correlations: {self._correlations}
-"""+'-'*30)
+"""
+                + "-" * 30
+            )
             variables = self._variables + self._errVariables
             print("Errors:")
             if self._correlations is None:

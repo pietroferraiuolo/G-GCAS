@@ -13,14 +13,17 @@ Examples
 --------
 
 """
+
 import os
 from astropy.table import QTable
 import datetime as dt
 from ggcas._utility import folder_paths as fn
-datapath    = fn.BASE_DATA_PATH
-querypath   = fn.QUERY_DATA_FOLDER
 
-def load_data(tn, name:str=None, format='ascii.tab'):
+datapath = fn.BASE_DATA_PATH
+querypath = fn.QUERY_DATA_FOLDER
+
+
+def load_data(tn, name: str = None, format="ascii.tab"):
     """
     Loads the data found in the file as an astropy quantity table.
 
@@ -40,13 +43,14 @@ def load_data(tn, name:str=None, format='ascii.tab'):
     data : astropy table
         The loaded data of the file.
     """
-    file_name = 'query_data.txt' if name is None else name
+    file_name = "query_data.txt" if name is None else name
     file_path = _findTracknum(tn, complete_path=True)
     file = os.path.join(file_path, file_name)
     data = QTable.read(file, format=format)
     return data
 
-def get_file_list(tn=None, fold=None, key:str=None):
+
+def get_file_list(tn=None, fold=None, key: str = None):
     """
     Returns the file list of a given globular cluster datapath.
 
@@ -106,45 +110,52 @@ def get_file_list(tn=None, fold=None, key:str=None):
 
     These are the folders of the clusters which have king-model data available. indeed,
     if we check:
-        
+
         >>> get_file_list(fold=fold_list[0])
         ['.../G-GCAS/ggcas/data/models/NGC104/SM_king.txt']
     """
     if tn is None and fold is not None:
-        fl = sorted([os.path.join(fold, file) \
-                     for file in os.listdir(fold)])
+        fl = sorted([os.path.join(fold, file) for file in os.listdir(fold)])
     else:
         if fold is None:
             fold = _findTracknum(tn, complete_path=True)
-            fl = sorted([os.path.join(fold, tn, file) \
-                         for file in os.listdir(os.path.join(fold, tn))])
+            fl = sorted(
+                [
+                    os.path.join(fold, tn, file)
+                    for file in os.listdir(os.path.join(fold, tn))
+                ]
+            )
         else:
             try:
                 paths = _findTracknum(tn, complete_path=True)
                 if isinstance(paths, str):
                     paths = [paths]
                 for path in paths:
-                    if fold in path.split('/')[-2]:
-                        fl = sorted([os.path.join(path, file) \
-                                                 for file in os.listdir(path)])
+                    if fold in path.split("/")[-2]:
+                        fl = sorted(
+                            [os.path.join(path, file) for file in os.listdir(path)]
+                        )
                     else:
                         raise Exception
             except Exception as exc:
-                raise FileNotFoundError(f"Invalid Path: no data found for '.../{fold}/{tn}'") from exc
+                raise FileNotFoundError(
+                    f"Invalid Path: no data found for '.../{fold}/{tn}'"
+                ) from exc
     if key is not None:
         try:
             selected_list = []
             for file in fl:
-                if key in file.split('/')[-1]:
+                if key in file.split("/")[-1]:
                     selected_list.append(file)
         except TypeError as err:
             raise TypeError("'key' argument must be a string") from err
         fl = selected_list
-    if len(fl)==1:
+    if len(fl) == 1:
         fl = fl[0]
     return fl
 
-def get_kwargs(names:tuple, default, kwargs):
+
+def get_kwargs(names: tuple, default, kwargs):
     """
     Gets a tuple of possible kwargs names for a variable and checks if it was
     passed, and in case returns it.
@@ -171,7 +182,8 @@ def get_kwargs(names:tuple, default, kwargs):
             return kwargs[key]
     return default
 
-def tnlist(gc_name:str):
+
+def tnlist(gc_name: str):
     """
     Returns the list of tracking numbers for a given globular cluster.
 
@@ -191,6 +203,7 @@ def tnlist(gc_name:str):
     tns = sorted([os.path.join(basepath, tt) for tt in tn])
     return tns
 
+
 def _timestamp():
     """
     Creates a new tracking number in the format 'yyyymmdd_HHMMSS'
@@ -204,8 +217,8 @@ def _timestamp():
     tn = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
     return tn
 
-def _findTracknum(tn, complete_path:bool=True):
 
+def _findTracknum(tn, complete_path: bool = True):
     """
     Search for the tracking number given in input within all the data path subfolders.
 
@@ -226,7 +239,7 @@ def _findTracknum(tn, complete_path:bool=True):
     """
     tn_path = []
     for data_type in os.listdir(datapath):
-        querypath = os.path.join(datapath, data_type)    
+        querypath = os.path.join(datapath, data_type)
         for fold in os.listdir(querypath):
             search_fold = os.path.join(querypath, fold)
             if tn in os.listdir(search_fold):
@@ -235,6 +248,6 @@ def _findTracknum(tn, complete_path:bool=True):
                 else:
                     tn_path.append(fold)
     path_list = sorted(tn_path)
-    if len(path_list)==1:
+    if len(path_list) == 1:
         path_list = path_list[0]
     return path_list

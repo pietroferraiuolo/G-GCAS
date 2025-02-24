@@ -243,7 +243,8 @@ def _kde_labels(kind: str, coeffs):
     """
     def _format_number(num):
         """
-        Format the number using scientific notation if it is too large or too small.
+        Format the number using scientific notation if it is too large or too
+        small.
         """
         if abs(num) < 1e-3 or abs(num) > 1e3:
             return f"{num:.2e}"

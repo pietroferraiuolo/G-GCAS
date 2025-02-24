@@ -60,7 +60,8 @@ object:
     150 ebpminrp_gspphot_upper
     151 libname_gspphot
 """
-import os 
+
+import os
 import numpy as np
 import pandas as _pd
 import configparser
@@ -72,10 +73,12 @@ from astroquery.gaia import Gaia
 from ggcas._cluster import Cluster
 from typing import Optional, Union
 from ggcas._utility.osutils import _timestamp
-_QDATA = 'query_data.txt'
-_QINFO = 'query_info.ini'
 
-def available_tables(key:str=None):
+_QDATA = "query_data.txt"
+_QINFO = "query_info.ini"
+
+
+def available_tables(key: str = None):
     """
     Prints out the complete list of data tables present in the Gaia archive.
 
@@ -96,6 +99,7 @@ def available_tables(key:str=None):
     else:
         for table in tables:
             print(table.name)
+
 
 class GaiaQuery:
     """
@@ -165,6 +169,7 @@ class GaiaQuery:
     and its information, such as the parameters used.
 
     """
+
     def __init__(self, gaia_table: Optional[Union[str, list]] = "gaiadr3.gaia_source"):
         """
         The Constructor
@@ -177,17 +182,15 @@ class GaiaQuery:
         """
         Gaia.MAIN_GAIA_TABLE = gaia_table
         Gaia.ROW_LIMIT = -1
-        self._table     = gaia_table
-        self._path      = BASE_DATA_PATH
-        self._fold      = None
+        self._table = gaia_table
+        self._path = BASE_DATA_PATH
+        self._fold = None
         self._queryInfo = {}
-        self._baseQ     = \
-"""SELECT {data}
+        self._baseQ = """SELECT {data}
 FROM {table}
 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
     {cond}"""
-        self._joinQ     = \
-"""SELECT {data}
+        self._joinQ = """SELECT {data}
 FROM {table}
 WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRCLE('ICRS',{circle}))=1
     {cond}"""
@@ -203,7 +206,13 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         """The string representation"""
         return self.__get_str()
 
-    def free_query(self, radius, gc:Optional[Union[Cluster,str]]=None, save:bool=False, **kwargs):
+    def free_query(
+        self,
+        radius,
+        gc: Optional[Union[Cluster, str]] = None,
+        save: bool = False,
+        **kwargs,
+    ):
         """
         This function allows to perform an ADQL search into the Gaia catalogue with
         personalized parameters, such as data to collect and conditions to apply.
@@ -249,32 +258,36 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
             Result of the async query, stored into an astropy table.
 
         """
-        ra,dec,savename=self._get_coordinates(gc)
+        ra, dec, savename = self._get_coordinates(gc)
         self._queryInfo = {
-            'Scan Info': {
-                'RA': ra,
-                'DEC': dec,
-                'Scan Radius': radius
-                },
-            'Flag': {'Query': 'free'}
-            }
-        dat = get_kwargs(('data', 'dat','params', 'parameters'), 'source_id', kwargs)
-        self._queryInfo['Scan Info']['Data Acquired'],_ = self._formatCheck(dat, 'None')
-        cond = get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
+            "Scan Info": {"RA": ra, "DEC": dec, "Scan Radius": radius},
+            "Flag": {"Query": "free"},
+        }
+        dat = get_kwargs(("data", "dat", "params", "parameters"), "source_id", kwargs)
+        self._queryInfo["Scan Info"]["Data Acquired"], _ = self._formatCheck(
+            dat, "None"
+        )
+        cond = get_kwargs(("cond", "conds", "conditions", "condition"), "None", kwargs)
         if isinstance(cond, list):
-            ccond = ''
-            for c in range(len(cond)-1):
-                ccond += cond[c]+', '
+            ccond = ""
+            for c in range(len(cond) - 1):
+                ccond += cond[c] + ", "
             ccond += cond[-1]
-            self._queryInfo['Scan Info']['Conditions Applied'] = ccond
+            self._queryInfo["Scan Info"]["Conditions Applied"] = ccond
         else:
-            self._queryInfo['Scan Info']['Conditions Applied'] = cond
+            self._queryInfo["Scan Info"]["Conditions Applied"] = cond
         samp = self._run_query(savename, ra, dec, radius, dat, cond, save)
         sample = Sample(samp, gc=gc)
-        sample.qinfo = self._queryInfo['Scan Info']
+        sample.qinfo = self._queryInfo["Scan Info"]
         return sample
 
-    def get_astrometry(self, radius, gc:Optional[Union[Cluster,str]]=None, save:bool=False, **kwargs):
+    def get_astrometry(
+        self,
+        radius,
+        gc: Optional[Union[Cluster, str]] = None,
+        save: bool = False,
+        **kwargs,
+    ):
         """
         A pre-constructed ADQL search into the Gaia catalogue with fixed data
         retrieved, which is the principal astrometric parameters, with the possibility
@@ -316,32 +329,40 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         astro_cluster : astropy.Table
             Astropy table with  the query results.
         """
-        ra,dec,savename=self._get_coordinates(gc)
-        astrometry = 'source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error'
+        ra, dec, savename = self._get_coordinates(gc)
+        astrometry = "source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error"
         self._queryInfo = {
-            'Scan Info': {
-                'RA': ra,
-                'DEC': dec,
-                'Scan Radius': radius,
-                'Data Acquired': astrometry
-                },
-            'Flag': {'Query': 'astrometry'}
-            }
-        cond = get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
+            "Scan Info": {
+                "RA": ra,
+                "DEC": dec,
+                "Scan Radius": radius,
+                "Data Acquired": astrometry,
+            },
+            "Flag": {"Query": "astrometry"},
+        }
+        cond = get_kwargs(("cond", "conds", "conditions", "condition"), "None", kwargs)
         if isinstance(cond, list):
-            ccond = ''
-            for c in range(len(cond)-1):
-                ccond += (cond[c]+', ')
+            ccond = ""
+            for c in range(len(cond) - 1):
+                ccond += cond[c] + ", "
             ccond += cond[-1]
-            self._queryInfo['Scan Info']['Conditions Applied'] = ccond
+            self._queryInfo["Scan Info"]["Conditions Applied"] = ccond
         else:
-            self._queryInfo['Scan Info']['Conditions Applied'] = cond
-        astro_cluster = self._run_query(savename, ra, dec, radius, astrometry, cond, save)
+            self._queryInfo["Scan Info"]["Conditions Applied"] = cond
+        astro_cluster = self._run_query(
+            savename, ra, dec, radius, astrometry, cond, save
+        )
         astro_sample = Sample(astro_cluster, gc=gc)
-        astro_sample.qinfo = self._queryInfo['Scan Info']
+        astro_sample.qinfo = self._queryInfo["Scan Info"]
         return astro_sample
 
-    def get_photometry(self, radius, gc:Optional[Union[Cluster,str]]=None, save:str=False, **kwargs):
+    def get_photometry(
+        self,
+        radius,
+        gc: Optional[Union[Cluster, str]] = None,
+        save: str = False,
+        **kwargs,
+    ):
         """
         A pre-constructed ADQL search into the Gaia catalogue with fixed data
         retrieved, which is the principal photometric parameters, with the possibility
@@ -383,32 +404,40 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         photo_cluster : astropy.Table
             Astropy table with the results.
         """
-        ra,dec,savename=self._get_coordinates(gc)
-        photometry = 'source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot'
+        ra, dec, savename = self._get_coordinates(gc)
+        photometry = "source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot"
         self._queryInfo = {
-            'Scan Info': {
-                'RA': ra,
-                'DEC': dec,
-                'Scan Radius': radius,
-                'Data Acquired': photometry
-                },
-            'Flag': {'Query': 'photometry'}
-            }
-        cond = get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
+            "Scan Info": {
+                "RA": ra,
+                "DEC": dec,
+                "Scan Radius": radius,
+                "Data Acquired": photometry,
+            },
+            "Flag": {"Query": "photometry"},
+        }
+        cond = get_kwargs(("cond", "conds", "conditions", "condition"), "None", kwargs)
         if isinstance(cond, list):
-            ccond = ''
-            for c in range(len(cond)-1):
-                ccond += cond[c]+', '
+            ccond = ""
+            for c in range(len(cond) - 1):
+                ccond += cond[c] + ", "
             ccond += cond[-1]
-            self._queryInfo['Scan Info']['Conditions Applied'] = ccond
+            self._queryInfo["Scan Info"]["Conditions Applied"] = ccond
         else:
-            self._queryInfo['Scan Info']['Conditions Applied'] = cond
-        photo_cluster = self._run_query(savename, ra, dec, radius, photometry, cond, save)
+            self._queryInfo["Scan Info"]["Conditions Applied"] = cond
+        photo_cluster = self._run_query(
+            savename, ra, dec, radius, photometry, cond, save
+        )
         phot_sample = Sample(photo_cluster, gc=gc)
-        phot_sample.qinfo = self._queryInfo['Scan Info']
+        phot_sample.qinfo = self._queryInfo["Scan Info"]
         return phot_sample
 
-    def get_rv(self, radius, gc:Optional[Union[Cluster,str]]=None, save:bool=False, **kwargs):
+    def get_rv(
+        self,
+        radius,
+        gc: Optional[Union[Cluster, str]] = None,
+        save: bool = False,
+        **kwargs,
+    ):
         """
         A pre-constructed ADQL search into the Gaia catalogue with fixed data
         retrieved, which is the radial velociti parameter with its error, with
@@ -448,29 +477,29 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         rv_cluster : astropy.Table
             Astropy t able with te result.
         """
-        ra,dec,savename=self._get_coordinates(gc)
-        rv = 'source_id, radial_velocity, radial_velocity_error'
+        ra, dec, savename = self._get_coordinates(gc)
+        rv = "source_id, radial_velocity, radial_velocity_error"
         self._queryInfo = {
-            'Scan Info': {
-                'RA': ra,
-                'DEC': dec,
-                'Scan Radius': radius,
-                'Data Acquired': rv
-                },
-            'Flag': {'Query': 'radvel'}
-            }
-        cond = get_kwargs(('cond', 'conds', 'conditions', 'condition'), 'None', kwargs)
+            "Scan Info": {
+                "RA": ra,
+                "DEC": dec,
+                "Scan Radius": radius,
+                "Data Acquired": rv,
+            },
+            "Flag": {"Query": "radvel"},
+        }
+        cond = get_kwargs(("cond", "conds", "conditions", "condition"), "None", kwargs)
         if isinstance(cond, list):
-            ccond = ''
-            for c in range(len(cond)-1):
-                ccond += cond[c]+', '
+            ccond = ""
+            for c in range(len(cond) - 1):
+                ccond += cond[c] + ", "
             ccond += cond[-1]
-            self._queryInfo['Scan Info']['Conditions Applied'] = ccond
+            self._queryInfo["Scan Info"]["Conditions Applied"] = ccond
         else:
-            self._queryInfo['Scan Info']['Conditions Applied'] = cond
+            self._queryInfo["Scan Info"]["Conditions Applied"] = cond
         rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
         rv_sample = Sample(rv_cluster, gc=gc)
-        rv_sample.qinfo = self._queryInfo['Scan Info']
+        rv_sample.qinfo = self._queryInfo["Scan Info"]
         return rv_sample
 
     def _run_query(self, gc_id, ra, dec, radius, data, cond, save):
@@ -506,15 +535,17 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
             if save:
                 self._saveQuery(sample, gc_id)
         else:
-            print(f"""Found data with the same conditions for object {gc_id} in
+            print(
+                f"""Found data with the same conditions for object {gc_id} in
 {check[1]}.
-Loading it...""")
+Loading it..."""
+            )
             sample = load_data(check[1])
             self.last_result = check[1]
             print(f"Sample number of sources: {len(sample):d}")
         return sample
 
-    def _saveQuery(self, dat, name:str):
+    def _saveQuery(self, dat, name: str):
         """
         Routine for saving the query with its information, in the 'query_data.txt'
         and 'query_info.txt' files
@@ -536,10 +567,10 @@ Loading it...""")
         info = os.path.join(tnfold, _QINFO)
         if isinstance(dat, Table) is False:
             dat = Table(dat)
-        dat.write(data, format='ascii.tab')
+        dat.write(data, format="ascii.tab")
         for section, options in self._queryInfo.items():
             config[section] = options
-        with open(info, 'w', encoding='UTF-8') as configfile:
+        with open(info, "w", encoding="UTF-8") as configfile:
             config.write(configfile)
         print(data)
         print(info)
@@ -560,7 +591,9 @@ Loading it...""")
             print(f"Path '{self._fold}' did not exist. Created.")
         return self._fold
 
-    def _formatCheck(self, data: Optional[Union[str,list]], conditions: Optional[Union[str,list]]):
+    def _formatCheck(
+        self, data: Optional[Union[str, list]], conditions: Optional[Union[str, list]]
+    ):
         """
         Function to check and correct the format the 'data' and 'conditions'
         variables were imput with.
@@ -581,28 +614,36 @@ Loading it...""")
             The correct format for the conditions variable.
 
         """
-        dat  = ''
-        cond = ''
+        dat = ""
+        cond = ""
         if data is not None:
             if isinstance(data, list):
-                for i in range(len(data)-1):
-                    dat += data[i]+', '
+                for i in range(len(data) - 1):
+                    dat += data[i] + ", "
                 dat += data[-1]
-            else: dat=data
-        else: dat='source_id'
-        if conditions != 'None':
+            else:
+                dat = data
+        else:
+            dat = "source_id"
+        if conditions != "None":
             if isinstance(conditions, str):
-                conditions = conditions.split(',')
-                cond = 'AND '
-                for i in range(len(conditions)-1):
-                    cond += conditions[i]+"""
+                conditions = conditions.split(",")
+                cond = "AND "
+                for i in range(len(conditions) - 1):
+                    cond += (
+                        conditions[i]
+                        + """
     AND """
+                    )
                 cond += conditions[-1]
             else:
-                cond = 'AND '
-                for i in range(len(conditions)-1):
-                    cond += conditions[i]+"""
+                cond = "AND "
+                for i in range(len(conditions) - 1):
+                    cond += (
+                        conditions[i]
+                        + """
     AND """
+                    )
                 cond += conditions[-1]
         return dat, cond
 
@@ -633,12 +674,14 @@ Loading it...""")
         if isinstance(ra, u.Quantity):
             ra = ra / u.deg
         if isinstance(dec, u.Quantity):
-            dec= dec / u.deg
+            dec = dec / u.deg
         if isinstance(radius, u.Quantity):
-            radius  = radius / u.deg
-        circle  = f"{ra},{dec},{radius:.3f}"
+            radius = radius / u.deg
+        circle = f"{ra},{dec},{radius:.3f}"
         dat, cond = self._formatCheck(data, conditions)
-        query = self._baseQ.format(data=dat, table=self._table, circle=circle, cond=cond)
+        query = self._baseQ.format(
+            data=dat, table=self._table, circle=circle, cond=cond
+        )
         self.last_query = query
         return query
 
@@ -665,17 +708,17 @@ Loading it...""")
 
         """
         if gc is None:
-            ra = kwargs.get('ra', None)
-            dec = kwargs.get('dec', None)
+            ra = kwargs.get("ra", None)
+            dec = kwargs.get("dec", None)
             gc = Cluster(ra=ra, dec=dec)
-            savename = kwargs.get('name', 'UntrackedData')
+            savename = kwargs.get("name", "UntrackedData")
         else:
             if isinstance(gc, Cluster):
                 ra = gc.ra
                 dec = gc.dec
                 savename = gc.id
             elif isinstance(gc, str):
-                gc=Cluster(gc)
+                gc = Cluster(gc)
                 ra = gc.ra
                 dec = gc.dec
                 savename = gc.id
@@ -708,16 +751,19 @@ Loading it...""")
             if os.path.exists(file_path):
                 config.read(file_path)
                 try:
-                    data_acquired = config['Scan Info']['Data Acquired']
-                    conditions_applied = config['Scan Info']['Conditions Applied']
-                    scan_radius = config['Scan Info']['Scan Radius']
+                    data_acquired = config["Scan Info"]["Data Acquired"]
+                    conditions_applied = config["Scan Info"]["Conditions Applied"]
+                    scan_radius = config["Scan Info"]["Scan Radius"]
                 except KeyError as e:
                     print(f"Key error: {e}")
                     continue
-                if (data_acquired == self._queryInfo['Scan Info']['Data Acquired'] and
-                    conditions_applied == self._queryInfo['Scan Info']['Conditions Applied'] and
-                    scan_radius == str(self._queryInfo['Scan Info']['Scan Radius'])):
-                    check = (True, tn.split('/')[-1])
+                if (
+                    data_acquired == self._queryInfo["Scan Info"]["Data Acquired"]
+                    and conditions_applied
+                    == self._queryInfo["Scan Info"]["Conditions Applied"]
+                    and scan_radius == str(self._queryInfo["Scan Info"]["Scan Radius"])
+                ):
+                    check = (True, tn.split("/")[-1])
                     break
         return check
 
@@ -734,13 +780,19 @@ Loading it...""")
     def __get_repr(self):
         """Get text for '__repr__' method"""
         table = self.__load_table()
-        text = ''
+        text = ""
         if isinstance(table, np.ndarray):
             for t in table:
-                text += f"\n{t.name.upper()}\n"+'-'*len(t.name)+f"\n{t.description}\n"
-        else :
-            text = f"{table.name.upper()}\n"+'-'*len(table.name)+f"\n{table.description}"
-        text += '\n \n<ggcas.query.GaiaQuery class>'
+                text += (
+                    f"\n{t.name.upper()}\n" + "-" * len(t.name) + f"\n{t.description}\n"
+                )
+        else:
+            text = (
+                f"{table.name.upper()}\n"
+                + "-" * len(table.name)
+                + f"\n{table.description}"
+            )
+        text += "\n \n<ggcas.query.GaiaQuery class>"
         return text
 
     def __get_str(self):
@@ -748,29 +800,28 @@ Loading it...""")
         tables = self.__load_table()
         if isinstance(tables, np.ndarray):
             cols = np.zeros(tables.shape[0], dtype=list)
-            text = ''
+            text = ""
             for t in tables:
-                text += f"{t.name.upper()}"+' '*10
-            for i,table in enumerate(tables):
+                text += f"{t.name.upper()}" + " " * 10
+            for i, table in enumerate(tables):
                 cols[i] = []
                 for columns in table.columns:
                     cols[i].append(f"{columns.name}")
-            line=''
+            line = ""
             for i in range(len(cols[0])):
                 for t, n in enumerate(cols):
                     try:
-                        tab = " "*(max([len(c) for c in (n)]) - len(n[i]) +2)
-                        line += f"{n[i]}"+tab
+                        tab = " " * (max([len(c) for c in (n)]) - len(n[i]) + 2)
+                        line += f"{n[i]}" + tab
                     except IndexError:
-                        tab = " "*(len(tables[t].name)+10)
-                        line += "--"+tab
-                line += '\n'
-            text += ('\n'+line)
+                        tab = " " * (len(tables[t].name) + 10)
+                        line += "--" + tab
+                line += "\n"
+            text += "\n" + line
         else:
             text = ""
-            i=0
+            i = 0
             for column in tables.columns:
                 text += f"{i} {column.name}\n"
-                i+=1
+                i += 1
         return text
-

@@ -8,15 +8,17 @@ Description
 This module contains R libraries implementation checks
 for the G-GCAS package.
 """
+from logging import ERROR
 from typing import Union
-from rpy2.robjects.packages import importr
+from rpy2.robjects.packages import importr, isinstalled, LibraryError
 from rpy2.rinterface_lib.callbacks import logger as rpy2_logger
-import logging
+
 # Disable unnecessary R logging
-rpy2_logger.setLevel(logging.ERROR)
+rpy2_logger.setLevel(ERROR)
 
 utils = importr('utils')
 utils.chooseCRANmirror(ind=1)
+
 
 def check_packages(packages:Union[str, list[str]]) -> None:
     """
@@ -34,10 +36,14 @@ def check_packages(packages:Union[str, list[str]]) -> None:
     if isinstance(packages, str):
         packages = [packages]
     for package in packages:
-        try:
-            importr(package)
-        except:
+        if not isinstalled(package):
             print(f"Package '{package}' is not installed.\nInstalling it now...")
             utils.install_packages(package)
-            importr(package)
             print(f"Package '{package}' installed.")
+        try:
+            importr(package)
+        except LibraryError as e:
+            raise LibraryError(
+                f"Package `{package}` installed but failed to import") from e
+        print(f"Correctly imported `{package}`.")
+            

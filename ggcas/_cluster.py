@@ -27,7 +27,12 @@ import os, shutil, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.table import Table
-from ggcas._utility import CLUSTER_DATA_FOLDER, CLUSTER_MODEL_FOLDER, CATALOG_FILE, UNTRACKED_DATA_FOLDER
+from ggcas._utility import (
+    CLUSTER_DATA_FOLDER,
+    CLUSTER_MODEL_FOLDER,
+    CATALOG_FILE,
+    UNTRACKED_DATA_FOLDER,
+)
 from ggcas.analyzers.king import king_integrator
 from ggcas.plots import label_font, title_font
 

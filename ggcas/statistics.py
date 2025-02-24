@@ -17,20 +17,13 @@ import os as _os
 import time as _time
 import numpy as _np
 import pandas as _pd
-from ggcas.analyzers._Rcode import (
-    check_packages, 
-    r2py_models as _rm
-)
+from ggcas.analyzers._Rcode import check_packages, r2py_models as _rm
 from astropy.table import Table as _Table
 from ggcas._utility import R_SOURCE_FOLDER as _RSF
 import rpy2.robjects as _ro
 from astroML.density_estimation import XDGMM
-from rpy2.robjects import (
-    pandas2ri as pd2r, 
-    numpy2ri as np2r, 
-    r as R, 
-    globalenv as genv
-)
+from rpy2.robjects import pandas2ri as pd2r, numpy2ri as np2r, r as R, globalenv as genv
+
 
 def XD_estimator(data, errors, correlations=None, *xdargs):
     """
@@ -38,7 +31,7 @@ def XD_estimator(data, errors, correlations=None, *xdargs):
 
     This function fits an eXtreme Deconvolution Gaussian Mixture Model (XDGMM)
     to the input data. The XDGMM, part of the astroML package, is a probabilistic
-    model that can be used to estimate the underlying distribution of a dataset, 
+    model that can be used to estimate the underlying distribution of a dataset,
     taking into account measurement errors and correlations between features.
 
     Parameters
@@ -105,7 +98,9 @@ def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
         # Convert kwargs to R list
         r_kwargs = _ro.vectors.ListVector(kwargs)
         # Call the R function with the data and additional arguments
-        fitted_model = genv["GaussianMixtureModel"](r_data, r_fit_data, **dict(r_kwargs.items()))
+        fitted_model = genv["GaussianMixtureModel"](
+            r_data, r_fit_data, **dict(r_kwargs.items())
+        )
         clusters = fitted_model.rx2("cluster")
         fitted_model = fitted_model.rx2("model")
     else:
@@ -173,7 +168,7 @@ def _data_format_check(data):
     ----------
     data : numpy.ndarray, list, astropy.table.Table, pandas.DataFrame
         The data whose format has to be checked.
-    
+
     Returns:
     -------
     data : numpy.ndarray

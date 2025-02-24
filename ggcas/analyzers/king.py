@@ -4,10 +4,11 @@ from ggcas._utility import get_file_list, KING_INTEGRATOR_FOLDER
 _king_dir = KING_INTEGRATOR_FOLDER
 _king_exe = os.path.join(_king_dir, 'king_integrator')
 
+
 def king_integrator(w0, output='profile'):
     r"""
-    This function calls a Fortran90 code for the Single-Mass King model integration
-    routine.
+    This function calls a Fortran90 code for the Single-Mass King model 
+    integration routine.
 
     Taking as imput a value for the King $W_0$ parameter, it will perform the
     integration of the model, producing a series of output data files, described
@@ -29,7 +30,7 @@ def king_integrator(w0, output='profile'):
             - params:
             - phi: information about the gravitational potential of the system
             - profiles: (normalized) density and w0 profiles with respect to the
-            dimentionless radial distance from the centre
+                dimentionless radial distance from the centre
             - Skin: Surface kinetick energy distribution
             - x0Cv:
 
