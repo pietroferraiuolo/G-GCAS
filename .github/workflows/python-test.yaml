@@ -24,7 +24,6 @@ jobs:
       run: |
         echo "GCASDATA=${{github.workspace}}/ggcas" >> $GITHUB_ENV
         echo "$GCASDATA"
-        export RPY2_CFFI_MODE=ABI
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
