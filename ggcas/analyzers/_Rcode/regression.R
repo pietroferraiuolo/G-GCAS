@@ -144,14 +144,13 @@ regression <- function(data, method, verb = FALSE) {
 }
 
 linear_regression <- function(data, method = "linear", verb = FALSE) {
-  # method is a dummy argument for the python interface
-  fit <- lm(data ~ 1)
-  residuals <- residuals(fit)
+  # `method` is a dummy argument for the python interface
+  fit <- lm(y ~ x, data)
   return(
     list(data = data,
-         x = data,
+         x = data$x,
          y = fitted(fit),
          coeffs = coef(fit),
-         residuals = residuals)
+         residuals = resid(fit))
   )
 }

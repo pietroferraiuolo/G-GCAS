@@ -114,8 +114,6 @@ def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
     return _rm.GMModel(fitted_model, clusters)
 
 
-# TODO
-# FIX THE REGRESSION R FUNCTION FOR BETTER HANDLING THE LINEAR CASE
 def regression(data, kind="gaussian", verbose: bool = True):
     """
     Regression model estimation function.
@@ -153,11 +151,19 @@ def regression(data, kind="gaussian", verbose: bool = True):
     np2r.activate()
     regression_code = _os.path.join(_RSF, "regression.R")
     R(f'source("{regression_code}")')
-    if not kind=='linear':
-        reg_func = genv["regression"]
-    else:
+    if kind=='linear':
+        pd2r.activate()
         reg_func = genv["linear_regression"]
-    r_data = np2r.numpy2rpy(data)
+        D = _np.array(data).shape[-1] if isinstance(data, list) else data.shape[-1]
+        if D != 2:
+            x = list(_np.arange(0.,1.,1/len(data)))
+            y = list(data)
+            data = _pd.DataFrame({'x': x, 'y': y})
+        r_data = pd2r.py2rpy_pandasdataframe(data)
+        pd2r.deactivate()
+    else:
+        reg_func = genv["regression"]
+        r_data = np2r.numpy2rpy(data)
     regression_model = reg_func(r_data, method=kind, verb=verbose)
     model = _rm.RegressionModel(regression_model, type=kind)
     np2r.deactivate()

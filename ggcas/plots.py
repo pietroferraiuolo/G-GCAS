@@ -567,7 +567,7 @@ def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
     _plt.show()
 
 
-def regression(regression_model, **kwargs):
+def regressionPlot(regression_model, **kwargs):
     """
     Plot the regression model with the data and residuals.
 
@@ -587,8 +587,12 @@ def regression(regression_model, **kwargs):
             Label of the x-axis.
         title : str
             Title of the figure.
+        fmt : str
+            Main plot style. Only works when passing a linear regression
+            model. Default is '-' (normal "solid" plot).
         size : int or float
-            Size of the scattered data points. Alias: 's'.
+            Size of the scattered data points in both plots. 
+            Alias: 's'.
         plot_color : str
             Color of the data plot. Aliases:
             - 'pcolor'
@@ -621,7 +625,10 @@ def regression(regression_model, **kwargs):
     fig.subplots_adjust(hspace=0)
     # data & fit plots
     if rm.kind=='linear':
-        fax.plot(rm.data, c=pc, markersize=s, linewidth=1.0, alpha=0.8, label='Data')
+        fmt = kwargs.get('fmt', '-')
+        x = rm.data['x'].to_numpy()
+        y = rm.data['y'].to_numpy()
+        fax.plot(x, y, c=pc, markersize=s, linewidth=1.0, alpha=0.8, label='Data')
     else:
         fax.hist(
             rm.data, bins=len(rm.y), color=pc, histtype="step", alpha=0.85, label="Data"
@@ -634,7 +641,7 @@ def regression(regression_model, **kwargs):
     fax.legend(loc="best", fontsize="medium")
     # residuals plot
     rax.set_ylabel("Residuals")
-    rax.yaxis.set_label_position("right")
+    rax.yaxis.set_label_position("left")
     rax.yaxis.tick_right()
     rax.set_xlabel(xlabel)
     rax.set_xlim(xlim)
@@ -654,8 +661,8 @@ def seaborn(type: str, *args, **kwargs):
     """
     Wrapper to make a seaborn plot.
 
-    Check seaborn
-    <a href="https://seaborn.pydata.org/index.html">documentation</a>
+    Check 
+    <a href="https://seaborn.pydata.org/index.html">seaborn documentation</a>
     for more info on plot types and parameters.
 
     Parameters
