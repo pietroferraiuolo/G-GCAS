@@ -1,5 +1,5 @@
 rpy2==3.5.17
-numpy==1.26.0
+numpy==1.26.4
 scipy
 sympy==1.13
 pandas
