@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-latest]
         python-version: ["3.x"]
     steps:
-    - name: "test Env Variables"
+    - name: "Set Environment Variables"
       run: |
         echo "GCASDATA=${{github.workspace}}/ggcas" >> $GITHUB_ENV
         echo "$GCASDATA"
