@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Module: functions.py
 
@@ -119,7 +120,6 @@ Example usage of `CartesianConversion` class:
 import sympy as _sp
 import numpy as _np
 from astropy import units as _u
-from __future__ import annotations
 from astropy.table import Table as _Table
 from numpy.typing import ArrayLike as _ArrayLike
 from typing import List as _List, Union as _Union

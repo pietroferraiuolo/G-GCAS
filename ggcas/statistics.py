@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Author(s)
 ---------
@@ -18,7 +19,6 @@ import numpy as _np
 import pandas as _pd
 import time as _time
 import rpy2.robjects as _ro
-from __future__ import annotations
 from astropy.table import Table as _Table
 from astroML.density_estimation import XDGMM
 from ggcas._utility import R_SOURCE_FOLDER as _RSF

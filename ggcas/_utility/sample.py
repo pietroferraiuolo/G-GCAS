@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 ::module..ggcas._utility.sample
 
@@ -23,7 +24,6 @@ import pandas as _pd
 from typing import List
 from astropy import units as u
 from typing import Optional, Union
-from __future__ import annotations
 from ggcas._cluster import Cluster
 from astropy.table import QTable, Table
 

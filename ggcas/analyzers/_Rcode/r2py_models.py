@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Author(s)
 ---------
@@ -18,7 +19,6 @@ from rpy2.robjects import (
     numpy2ri as np2r, 
     r as R,
 )
-from __future__ import annotations
 
 
 class GMModel:

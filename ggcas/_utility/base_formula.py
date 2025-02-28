@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Author(s)
 ---------
@@ -11,7 +12,6 @@ Base class for formulas calsses, used in the 'ggcas.functions' module.
 import numpy as np
 from typing import List
 from sympy import Basic as sb
-from __future__ import annotations
 from numpy.typing import ArrayLike
 from abc import ABC, abstractmethod
 from ggcas.analyzers.calculus import (

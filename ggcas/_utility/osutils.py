@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Author(s)
 ---------
@@ -17,7 +18,6 @@ Examples
 import os
 import datetime as dt
 from astropy.table import QTable
-from __future__ import annotations
 from ggcas._utility import folder_paths as fn
 
 datapath = fn.BASE_DATA_PATH

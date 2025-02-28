@@ -8,8 +8,8 @@ Description
 This module contains R libraries implementation checks
 for the G-GCAS package.
 """
-from logging import ERROR
 from typing import Union
+from logging import ERROR
 from rpy2.robjects.packages import importr, isinstalled, LibraryError
 from rpy2.rinterface_lib.callbacks import logger as rpy2_logger
 

@@ -1,9 +1,9 @@
+from __future__ import annotations
 """"""
 
 import os as _os
 import shutil as _sh
 import subprocess as _subp
-from __future__ import annotations
 from astropy.table import QTable as _QTable
 from ggcas._utility import (
     get_file_list as _get_file_list,

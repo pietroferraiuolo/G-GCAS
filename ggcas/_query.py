@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Module: query.py
 
@@ -71,7 +72,6 @@ from astropy.table import Table
 from astroquery.gaia import Gaia
 from typing import Optional, Union
 from ggcas._cluster import Cluster
-from __future__ import annotations
 from ggcas._utility.sample import Sample
 from ggcas._utility.osutils import _timestamp
 
