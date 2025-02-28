@@ -22,7 +22,7 @@ from ggcas.analyzers.calculus import (
 
 class BaseFormula(ABC):
     """
-    Base class for the vrious formula calsses
+    Base class for the various formula calsses
     """
 
     def __init__(self):
