@@ -9,10 +9,11 @@ Base class for formulas calsses, used in the 'ggcas.functions' module.
 """
 
 import numpy as np
-from abc import ABC, abstractmethod
 from typing import List
-from numpy.typing import ArrayLike
 from sympy import Basic as sb
+from __future__ import annotations
+from numpy.typing import ArrayLike
+from abc import ABC, abstractmethod
 from ggcas.analyzers.calculus import (
     compute_numerical_function as _compute_numerical,
     compute_error as _compute_error,

@@ -63,15 +63,16 @@ object:
 
 import os
 import numpy as np
-import pandas as _pd
 import configparser
+import pandas as _pd
 from ggcas._utility import *
-from ggcas._utility.sample import Sample
 from astropy import units as u
 from astropy.table import Table
 from astroquery.gaia import Gaia
-from ggcas._cluster import Cluster
 from typing import Optional, Union
+from ggcas._cluster import Cluster
+from __future__ import annotations
+from ggcas._utility.sample import Sample
 from ggcas._utility.osutils import _timestamp
 
 _QDATA = "query_data.txt"

@@ -17,6 +17,7 @@ from . import _glpoints
 from typing import Dict, Any
 import multiprocessing as mp
 from numpy.typing import ArrayLike
+from __future__ import annotations
 
 
 def compute_numerical_function(func, variables, var_data):

@@ -116,12 +116,13 @@ Example usage of `CartesianConversion` class:
     ```
 """
 
-import numpy as _np
 import sympy as _sp
-from typing import List as _List, Union as _Union
-from numpy.typing import ArrayLike as _ArrayLike
+import numpy as _np
 from astropy import units as _u
+from __future__ import annotations
 from astropy.table import Table as _Table
+from numpy.typing import ArrayLike as _ArrayLike
+from typing import List as _List, Union as _Union
 from ggcas._utility.base_formula import BaseFormula
 from ggcas.analyzers.calculus import (
     compute_numerical_function as _compute_numerical,

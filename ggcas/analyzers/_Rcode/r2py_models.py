@@ -10,6 +10,7 @@ into Python dictionaries. This allows for a easier and more intuitive access
 to the model parameters and results.
 
 """
+
 import numpy as np
 import rpy2.robjects as ro
 from rpy2.robjects import (
@@ -17,6 +18,8 @@ from rpy2.robjects import (
     numpy2ri as np2r, 
     r as R,
 )
+from __future__ import annotations
+
 
 class GMModel:
     """

@@ -15,8 +15,9 @@ Examples
 """
 
 import os
-from astropy.table import QTable
 import datetime as dt
+from astropy.table import QTable
+from __future__ import annotations
 from ggcas._utility import folder_paths as fn
 
 datapath = fn.BASE_DATA_PATH
