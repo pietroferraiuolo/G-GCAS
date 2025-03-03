@@ -2,7 +2,9 @@ name: Python Test
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - '*-*' # Matches branches starting with 'issue-'
     paths-ignore:
       - './ggcas/data/**'
       - './ggcas/king/**'
