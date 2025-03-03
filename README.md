@@ -1,5 +1,5 @@
 # Gaia - Globular Clusters Analysis Software
- ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pietroferraiuolo/G-GCAS/python-test.yml)
+ ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pietroferraiuolo/G-GCAS/python-test.yaml)
 
 This package is a software which uses GAIA data releases to retrieve and analyze Globular Cluster (mainly) astrometric data.
 
@@ -13,9 +13,7 @@ This package is a software which uses GAIA data releases to retrieve and analyze
 As of now, that there is not yet a PyPi version available, intall the package from the github repository:
 
 ```bash
-git clone https://github.com/pietroferraiuolo/G-GCAS.git
-cd G-GCAS
-pip install .
+pip install git+https://github.com/pietroferraiuolo/G-GCAS.git
 ```
 
 ## Package Content Description
