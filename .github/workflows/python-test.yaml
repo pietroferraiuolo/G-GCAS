@@ -2,12 +2,10 @@ name: Python Test
 
 on:
   push:
-    branches:
-      - main
-      - '*-*' # Matches branches starting with 'issue-'
+    branches: [ main]
     paths-ignore:
-      - './ggcas/data/**'
-      - './ggcas/king/**'
+      - './grasp/data/**'
+      - './grasp/king/**'
       - './scripts/**'
   pull_request:
     branches: [ main ]
@@ -23,7 +21,7 @@ jobs:
     steps:
     - name: "Set Environment Variables"
       run: |
-        echo "GCASDATA=${{github.workspace}}/ggcas" >> $GITHUB_ENV
+        echo "GCASDATA=${{github.workspace}}/grasp" >> $GITHUB_ENV
         echo "$GCASDATA"
         echo $GITHUB_ENV
     - uses: actions/checkout@v4
