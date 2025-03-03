@@ -8,7 +8,7 @@ import setuptools
 
 about = {}
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'ggcas', '__version__.py'), 'r') as _:
+with open(os.path.join(here, 'grasp', '__version__.py'), 'r') as _:
     exec(_.read(), about)
 
 with open ('requirements.txt', 'r') as _:
@@ -20,7 +20,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={
-        'ggcas': ['data/*.xlsx', 'data/query/**/**/*.txt', 'data/models/**/*.txt'],
+        'grasp': ['data/*.xlsx', 'data/query/**/**/*.txt', 'data/models/**/*.txt'],
     },
     install_requires=requires,
     author=about['__author__'],

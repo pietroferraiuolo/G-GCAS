@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from astropy import units as u
-from ggcas import functions as f
+from grasp import functions as f
 
 class TestAngularSeparation(unittest.TestCase):
     def setUp(self):

@@ -3,7 +3,7 @@ astropy>=7.0.0
 scikit-learn
 scipy
 numpy==1.26.4
-sympy==1.13
+sympy>=1.13.0
 pandas
 astroML==1.0.2.post1
 seaborn==0.13.2

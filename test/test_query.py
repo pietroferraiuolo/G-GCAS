@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from ggcas._query import GaiaQuery
-from ggcas._cluster import Cluster
+from grasp.gaia.query import GaiaQuery
+from grasp._cluster import Cluster
 
 class TestGaiaQuery(unittest.TestCase):
 

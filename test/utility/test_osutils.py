@@ -2,8 +2,8 @@ import unittest
 import os
 from unittest.mock import patch
 from astropy.table import QTable
-from ggcas._utility import osutils as osu
-from ggcas._utility import folder_paths as fn
+from grasp._utility import osutils as osu
+from grasp._utility import folder_paths as fn
 import numpy as np
 
 class TestOsutils(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestOsutils(unittest.TestCase):
 
     def test_timestamp(self):
         # Test the _timestamp function
-        result = osu._timestamp()
+        result = osu.timestamp()
         # Check if the result matches the expected format
         self.assertRegex(result, r'\d{8}_\d{6}')
 

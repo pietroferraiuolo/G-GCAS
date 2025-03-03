@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 import sympy as sp
-from ggcas.analyzers.calculus import compute_numerical_function, compute_error, gaus_legendre_integrator
+from grasp.analyzers.calculus import compute_numerical_function, compute_error, gaus_legendre_integrator
 
 class TestCalculusFunctions(unittest.TestCase):
 
