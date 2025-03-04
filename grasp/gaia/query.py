@@ -15,7 +15,7 @@ How to Use it
 After importing the module, initialize the class with a table (default is the
 Gaia data release 3 table)
 
-    >>> from ggcas import query
+    >>> from grasp.gaia import query
     >>> gq = query.GaiaQuery()
     >>> Initialized with Gaia table: 'gaiadr3.gaia_source'
     

@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Author(s)
 ---------
@@ -92,6 +91,10 @@ def doubleHistScatter(x, y, kde=False, kde_kind: str = "gaussian", **kwargs):
             Size of the figure.
 
     """
+    xmin = _np.nanmin(x)
+    xmax = _np.nanmax(x)
+    ymin = _np.nanmin(y)
+    ymax = _np.nanmax(y)
     title = kwargs.get("title", "")
     xlabel = kwargs.get("xlabel", "")
     ylabel = kwargs.get("ylabel", "")
@@ -102,7 +105,7 @@ def doubleHistScatter(x, y, kde=False, kde_kind: str = "gaussian", **kwargs):
     colorx = kwargs.get("colorx", "green")
     sc = kwargs.get("scatter_color", "black")
     s = _osu.get_kwargs(("size", "s"), 5, kwargs)
-    fsize = kwargs.get("figsize", default_figure_size)
+    fsize = kwargs.get("figsize", (5.6,5.2))
     fig = _plt.figure(figsize=fsize)
     gs = fig.add_gridspec(
         nrows=2,
@@ -113,26 +116,33 @@ def doubleHistScatter(x, y, kde=False, kde_kind: str = "gaussian", **kwargs):
         right=0.9,
         bottom=0.1,
         top=0.9,
-        wspace=0.025,
-        hspace=0.025,
+        wspace=0.015,
+        hspace=0.015,
     )
     ax = fig.add_subplot(gs[1, 0])
     ax_histx = fig.add_subplot(gs[0, 0], sharex=ax)
     ax_histy = fig.add_subplot(gs[1, 1], sharey=ax)
-    ax_histx.tick_params(axis="x", labelbottom=False)
-    ax_histy.tick_params(axis="y", labelleft=False)
+    ax_histx.tick_params(axis="x", labelbottom=False, length=0.)
+    ax_histy.tick_params(axis="y", labelleft=False, length=0.)
     # the scatter plot:
     ax.scatter(x, y, color=sc, alpha=alpha, s=s)
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-    ax_histx.set_ylabel("Counts")
-    ax_histy.set_xlabel("Counts")
+    #ax_histx.set_ylabel("Counts")
+    ax_histy.set_xlabel("Counts\n")
     ax.set_xlabel(xlabel, fontdict=label_font)
     ax.set_ylabel(ylabel, fontdict=label_font)
     bins = int(1.5 * _np.sqrt(len(x)))
-    ax_histx.hist(x, bins=bins, color=colorx, alpha=0.6)
-    ax_histy.hist(y, bins=bins, orientation="horizontal", color=colory, alpha=0.6)
+    hx = ax_histx.hist(x, bins=bins, color=colorx, alpha=0.6)
+    hy = ax_histy.hist(y, bins=bins, orientation="horizontal", color=colory, alpha=0.6)
     _plt.suptitle(title, size=20, style="italic", family="cursive")
+    ax_histx.set_xlim(xlim)
+    ax_histy.set_ylim(ylim)
+    ax_histy.xaxis.set_ticks_position('top')
+    ax_histy.xaxis.set_label_position('top')
+    ax_histx.yaxis.set_ticks_position('right')
+    ax_histy.set_xticks(_np.arange(hy[0].max(), hy[0].max()+1, 1))
+    ax_histx.set_yticks(_np.arange(hx[0].max(), hx[0].max()+1, 1))
     if kde:
         reg_x = _kde_estimator(x, kde_kind)
         reg_y = _kde_estimator(y, kde_kind)
@@ -150,8 +160,6 @@ def doubleHistScatter(x, y, kde=False, kde_kind: str = "gaussian", **kwargs):
         )
         ax_histx.legend(loc="best", fontsize="small")
         ax_histy.legend(loc="best", fontsize="small")
-    ax_histx.set_xlim(xlim)
-    ax_histy.set_ylim(ylim)
     _plt.show()
 
 

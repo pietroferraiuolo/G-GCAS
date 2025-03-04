@@ -9,3 +9,5 @@ astroML==1.0.2.post1
 seaborn==0.13.2
 matplotlib==3.9.3
 astroquery==0.4.7
+gaiadr3-zeropoint
+nsstools

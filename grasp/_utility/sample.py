@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 ::module..ggcas._utility.sample
 
@@ -38,10 +37,10 @@ class Sample:
 
     Parameters
     ----------
-    gc : ggcas.cluster.Cluster
-        Globular cluster object used for the query.
     sample : astropy.table.Table
         Table containing the retrieved sample's data.
+    gc : ggcas.cluster.Cluster, optional
+        Globular cluster object used for the query.
     """
 
     def __init__(self, sample, gc: Optional[Union[Cluster, str]] = None):
@@ -210,6 +209,14 @@ class Sample:
     def info(self, *args):
         """Returns the info of the sample"""
         return self._sample.info(*args)
+    
+    def head(self, n: int = 5):
+        """Returns the first n rows of the sample"""
+        return self._sample.to_pandas().head(n)
+    
+    def describe(self):
+        """Returns the description of the sample"""
+        return self._sample.to_pandas().describe()
 
     def join(self, other, inplace: bool = False):
         """
@@ -244,7 +251,7 @@ class Sample:
 
     def to_pandas(self, overwrite: bool = False, *args, **kwargs):
         """
-        Converts the sample (astropy.Table as default) to a pandas DataFrame.
+        Converts the sample (`astropy.QTable` as default) to a pandas DataFrame.
 
         Parameters
         ----------
