@@ -21,7 +21,7 @@ jobs:
     steps:
     - name: "Set Environment Variables"
       env: 
-      GCASDATA: ${{github.workspace}}/ggcas
+        GCASDATA: ${{github.workspace}}/ggcas
       run: |
         echo $GCASDATA
         echo $GITHUB_ENV
