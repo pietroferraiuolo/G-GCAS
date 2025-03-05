@@ -1,8 +1,8 @@
 import unittest
 import numpy as np
 import pandas as pd
-from ggcas import plots as gplt
-from ggcas.statistics import regression
+from grasp import plots as gplt
+from grasp.statistics import regression
 
 
 class TestPlots(unittest.TestCase):
