@@ -1,0 +1,15 @@
+FORMULARY
+	Managing
+		- read file / load formulary
+				- file type: sympy / latex
+				- eqs names
+				- variable parser
+				- equation parser
+		- save new formulary
+		- add formula 
+		- update current formulary
+	Computations
+		- get formula error equation
+		- compute numerical formula 
+		- compute numerical formula error
+		
