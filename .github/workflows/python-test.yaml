@@ -22,10 +22,9 @@ jobs:
         os: [ubuntu-latest]
         python-version: ["3.x"]
     steps:
-    - name: "Set Environment Variables"
-      env: 
-        GCASDATA: ${{github.workspace}}/grasp
+    - name: "Set Environment Variables" 
       run: |
+        echo "GCASDATA=${{github.workspace}}/ggcas" >> $GITHUB_ENV
         echo $GCASDATA
         echo $GITHUB_ENV
     - uses: actions/checkout@v4
