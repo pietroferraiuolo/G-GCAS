@@ -1,37 +1,37 @@
-ggcas._utility package
+grasp._utility package
 ======================
 
 Submodules
 ----------
 
-ggcas._utility.folder\_paths module
+grasp._utility.folder\_paths module
 -----------------------------------
 
-.. automodule:: ggcas._utility.folder_paths
+.. automodule:: grasp._utility.folder_paths
    :members:
    :undoc-members:
    :show-inheritance:
 
-ggcas._utility.osutils module
+grasp._utility.osutils module
 -----------------------------
 
-.. automodule:: ggcas._utility.osutils
+.. automodule:: grasp._utility.osutils
    :members:
    :undoc-members:
    :show-inheritance:
    
-ggcas._utility.base_formula module
+grasp._utility.base_formula module
 ----------------------------------
 
-.. automodule:: ggcas._utility.base_formula
+.. automodule:: grasp._utility.base_formula
    :members:
    :undoc-members:
    :show-inheritance:
    
-ggcas._utility.sample module
+grasp._utility.sample module
 ----------------------------
 
-.. automodule:: ggcas._utility.sample
+.. automodule:: grasp._utility.sample
    :members:
    :undoc-members:
    :show-inheritance:
@@ -39,7 +39,7 @@ ggcas._utility.sample module
 Module contents
 ---------------
 
-.. automodule:: ggcas._utility
+.. automodule:: grasp._utility
    :members:
    :undoc-members:
    :show-inheritance:

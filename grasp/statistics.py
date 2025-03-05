@@ -8,7 +8,7 @@ Description
 -----------
 This module provides a series of functions for the statistical analysis of 
 (astronomical) data. The functions are designed to be used in the context of
-the GGCAS software. The module comes with a related sub-module, `r2py_models.py`,
+the grasp software. The module comes with a related sub-module, `r2py_models.py`,
 which handles the conversion of R objects to Python objects, since the majority 
 of the statistical analysis is done through R scripts. 
 
@@ -145,7 +145,7 @@ def regression(data, kind="gaussian", verbose: bool = True):
 
     Returns
     -------
-    model : ggcas.analyzers._Rcode.RegressionModel
+    model : grasp.analyzers._Rcode.RegressionModel
         The fitted regression model, translated from R to Py.
     """
     check_packages("minpack.lm")

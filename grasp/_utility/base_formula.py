@@ -6,7 +6,7 @@ Author(s)
 
 Description
 -----------
-Base class for formulas calsses, used in the 'ggcas.functions' module.
+Base class for formulas calsses, used in the 'grasp.functions' module.
 """
 
 import numpy as np

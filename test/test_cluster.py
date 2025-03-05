@@ -7,10 +7,10 @@ from unittest.mock import patch, MagicMock
 
 class TestCluster(unittest.TestCase):
 
-    @patch('ggcas._utility.folder_paths.CLUSTER_DATA_FOLDER')
-    @patch('ggcas._utility.folder_paths.CLUSTER_MODEL_FOLDER')
-    @patch('ggcas._cluster.Cluster._load_cluster_parameters')
-    @patch('ggcas._cluster.Cluster._load_king_model')
+    @patch('grasp._utility.folder_paths.CLUSTER_DATA_FOLDER')
+    @patch('grasp._utility.folder_paths.CLUSTER_MODEL_FOLDER')
+    @patch('grasp._cluster.Cluster._load_cluster_parameters')
+    @patch('grasp._cluster.Cluster._load_king_model')
     def test_cluster_initialization(self, mock_load_king_model, mock_load_cluster_parameters, mock_model_folder, mock_data_folder):
         mock_load_cluster_parameters.return_value = pd.Series({
             'ra': 10.0,
@@ -37,10 +37,10 @@ class TestCluster(unittest.TestCase):
         self.assertEqual(cluster.rt, (0.5 / 60 * u.deg) * 10**1.5)
         self.assertFalse(cluster.cflag)
 
-    @patch('ggcas._utility.folder_paths.CLUSTER_DATA_FOLDER')
-    @patch('ggcas._utility.folder_paths.CLUSTER_MODEL_FOLDER')
-    @patch('ggcas._cluster.Cluster._load_cluster_parameters')
-    @patch('ggcas._cluster.Cluster._load_king_model')
+    @patch('grasp._utility.folder_paths.CLUSTER_DATA_FOLDER')
+    @patch('grasp._utility.folder_paths.CLUSTER_MODEL_FOLDER')
+    @patch('grasp._cluster.Cluster._load_cluster_parameters')
+    @patch('grasp._cluster.Cluster._load_king_model')
     def test_cluster_initialization_no_name(self, mock_load_king_model, mock_load_cluster_parameters, mock_model_folder, mock_data_folder):
         cluster = Cluster()
 
@@ -49,10 +49,10 @@ class TestCluster(unittest.TestCase):
         self.assertIsNone(cluster.dec)
         self.assertIsNone(cluster.model)
 
-    @patch('ggcas._utility.folder_paths.CLUSTER_DATA_FOLDER')
-    @patch('ggcas._utility.folder_paths.CLUSTER_MODEL_FOLDER')
-    @patch('ggcas._cluster.Cluster._load_cluster_parameters')
-    @patch('ggcas._cluster.Cluster._load_king_model')
+    @patch('grasp._utility.folder_paths.CLUSTER_DATA_FOLDER')
+    @patch('grasp._utility.folder_paths.CLUSTER_MODEL_FOLDER')
+    @patch('grasp._cluster.Cluster._load_cluster_parameters')
+    @patch('grasp._cluster.Cluster._load_king_model')
     def test_show_model(self, mock_load_king_model, mock_load_cluster_parameters, mock_model_folder, mock_data_folder):
         mock_load_cluster_parameters.return_value = pd.Series({
             'ra': 10.0,
@@ -72,7 +72,7 @@ class TestCluster(unittest.TestCase):
         cluster = Cluster('ngc104')
         cluster.show_model()
 
-    @patch('ggcas._utility.folder_paths.CATALOG_FILE', 'mock_catalog.xlsx')
+    @patch('grasp._utility.folder_paths.CATALOG_FILE', 'mock_catalog.xlsx')
     @patch('pandas.read_excel')
     def test_load_cluster_parameters(self, mock_read_excel):
         mock_read_excel.return_value = pd.DataFrame({

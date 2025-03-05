@@ -1,29 +1,29 @@
-ggcas.analyzers package
+grasp.analyzers package
 =======================
 
 Submodules
 ----------
 
-ggcas.analyzers.calculus module
+grasp.analyzers.calculus module
 -------------------------------
 
-.. automodule:: ggcas.analyzers.calculus
+.. automodule:: grasp.analyzers.calculus
    :members:
    :undoc-members:
    :show-inheritance:
 
-ggcas.analyzers.dynamics module
+grasp.analyzers.dynamics module
 -------------------------------
 
-.. automodule:: ggcas.analyzers.dynamics
+.. automodule:: grasp.analyzers.dynamics
    :members:
    :undoc-members:
    :show-inheritance:
 
-ggcas.analyzers._Rcode module
+grasp.analyzers._Rcode module
 -----------------------------
 
-.. automodule:: ggcas.analyzers._Rcode
+.. automodule:: grasp.analyzers._Rcode
    :members:
    :undoc-members:
    :show-inheritance:
@@ -31,7 +31,7 @@ ggcas.analyzers._Rcode module
 Module contents
 ---------------
 
-.. automodule:: ggcas.analyzers
+.. automodule:: grasp.analyzers
    :members:
    :undoc-members:
    :show-inheritance:

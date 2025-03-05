@@ -1,10 +1,10 @@
-ggcas.statistics package
+grasp.statistics package
 ========================
 
 Module contents
 ---------------
 
-.. automodule:: ggcas.statistics
+.. automodule:: grasp.statistics
    :members:
    :undoc-members:
    :show-inheritance:

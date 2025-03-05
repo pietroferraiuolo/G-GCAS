@@ -1,4 +1,4 @@
-ggcas package
+grasp package
 =============
 
 Subpackages
@@ -7,48 +7,48 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   ggcas.analyzers
-   ggcas._utility
+   grasp.analyzers
+   grasp._utility
 
 Submodules
 ----------
 
-ggcas._cluster module
+grasp._cluster module
 ---------------------
 
-.. automodule:: ggcas._cluster
+.. automodule:: grasp._cluster
    :members:
    :undoc-members:
    :show-inheritance:
 
-ggcas.functions module
+grasp.functions module
 ----------------------
 
-.. automodule:: ggcas.functions
+.. automodule:: grasp.functions
    :members:
    :undoc-members:
    :show-inheritance:
 
-ggcas.plots module
+grasp.plots module
 ------------------
 
-.. automodule:: ggcas.plots
+.. automodule:: grasp.plots
    :members:
    :undoc-members:
    :show-inheritance:
 
-ggcas._query module
+grasp.gaia.query module
 -------------------
 
-.. automodule:: ggcas._query
+.. automodule:: grasp.gaia.query
    :members:
    :undoc-members:
    :show-inheritance:
    
-ggcas.statistics module
+grasp.statistics module
 -----------------------
 
-.. automodule:: ggcas.statistics
+.. automodule:: grasp.statistics
    :members:
    :undoc-members:
    :show-inheritance:
@@ -56,7 +56,7 @@ ggcas.statistics module
 Module contents
 ---------------
 
-.. automodule:: ggcas
+.. automodule:: grasp
    :members:
    :undoc-members:
    :show-inheritance:

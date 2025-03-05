@@ -1,4 +1,4 @@
-from zero_point import _zpt
+from zero_point import zpt as _zpt
 from grasp._utility.sample import Sample as _Sample
 
 

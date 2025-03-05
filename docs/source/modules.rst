@@ -4,6 +4,6 @@ G-GCAS
 .. toctree::
    :maxdepth: 4
 
-   ggcas
+   grasp
    setup
    test

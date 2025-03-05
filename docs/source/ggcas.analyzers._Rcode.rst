@@ -1,21 +1,21 @@
-ggcas.analyzers._Rcode package
+grasp.analyzers._Rcode package
 =======================
 
 Submodules
 ----------
 
-ggcas.analyzers.Rcode.r_check module
+grasp.analyzers.Rcode.r_check module
 ------------------------------------
 
-.. automodule:: ggcas.analyzers._Rcode.r_check
+.. automodule:: grasp.analyzers._Rcode.r_check
    :members:
    :undoc-members:
    :show-inheritance:
 
-ggcas.analyzers.r2py_models module
+grasp.analyzers.r2py_models module
 ----------------------------------
 
-.. automodule:: ggcas.analyzers._Rcode.r2py_models
+.. automodule:: grasp.analyzers._Rcode.r2py_models
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +23,7 @@ ggcas.analyzers.r2py_models module
 Module contents
 ---------------
 
-.. automodule:: ggcas.analyzers
+.. automodule:: grasp.analyzers
    :members:
    :undoc-members:
    :show-inheritance:

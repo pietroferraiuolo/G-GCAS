@@ -12,7 +12,7 @@ How to Use
 ----------
 Just import the module
 
-    >>> from ggcas import plots as gplt
+    >>> from grasp import plots as gplt
     >>> gplt.scatter_2hist(...) # your data
 
 """
@@ -345,7 +345,7 @@ def histogram(data, kde=False, kde_kind: str = "gaussian", out: bool = False, **
     The output can be used to make other plots and computations. For example
 
     >>> import numpy as np
-    >>> from ggcas import plots as gplt
+    >>> from grasp import plots as gplt
     >>> x = np.random.randn(1000)
     >>> y = np.random.randn(1000)
     >>> b, n = gplt.histogram(x, y)
@@ -582,7 +582,7 @@ def regressionPlot(regression_model, **kwargs):
 
     Parameters
     ----------
-    regression_model : ggcas.r2py_models.RegressionModel
+    regression_model : grasp.r2py_models.RegressionModel
         The regression model to be plotted.
 
     Other Parameters

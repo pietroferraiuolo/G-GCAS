@@ -36,7 +36,7 @@ This module provides a series of functions for the statistical analysis of astro
 includes functions for extreme deconvolution estimation, Gaussian mixture modeling, and regression 
 model estimation. The module leverages R scripts for statistical computations and integrates them into 
 Python using the `rpy2` package. R scripts and other supporting scripts are in the
-`ggcas.analyzers._Rcode` module.
+`grasp.analyzers._Rcode` module.
 
 ### _query.py
 This module contains the `GaiaQuery` class, which facilitates querying the Gaia database using ADQL

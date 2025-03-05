@@ -11,7 +11,7 @@ class TestGaiaQuery(unittest.TestCase):
     def test_initialization(self):
         self.assertEqual(self.gaia_query._table, "gaiadr3.gaia_source")
 
-    @patch('ggcas._query.GaiaQuery._run_query')
+    @patch('grasp.gaia.query.GaiaQuery._run_query')
     def test_free_query(self, mock_run_query):
         mock_run_query.return_value = MagicMock()
         cluster = Cluster('ngc104')
@@ -19,7 +19,7 @@ class TestGaiaQuery(unittest.TestCase):
         self.assertIsNotNone(result)
         mock_run_query.assert_called_once()
 
-    @patch('ggcas._query.GaiaQuery._run_query')
+    @patch('grasp.gaia.query.GaiaQuery._run_query')
     def test_get_astrometry(self, mock_run_query):
         mock_run_query.return_value = MagicMock()
         cluster = Cluster('ngc104')
@@ -27,7 +27,7 @@ class TestGaiaQuery(unittest.TestCase):
         self.assertIsNotNone(result)
         mock_run_query.assert_called_once()
 
-    @patch('ggcas._query.GaiaQuery._run_query')
+    @patch('grasp.gaia.query.GaiaQuery._run_query')
     def test_get_photometry(self, mock_run_query):
         mock_run_query.return_value = MagicMock()
         cluster = Cluster('ngc104')
@@ -35,7 +35,7 @@ class TestGaiaQuery(unittest.TestCase):
         self.assertIsNotNone(result)
         mock_run_query.assert_called_once()
 
-    @patch('ggcas._query.GaiaQuery._run_query')
+    @patch('grasp.gaia.query.GaiaQuery._run_query')
     def test_get_rv(self, mock_run_query):
         mock_run_query.return_value = MagicMock()
         cluster = Cluster('ngc104')

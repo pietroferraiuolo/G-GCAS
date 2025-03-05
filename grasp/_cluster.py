@@ -13,7 +13,7 @@ How to Use
 ----------
 Initialize the class with a cluster's name. As example
 
->>> from ggcas.cluster import Cluster
+>>> from grasp.cluster import Cluster
 >>> ngc104 = Cluster('ngc104')
 
 Now we can call methods to read the parameters
@@ -54,7 +54,7 @@ class Cluster:
     ----------
     Initialize the class with a cluster's name. As example
 
-    >>> from ggcas._cluster import Cluster
+    >>> from grasp._cluster import Cluster
     >>> ngc104 = Cluster('ngc104')
     """
 
@@ -188,9 +188,9 @@ class Cluster:
     def __get_repr(self):
         """repr creation"""
         if self.id == "UntrackedData":
-            text = "<ggcas._cluster.Cluster object>"
+            text = "<grasp._cluster.Cluster object>"
         else:
-            text = f"<ggcas._cluster.Cluster object: {self.id}>"
+            text = f"<grasp._cluster.Cluster object: {self.id}>"
         return text
 
     def __get_str(self):

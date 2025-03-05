@@ -24,7 +24,7 @@ jobs:
     steps:
     - name: "Set Environment Variables"
       env: 
-        GCASDATA: ${{github.workspace}}/ggcas
+        GCASDATA: ${{github.workspace}}/grasp
       run: |
         echo $GCASDATA
         echo $GITHUB_ENV

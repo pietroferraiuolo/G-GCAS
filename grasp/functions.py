@@ -40,7 +40,7 @@ How to Use
 ----------
 1. Import the module:
     ```python
-    from ggcas import functions
+    from grasp import functions
     ```
 
 2. Create an instance of the desired class and call the appropriate methods:
@@ -55,7 +55,7 @@ Examples
 --------
 Example usage of `AngularSeparation` class:
     ```python
-    from ggcas import functions
+    from grasp import functions
     from astropy import units as u
 
     ra0 = 10.0 * u.deg
@@ -66,7 +66,7 @@ Example usage of `AngularSeparation` class:
 
 Example usage of `LosDistance` class:
     ```python
-    from ggcas import functions
+    from grasp import functions
 
     los_dist = functions.LosDistance()
     print(los_dist)
@@ -74,7 +74,7 @@ Example usage of `LosDistance` class:
 
 Example usage of `RadialDistance2D` class:
     ```python
-    from ggcas import functions
+    from grasp import functions
     from astropy import units as u
 
     gc_distance = 1000 * u.pc
@@ -84,7 +84,7 @@ Example usage of `RadialDistance2D` class:
 
 Example usage of `RadialDistance3D` class:
     ```python
-    from ggcas import functions
+    from grasp import functions
     from astropy import units as u
 
     gc_distance = 1000 * u.pc
@@ -94,7 +94,7 @@ Example usage of `RadialDistance3D` class:
 
 Example usage of `TotalVelocity` class:
     ```python
-    from ggcas import functions
+    from grasp import functions
 
     total_vel = functions.TotalVelocity()
     print(total_vel)
@@ -102,7 +102,7 @@ Example usage of `TotalVelocity` class:
 
 Example usage of `EffectivePotential` class:
     ```python
-    from ggcas import functions
+    from grasp import functions
 
     eff_pot = functions.EffectivePotential(shell=True)
     print(eff_pot)
@@ -110,7 +110,7 @@ Example usage of `EffectivePotential` class:
 
 Example usage of `CartesianConversion` class:
     ```python
-    from ggcas import functions
+    from grasp import functions
 
     cart_conv = functions.CartesianConversion(ra0=10.0, dec0=20.0)
     print(cart_conv)

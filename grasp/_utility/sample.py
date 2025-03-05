@@ -1,5 +1,5 @@
 """
-::module..ggcas._utility.sample
+::module..grasp._utility.sample
 
 sample.py
 =========
@@ -39,7 +39,7 @@ class Sample:
     ----------
     sample : astropy.table.Table
         Table containing the retrieved sample's data.
-    gc : ggcas.cluster.Cluster, optional
+    gc : grasp.cluster.Cluster, optional
         Globular cluster object used for the query.
     """
 
@@ -224,14 +224,14 @@ class Sample:
 
         Parameters
         ----------
-        other : ggcas.Sample
+        other : grasp.Sample
             The other sample data to join with.
         inplace : bool
             If True, the operation is done in place, otherwise a new object is returned.
 
         Returns
         -------
-        sample : ggcas.Sample
+        sample : grasp.Sample
             The sample object containing the joined data.
         """
         sample = self._sample.to_pandas()

@@ -1,10 +1,10 @@
-ggcas.functions package
+grasp.functions package
 ========================
 
 Module contents
 ---------------
 
-.. automodule:: ggcas.functions
+.. automodule:: grasp.functions
    :members:
    :undoc-members:
    :show-inheritance:

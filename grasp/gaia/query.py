@@ -131,7 +131,7 @@ class GaiaQuery:
     -------------
     Import the class and initialize it
 
-    >>> from ggcas.query import GaiaQuery
+    >>> from grasp.query import GaiaQuery
     >>> dr3 = GaiaQuery()
     'Initialized with Gaia table: gaiadr3.gaia_source'
 
@@ -141,13 +141,13 @@ class GaiaQuery:
     >>> dr2 = GaiaQuery(gaia_table=table)
     'Initialized with Gaia table: gaiadr2.gaia_source'
 
-    The queries, to work efficiently, require a 'ggcas.cluster.Cluster' object: so,
+    The queries, to work efficiently, require a 'grasp.cluster.Cluster' object: so,
     let's take an example cluster, ngc104:
 
-        >>> from ggcas._cluster import Cluster
+        >>> from grasp._cluster import Cluster
         >>> gc = Cluster('ngc104')
         >>> gc
-        <ggcas.cluster.Cluster object: NGC104>
+        <grasp.cluster.Cluster object: NGC104>
 
     At this point, simply passing as argument the gc object to the query function:
 
@@ -219,7 +219,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         ----------
         radius : float
             Radius, in degrees, of the scan circle.
-        gc : ggcas.cluster.Cluster or str
+        gc : grasp.cluster.Cluster or str
             String name or Cluster object, created with the G-GCAS module, of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
@@ -299,7 +299,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         ----------
         radius : float
             Radius, in degrees, of the scan circle.
-        gc : ggcas.cluster.Cluster or str
+        gc : grasp.cluster.Cluster or str
             String name or Cluster object created with the G-GCAS module of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
@@ -374,7 +374,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         ----------
         radius : float
             Radius, in degrees, of the scan circle.
-        gc : ggcas.cluster.Cluster or str
+        gc : grasp.cluster.Cluster or str
             String name or Cluster object created with the G-GCAS module of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
@@ -448,7 +448,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         ----------
         radius : float
             Radius, in degrees, of the scan circle.
-        gc : ggcas.cluster.Cluster or str
+        gc : grasp.cluster.Cluster or str
             String name or Cluster object created with the G-GCAS module of a globular cluster.
         save : bool, optional
             Whether to save the obtained data with its information or not.
@@ -690,7 +690,7 @@ Loading it..."""
 
         Parameters
         ----------
-        gc : ggcas.Cluste or str or None
+        gc : grasp.Cluste or str or None
             The cluster object or the string name of the cluster.
         **kwargs : dict
             The optional arguments to pass to the function.
@@ -790,7 +790,7 @@ Loading it..."""
                 + "-" * len(table.name)
                 + f"\n{table.description}"
             )
-        text += "\n \n<ggcas.query.GaiaQuery class>"
+        text += "\n \n<grasp.query.GaiaQuery class>"
         return text
 
     def __get_str(self):

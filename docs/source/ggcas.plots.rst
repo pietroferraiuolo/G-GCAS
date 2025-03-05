@@ -1,10 +1,10 @@
-ggcas.plots package
+grasp.plots package
 ===================
 
 Module contents
 ---------------
 
-.. automodule:: ggcas.plots
+.. automodule:: grasp.plots
    :members:
    :undoc-members:
    :show-inheritance:
