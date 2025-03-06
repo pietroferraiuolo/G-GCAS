@@ -18,7 +18,7 @@ except KeyError as exc:
 BASE_DATA_PATH = os.path.join(BASE_PATH, "data")
 SYS_DATA_FOLDER = os.path.join(BASE_PATH, "sysdata")
 CATALOG_FILE = os.path.join(BASE_PATH, 'sysdata', "_Catalogue.xlsx")
-FORMULARY_BASE_FILE = os.path.join(SYS_DATA_FOLDER, "Base Formulary.frm")
+FORMULARY_BASE_FILE = os.path.join(SYS_DATA_FOLDER, "base.frm")
 QUERY_DATA_FOLDER = os.path.join(BASE_DATA_PATH, "query")
 KING_MODELS_FOLDER = os.path.join(BASE_DATA_PATH, "models")
 KING_INTEGRATOR_FOLDER = os.path.join(BASE_PATH, "analyzers", "_king")

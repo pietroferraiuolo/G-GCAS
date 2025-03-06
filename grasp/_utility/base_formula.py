@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Author(s)
 ---------
@@ -27,6 +26,7 @@ class BaseFormula(ABC):
 
     def __init__(self):
         """The constructor"""
+        self._name: str = None
         self._variables: List[sb] = []
         self._formula: sb = None
         self._errFormula: sb = None
@@ -36,7 +36,7 @@ class BaseFormula(ABC):
         self._errors: ArrayLike = None
 
     def __str__(self) -> str:
-        """Return the actual formula as a string"""
+        """String representation"""
         return self._get_str()
 
     def __repr__(self) -> str:
@@ -44,11 +44,12 @@ class BaseFormula(ABC):
         return self._get_str()
 
     def _get_str(self):
-        formula = self._analitical_formula()
+        """Return the actual formula as a string"""
+        formula = self._formula
         computed = (True if self._values is not None else False) or (
             True if self._errors is not None else False
         )
-        return f"{self.__class__.__name__}:\n{formula}\nComputed: {computed}"
+        return f"{self._name}:\n{formula}\nComputed: {computed}"
 
     @property
     def formula(self) -> sb:
@@ -137,12 +138,12 @@ Correlations: {self._correlations}
         self._values = _compute_numerical(self._formula, self._variables, data)
         return self
 
-    @abstractmethod
-    def _get_formula(self) -> sb:
-        """Return the derived formula of the class"""
-        pass
+    # @abstractmethod
+    # def _get_formula(self) -> sb:
+    #     """Return the derived formula of the class"""
+    #     pass
 
-    @abstractmethod
-    def _analitical_formula(self) -> str:
-        """Return the analitical formula for the class"""
-        pass
+    # @abstractmethod
+    # def _analitical_formula(self) -> str:
+    #     """Return the analitical formula for the class"""
+    #     pass
