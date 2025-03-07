@@ -498,7 +498,9 @@ def scatterXHist(x, y, xerr: _Optional[_Union[float, _np.ndarray]] = None, **kwa
 
 def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
     """
-    Scatter plot with error bars.
+    Plot data with error bars.
+
+    Both `x` and `y` data with errors are supported
 
     Parameters
     ----------
@@ -511,35 +513,34 @@ def errorbar(data, dataerr, x=None, xerr=None, **kwargs):
     xerr : ndarray, optional
         Errors associated with the x-axis data. The default is None.
 
-    Other Parameters
-    ----------------
-    **kwargs : Additional callbacks for matplotlib (see matplotlib.pyplot.errorbar documentation).
-        fmt : str
-            Scatter point shape.
-        color : str
-            Scatter point color.
-            Aliases - 'sc' ; 'scolor' ; 'scatcol'.
-        ecolor : str
-            Error bar color.
-            Aliases - 'ec' ; 'errc' ; 'errcolor' ; 'errorcolor'.
-        markersize : float
-            Scatter point size.
-            Aliases - 's' ; 'ms'.
-        capsize : float
-            Error bar cap length.
-        elinewidth : float
-            Error bar thickness.
-            Aliases - 'elw' ; 'errlinew'.
-        barsabove : bool
-            If True, the error bars will be plotted over the scatter points.
-        title : str
-            Title of the plot.
-        xlabel : str
-            Label of the x-axis.
-        ylabel : str
-            Label of the y-axis.
-        figsize : tuple
-            Size of the figure.
+    ### kwargs : Additional callbacks for matplotlib (see matplotlib.pyplot.errorbar documentation).
+
+    fmt : str
+        Scatter point shape.
+    color : str
+        Scatter point color.
+        Aliases - 'sc' ; 'scolor' ; 'scatcol'.
+    ecolor : str
+        Error bar color.
+        Aliases - 'ec' ; 'errc' ; 'errcolor' ; 'errorcolor'.
+    markersize : float
+        Scatter point size.
+        Aliases - 's' ; 'ms'.
+    capsize : float
+        Error bar cap length.
+    elinewidth : float
+        Error bar thickness.
+        Aliases - 'elw' ; 'errlinew'.
+    barsabove : bool
+        If True, the error bars will be plotted over the scatter points.
+    title : str
+        Title of the plot.
+    xlabel : str
+        Label of the x-axis.
+    ylabel : str
+        Label of the y-axis.
+    figsize : tuple
+        Size of the figure.
 
     """
     ec = _osu.get_kwargs(
