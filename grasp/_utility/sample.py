@@ -22,7 +22,7 @@ easily.
 import pandas as _pd
 from astropy import units as _u
 from typing import List as _List
-from grasp._cluster import Cluster as _Cluster
+from grasp._utility.cluster import Cluster as _Cluster
 from typing import Optional as _Optional, Union as _Union
 from astropy.table import QTable as _QTable, Table as _Table
 
@@ -45,17 +45,21 @@ class Sample:
 
     def __init__(self, sample, gc: _Optional[_Union[_Cluster, str]] = None):
         """The constructor"""
-        self.gc = gc if isinstance(gc, _Cluster) else _Cluster(gc)
+        self.gc = (gc if isinstance(gc, _Cluster) else _Cluster(gc)) if gc else None
         self.qinfo = None
         self._sample = (
             _QTable.from_pandas(sample) if isinstance(sample, _pd.DataFrame) else sample
         )
+        self.__check_simulation()
         self._table = None
         self._bckupSample = self._sample.copy()
 
     def __str__(self):
         """The string representation"""
-        return self.gc.__str__() + "\n" + self._sample.__str__()
+        if self._is_simulation:
+            return f"Simulated data sample"+ "\n" + self._sample.__str__()
+        else:
+            return self.gc.__str__() + "\n" + self._sample.__str__()
 
     def __repr__(self):
         """The representation"""
@@ -241,6 +245,8 @@ class Sample:
         **kwargs : dict
             The parameters to update.
         """
+        if self._is_simulation:
+            return "This is a simulation data sample. No GC available."
         for key in kwargs:
             if hasattr(self.gc, key):
                 setattr(self.gc, key, kwargs[key])
@@ -257,9 +263,39 @@ class Sample:
         return self.gc.__str__()
 
 
+    def __check_simulation(self):
+        """Check wether the data the sample has been instanced with is
+        a simulation or real data"""
+        sim_a = [
+            'Mass_[Msun]',
+            'x_[pc]',
+            'y_[pc]',
+            'z_[pc]',
+            'vx_[km/s]',
+            'vy_[km/s]',
+            'vz_[km/s]'
+        ]
+        if all(a == b for a, b in zip(sim_a, self.__iter__())):
+            self.qinfo = "McLuster Simulation"
+            self._sample['M'] = self._sample['Mass_[Msun]'] * _u.Msun
+            self._sample["x"] = self._sample["x_[pc]"] * _u.pc
+            self._sample["y"] = self._sample["y_[pc]"] * _u.pc
+            self._sample["z"] = self._sample["z_[pc]"] * _u.pc
+            self._sample["vx"] = self._sample["vx_[km/s]"] * _u.km / _u.s
+            self._sample["vy"] = self._sample["vy_[km/s]"] * _u.km / _u.s
+            self._sample["vz"] = self._sample["vz_[km/s]"] * _u.km / _u.s
+            self.drop_columns(sim_a)
+            self._is_simulation = True
+        else:
+            self._is_simulation = False
+            return
+
+
     def __get_repr(self):
         """Gets the str representation"""
-        if self.gc.id == "UntrackedData":
+        if self._is_simulation:
+            gctxt = f"""Simulated data sample"""
+        elif self.gc.id == "UntrackedData":
             gctxt = f"""Gaia data retrieved at coordinates
 RA={self.gc.ra:.2f} DEC={self.gc.dec:.2f}
 """

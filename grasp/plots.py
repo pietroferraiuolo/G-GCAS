@@ -20,7 +20,7 @@ Just import the module
 import numpy as _np
 import seaborn as sns
 import matplotlib.pyplot as _plt
-from grasp._utility import osutils as _osu
+from grasp.core import osutils as _osu
 from typing import Optional as _Optional, Union as _Union
 from grasp.statistics import regression as _kde_estimator
 from grasp.analyzers._Rcode.r2py_models import _kde_labels

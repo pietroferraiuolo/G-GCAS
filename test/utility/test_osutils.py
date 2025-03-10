@@ -2,8 +2,8 @@ import unittest
 import os
 from unittest.mock import patch
 from astropy.table import QTable
-from grasp._utility import osutils as osu
-from grasp._utility import folder_paths as fn
+from grasp.core import osutils as osu
+from grasp.core import folder_paths as fn
 import numpy as np
 
 class TestOsutils(unittest.TestCase):

@@ -20,7 +20,7 @@ import pandas as _pd
 import rpy2.robjects as _ro
 from astropy.table import Table as _Table
 from astroML.density_estimation import XDGMM
-from grasp._utility import R_SOURCE_FOLDER as _RSF
+from grasp.core.folder_paths import R_SOURCE_FOLDER as _RSF
 from grasp.analyzers._Rcode import check_packages as _checkRpackages, r2py_models as _rm
 from rpy2.robjects import (
     r as _R,

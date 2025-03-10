@@ -28,13 +28,12 @@ import os, shutil, pandas as pd, numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 from astropy.table import Table
-from grasp._utility import (
+from grasp.core.folder_paths import (
     CLUSTER_DATA_FOLDER,
     CLUSTER_MODEL_FOLDER,
     CATALOG_FILE,
     UNTRACKED_DATA_FOLDER,
 )
-
 from grasp.plots import label_font, title_font
 
 

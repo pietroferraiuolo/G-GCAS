@@ -1,5 +1,5 @@
 import unittest
-from grasp._cluster import Cluster
+from grasp._utility.cluster import Cluster
 import astropy.units as u
 import pandas as pd
 import numpy as np

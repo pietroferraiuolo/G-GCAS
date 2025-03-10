@@ -3,7 +3,7 @@ import sympy as _sp
 from shutil import rmtree as _rm
 from grasp._utility.base_formula import BaseFormula as _BaseFormula
 from sympy.parsing import latex as _latex, sympy_parser as _symparser
-from grasp._utility.folder_paths import (
+from grasp.core.folder_paths import (
     SYS_DATA_FOLDER as _sdf,
     FORMULARY_BASE_FILE as _fbf,
 )
@@ -79,7 +79,7 @@ class Formulary:
     def __getattr__(self, attr):
         """The attribute getter"""
         name = attr.translate(_py2str).title()
-        if (attr or name) in self.formulas.keys():
+        if attr in self.formulas.keys() or name in self.formulas.keys():
             try:
                 return self.formulas[name]
             except KeyError:

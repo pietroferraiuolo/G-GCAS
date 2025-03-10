@@ -5,11 +5,13 @@ import os as _os
 import shutil as _sh
 import subprocess as _subp
 from astropy.table import QTable as _QTable
-from grasp._utility import (
-    get_file_list as _get_file_list,
+from grasp.core.folder_paths import (
     MCLUSTER_SOURCE_CODE as _MCSC,
     SIMULATION_FOLDER as _SF,
-    timestamp,
+)
+from grasp.core.osutils import (
+    get_file_list as _get_file_list,
+    timestamp as _timestamp,
 )
 
 _mcluster = _os.path.join(_MCSC, "mcluster")
@@ -120,14 +122,14 @@ def _manage_output_files():
     """
     Move the output files to a new folder with a timestamp as the name.
     """
-    tn = timestamp()
+    tn = _timestamp()
     fold = _subp.run(["pwd"], capture_output=True, text=True)
     fold = fold.stdout.strip()
     _os.mkdir(_os.path.join(_SF, tn))
     output_data = _get_file_list(fold=fold, key=".txt")
     output_info = _get_file_list(fold=fold, key=".info")
-    data_path = _os.path.join(_SF, tn, output_data.split("/")[-1])
-    info_path = _os.path.join(_SF, tn, output_info.split("/")[-1])
+    data_path = _os.path.join(_SF, tn, output_data.split("/")[-1].strip())
+    info_path = _os.path.join(_SF, tn, output_info.split("/")[-1].strip())
     _sh.move(output_data, data_path)
     _sh.move(output_info, info_path)
     print(data_path + "\n" + info_path)

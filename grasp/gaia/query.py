@@ -64,13 +64,22 @@ object:
 import os as _os
 import numpy as _np
 import configparser as _cp
-from grasp._utility import *
 from astropy import units as _u
 from astropy.table import Table as _Table
 from astroquery.gaia import Gaia as _Gaia
-from grasp._cluster import Cluster as _Cluster
 from grasp._utility.sample import Sample as _Sample
 from typing import Optional as _Opt, Union as _Union
+from grasp._utility.cluster import Cluster as _Cluster
+from grasp.core.osutils import (
+    get_kwargs,
+    timestamp as _ts,
+    load_data as _loadData,
+    tnlist as _tnlist
+)
+from grasp.core.folder_paths import (
+    BASE_DATA_PATH as _BDP,
+    CLUSTER_DATA_FOLDER as _CDF
+    )
 
 _QDATA = "query_data.txt"
 _QINFO = "query_info.ini"
@@ -181,7 +190,7 @@ class GaiaQuery:
         _Gaia.MAIN_GAIA_TABLE = gaia_table
         _Gaia.ROW_LIMIT = -1
         self._table = gaia_table
-        self._path = BASE_DATA_PATH
+        self._path = _BDP
         self._fold = None
         self._queryInfo = {}
         self._baseQ = """SELECT {data}
@@ -538,7 +547,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
 {check[1]}.
 Loading it..."""
             )
-            sample = load_data(check[1])
+            sample = _loadData(check[1])
             self.last_result = check[1]
             print(f"Sample number of sources: {len(sample):d}")
         return sample
@@ -557,7 +566,7 @@ Loading it..."""
 
         """
         config = _cp.ConfigParser()
-        tn = timestamp()
+        tn = _ts()
         fold = self._checkPathExist(name.upper())
         tnfold = _os.path.join(fold, tn)
         _os.mkdir(tnfold)
@@ -583,7 +592,7 @@ Loading it..."""
             the path to check.
 
         """
-        self._fold = CLUSTER_DATA_FOLDER(dest)
+        self._fold = _CDF(dest)
         if not _os.path.exists(self._fold):
             _os.makedirs(self._fold)
             print(f"Path '{self._fold}' did not exist. Created.")
@@ -740,7 +749,7 @@ Loading it..."""
         """
         config = _cp.ConfigParser()
         try:
-            tns = tnlist(name)
+            tns = _tnlist(name)
         except FileNotFoundError:
             return False
         check = False

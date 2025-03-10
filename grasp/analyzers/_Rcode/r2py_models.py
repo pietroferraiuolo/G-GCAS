@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Author(s)
 ---------
@@ -12,12 +11,12 @@ to the model parameters and results.
 
 """
 
-import numpy as np
-import rpy2.robjects as ro
+import numpy as _np
+import rpy2.robjects as _ro
 from rpy2.robjects import (
-    pandas2ri as pd2r, 
-    numpy2ri as np2r, 
-    r as R,
+    pandas2ri as _pd2r, 
+    #numpy2ri as _np2r,
+    r as _R,
 )
 
 
@@ -84,7 +83,7 @@ f"""Python wrapper for R Mclust Gaussian Mixture Model
             d: the number of parameters/features fitted with the model
             G: the number of components in the model
         """
-        return np.array([self.model["n"], self.model["d"], self.model["G"]])
+        return _np.array([self.model["n"], self.model["d"], self.model["G"]])
 
     @property
     def loglik(self):
@@ -100,7 +99,7 @@ f"""Python wrapper for R Mclust Gaussian Mixture Model
             z: the membership probability of each data point to each component
             classification: the classification of the data points
         """
-        return np.array([self.model["z"], self.model["classification"]])
+        return _np.array([self.model["z"], self.model["classification"]])
 
     @property
     def parameters(self):
@@ -113,7 +112,7 @@ f"""Python wrapper for R Mclust Gaussian Mixture Model
                 covMats: the covariance matrices for each group of the model
                 sigmasq: the variance of the features of the model
         """
-        self.model["parameters"]["variance"]["covMats"] = np.swapaxes(
+        self.model["parameters"]["variance"]["covMats"] = _np.swapaxes(
             self.model["parameters"]["variance"]["sigma"], 0, 2
         )
         keys_to_remove = ["modelName", "d", "G", "sigma", "scale"]
@@ -220,20 +219,20 @@ def _listvector_to_dict(r_listvector):
         if isinstance(
             value,
             (
-                ro.rinterface.IntSexpVector,
-                ro.rinterface.FloatSexpVector,
-                ro.rinterface.StrSexpVector,
+                _ro.rinterface.IntSexpVector,
+                _ro.rinterface.FloatSexpVector,
+                _ro.rinterface.StrSexpVector,
             ),
         ):
             py_dict[key] = list(value) if len(value) > 1 else value[0]
         # Handle data frames (convert to pandas DataFrame)
-        elif isinstance(value, ro.vectors.DataFrame):
-            py_dict[key] = pd2r.rpy2py(value)
+        elif isinstance(value, _ro.vectors.DataFrame):
+            py_dict[key] = _pd2r.rpy2py(value)
         # Handle nested ListVectors
-        elif isinstance(value, ro.vectors.ListVector):
+        elif isinstance(value, _ro.vectors.ListVector):
             py_dict[key] = _listvector_to_dict(value)
         # Handle other lists
-        elif isinstance(value, ro.vectors.Vector):
+        elif isinstance(value, _ro.vectors.Vector):
             py_dict[key] = list(value)
         # Other R objects could be added as necessary
         else:
