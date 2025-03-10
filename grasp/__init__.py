@@ -3,7 +3,7 @@ GAIA - GLOBULAR CLUSTER ANALYSIS SOFTWARE
 =========================================
 Author(s)
 ---------
-    - Pietro Ferraiuolo : Written in 2024
+- Pietro Ferraiuolo : Written in 2024
 
 Description
 -----------
@@ -40,6 +40,7 @@ _utility:
 from .gaia.query import (
     available_tables
 )
+from .formulary import Formulary, load_base_formulary
 from ._cluster import Cluster
 from ._utility import (
     load_data,

@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Author(s)
 ---------
@@ -16,14 +15,19 @@ of the statistical analysis is done through R scripts.
 
 import os as _os
 import numpy as _np
-import pandas as _pd
 import time as _time
+import pandas as _pd
 import rpy2.robjects as _ro
 from astropy.table import Table as _Table
 from astroML.density_estimation import XDGMM
 from grasp._utility import R_SOURCE_FOLDER as _RSF
-from grasp.analyzers._Rcode import check_packages, r2py_models as _rm
-from rpy2.robjects import pandas2ri as pd2r, numpy2ri as np2r, r as R, globalenv as genv
+from grasp.analyzers._Rcode import check_packages as _checkRpackages, r2py_models as _rm
+from rpy2.robjects import (
+    r as _R,
+    numpy2ri as _np2r,
+    pandas2ri as _pd2r,
+    globalenv as _genv
+)
 
 
 def XD_estimator(data, errors, correlations=None, *xdargs):
@@ -89,29 +93,29 @@ def gaussian_mixture_model(train_data, fit_data=None, **kwargs):
     fitted_model : dict
         The fitted gaussian mixture model and its parameters.
     """
-    check_packages("mclust")
-    np2r.activate()
+    _checkRpackages("mclust")
+    _np2r.activate()
     code = _os.path.join(_RSF, "gaussian_mixture.R")
-    R(f'source("{code}")')
+    _R(f'source("{code}")')
     if fit_data is not None:
-        r_data = np2r.numpy2rpy(train_data)
-        r_fit_data = np2r.numpy2rpy(fit_data)
+        r_data = _np2r.numpy2rpy(train_data)
+        r_fit_data = _np2r.numpy2rpy(fit_data)
         # Convert kwargs to R list
         r_kwargs = _ro.vectors.ListVector(kwargs)
         # Call the R function with the data and additional arguments
-        fitted_model = genv["GaussianMixtureModel"](
+        fitted_model = _genv["GaussianMixtureModel"](
             r_data, r_fit_data, **dict(r_kwargs.items())
         )
         clusters = fitted_model.rx2("cluster")
         fitted_model = fitted_model.rx2("model")
     else:
-        r_data = np2r.numpy2rpy(train_data)
+        r_data = _np2r.numpy2rpy(train_data)
         # Convert kwargs to R list
         r_kwargs = _ro.vectors.ListVector(kwargs)
         # Call the R function with the data and additional arguments
-        fitted_model = genv["GM_model"](r_data, **dict(r_kwargs.items()))
+        fitted_model = _genv["GM_model"](r_data, **dict(r_kwargs.items()))
         clusters = None
-    np2r.deactivate()
+    _np2r.deactivate()
     return _rm.GMModel(fitted_model, clusters)
 
 
@@ -148,26 +152,26 @@ def regression(data, kind="gaussian", verbose: bool = True):
     model : grasp.analyzers._Rcode.RegressionModel
         The fitted regression model, translated from R to Py.
     """
-    check_packages("minpack.lm")
-    np2r.activate()
+    _checkRpackages("minpack.lm")
+    _np2r.activate()
     regression_code = _os.path.join(_RSF, "regression.R")
-    R(f'source("{regression_code}")')
+    _R(f'source("{regression_code}")')
     if kind=='linear':
-        pd2r.activate()
-        reg_func = genv["linear_regression"]
+        _pd2r.activate()
+        reg_func = _genv["linear_regression"]
         D = _np.array(data).shape[-1] if isinstance(data, list) else data.shape[-1]
         if D != 2:
             x = list(_np.arange(0.,1.,1/len(data)))
             y = list(data)
             data = _pd.DataFrame({'x': x, 'y': y})
-        r_data = pd2r.py2rpy_pandasdataframe(data)
-        pd2r.deactivate()
+        r_data = _pd2r.py2rpy_pandasdataframe(data)
+        _pd2r.deactivate()
     else:
-        reg_func = genv["regression"]
-        r_data = np2r.numpy2rpy(data)
+        reg_func = _genv["regression"]
+        r_data = _np2r.numpy2rpy(data)
     regression_model = reg_func(r_data, method=kind, verb=verbose)
     model = _rm.RegressionModel(regression_model, type=kind)
-    np2r.deactivate()
+    _np2r.deactivate()
     return model
 
 

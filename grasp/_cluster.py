@@ -34,7 +34,7 @@ from grasp._utility import (
     CATALOG_FILE,
     UNTRACKED_DATA_FOLDER,
 )
-from grasp.analyzers.king import king_integrator
+
 from grasp.plots import label_font, title_font
 
 
@@ -171,6 +171,7 @@ class Cluster:
             model["w"] = np.loadtxt(file, skiprows=1, usecols=2)
             model["rho"] = np.loadtxt(file, skiprows=1, usecols=3)
         except FileNotFoundError:
+            from grasp.analyzers.king import king_integrator
             print(
                 f"WARNING: no king model file found for '{self.id}'. Performing the Single-Mass King model integration."
             )

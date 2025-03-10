@@ -1,7 +1,6 @@
 import os as _os
 import sympy as _sp
 from shutil import rmtree as _rm
-from grasp.analyzers import calculus as _gcalc
 from grasp._utility.base_formula import BaseFormula as _BaseFormula
 from sympy.parsing import latex as _latex, sympy_parser as _symparser
 from grasp._utility.folder_paths import (
@@ -241,7 +240,7 @@ class Formulary:
                 print(f"\n{name}\n{formula}")
 
 
-    def load_formulary(self, filename: str = _fbf):
+    def load_formulary(self, filename: str):
         """
         Load a formulary from a file.
 
@@ -325,6 +324,21 @@ class Formulary:
                     )
 
 
+def load_base_formulary():
+    """
+    Load the base formulary file.
+
+    Returns
+    -------
+    formulary : Formulary object
+        The formulary object containing the base formulary.
+
+    """
+    formulary = Formulary()
+    formulary.load_formulary(_fbf)
+    return formulary
+
+
 class _FormulaWrapper(_BaseFormula):
 
     def __init__(self, name, formula, variables):
@@ -342,8 +356,9 @@ class _FormulaWrapper(_BaseFormula):
         Computes the analytical error for the quantity, through the
         error propagation formula.
         """
+        from grasp.analyzers.calculus import error_propagation
         correlation = True if len(self._variables) > 1 else False
-        propagation = _gcalc.error_propagation(
+        propagation = error_propagation(
             self._formula, self._variables, correlation
         )
         self._errFormula = propagation["error_formula"]

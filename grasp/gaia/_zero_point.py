@@ -1,8 +1,7 @@
 from zero_point import zpt as _zpt
-from grasp._utility.sample import Sample as _Sample
 
 
-def zero_point_correction(sample: _Sample = None, *zargs):
+def zero_point_correction(sample = None, *zargs):
     """
     Computes the parallax zero point correction for a given sample of stars,
     following the "recipe" given in the dited paper
@@ -58,5 +57,16 @@ Using the "Zero Point Correction" tool from Pau Ramos
         zpc = _zpt.zero_point_correction(*zargs)
         return zpc
     else:
-        zpc = _zpt.zpt_wrapper(sample.to_pandas())
-        sample.sample.add_column("zero_point_correction", zpc)
+        from pandas import DataFrame
+        from grasp._utility.sample import Sample as _Sample
+        if isinstance(sample, _Sample):
+            zpc = _zpt.zpt_wrapper(sample.to_pandas())
+            sample.sample.add_column("zero_point_correction", zpc)
+        elif isinstance(sample, DataFrame):
+            zpc = _zpt.zpt_wrapper(sample)
+            sample["zero_point_correction"] = zpc
+        else:
+            raise ValueError(
+                "The sample provided is not a valid Sample object."
+            )
+        return sample
