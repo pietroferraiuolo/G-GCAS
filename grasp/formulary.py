@@ -174,6 +174,9 @@ class Formulary():
             name or name.lower() or name.translate(_str2py).lower()
         ) in self.formulas.keys():
             formula = self.formulas[name]
+            for v in values.values():
+                if not isinstance(v, (int, float)):
+                    raise ValueError("Values must be numerical.")
             if isinstance(formula, _sp.Equality):
                 formula = formula.rhs
                 formula = formula.subs(values)

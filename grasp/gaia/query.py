@@ -547,7 +547,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
 {check[1]}.
 Loading it..."""
             )
-            sample = _loadData(check[1])
+            sample = _loadData(check[1], as_sample=False)
             self.last_result = check[1]
             print(f"Sample number of sources: {len(sample):d}")
         return sample
