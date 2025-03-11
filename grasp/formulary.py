@@ -20,18 +20,26 @@ _py2str = str.maketrans({
 _tex2sym = {
     # Basic Operations
     "^": "**",
-    "\\cdot": "*",
-    "\\times": "*",
-    "\\": "",
-    "\\geq": ">=",
-    "\\leq": "<=",
-    "\\prime": "'",
-    "\\approx": "~=",
-    "\\neq": "!=",
+    "\\":'', # Remove backslashes
 }
 
+_dummyF = ['f','g','h','k']*50
 
-class Formulary:
+class Formulary():
+    """
+    The formulary class, which is a collection of equations read from a file,
+    or directly instanced in the python session.
+
+    Parameters
+    ----------
+    name : str, optional
+        The name of the formulary.
+    formula_names : list, optional
+        The names of the formulas passed to instance the formulary.
+    formulas : list, optional
+        The formulas passed to instance the formulary.
+
+    """
 
     def __init__(self, name: str = "", formula_names: list = [], formulas: list = []):
         """The constructor"""
@@ -42,6 +50,7 @@ class Formulary:
         self._type = None
         self._file = None
         self._latexFormulas = {}
+        self._add_count = 0
         super().__init__()
 
     def __len__(self):
@@ -147,6 +156,7 @@ class Formulary:
             raise ValueError(f"'{name}' not found in the formulary.")
         return formula.compute(data_list, err_list, corr_list)
 
+
     def substitute(self, name, values):
         """
         Substitute values to symbols in a formula.
@@ -174,6 +184,7 @@ class Formulary:
         else:
             raise ValueError(f"'{name}' not found in the formulary.")
 
+
     def add_formula(self, name, formula):
         """
         Add a formula to the formulary.
@@ -182,8 +193,8 @@ class Formulary:
         ----------
         name : str
             The name of the formula.
-        formula : sympy.Expr
-            The formula to add.
+        formula : str
+            The formula to add, which can be writte in latex or sympy syntax.
 
         """
         if isinstance(formula, str):
@@ -201,8 +212,9 @@ class Formulary:
                         text = 'Ambiguity in the written formula...\n'
                         try: # Try to "translate" the formula from latex to sympy
                             transl = formula.translate(_tex2sym)
-                            assert transl == s_formula, f"Can't translate '{formula}'"
-                            formula = _symparser.parse_expr(transl)
+                            l2_formula = _symparser.parse_expr(transl)
+                            assert l2_formula == s_formula, f"Can't translate '{formula}'"
+                            formula = s_formula
                         except AssertionError as f:
                             print(f)
                         if isinstance((l_formula, s_formula), _sp.Equality):
@@ -218,11 +230,15 @@ class Formulary:
                     elif isinstance(e, (SyntaxError, ValueError, TypeError)):
                         formula = l_formula
                     elif isinstance(e, _latex.errors.LaTeXParsingError):
-                        formula = _symparser.parse_expr(formula)
+                        try:
+                            formula = _symparser.parse_expr(formula)
+                        except Exception as f:
+                            raise e
                     else:
                         raise e
         if not isinstance(formula, _sp.Equality):
-            formula = _sp.Eq(_sp.Symbol('f'), formula)
+            formula = _sp.Eq(_sp.Symbol(_dummyF[self._add_count]+f'_{self._add_count//4}'), formula)
+            self._add_count += 1
         self.__setitem__(name, formula)
         self.symbols.update(formula.free_symbols)
         self.functions.update(formula.atoms(_sp.Function))

@@ -42,7 +42,7 @@ import grasp.core.folder_paths as gpaths
 
 from grasp.gaia._zero_point import zero_point_correction
 from grasp.gaia.query import GaiaQuery
-from grasp.analyzers.mcluster import mcluster_run
+from grasp.analyzers.mcluster import mcluster_run, docs as mcluster_docs
 from grasp.analyzers import calculus
 from grasp.analyzers._Rcode.r2py_models import RegressionModel, GMModel
 from grasp._utility.base_formula import BaseFormula
@@ -51,6 +51,35 @@ from grasp._utility.sample import Sample
 
 from grasp import statistics
 from grasp import plots
+from grasp.formulary import Formulary, load_base_formulary
+
+
+def dr3():
+    """Instance a GaiaQuery with DR3"""
+
+    print("""
+GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE
+            ..............
+         ..:;;..:;;;;;:::::;;
+       ;;;;;;::.::;;;;;;;;;;;;;
+      ;;;;.:;;;..;XXXXXX.::....:
+     :;::;::..+XXXXXXXXX+:;;;;;;:
+    ;::;:.:;;:XXXXXXXXXXX::::::::;        __ _  __ _(_) __ _
+    .;;..;;;:.:XXXXXXXXX$$$$$$$$$$X.     / _` |/ _` | |/ _` |
+    :;..:;;;..:xXXXXXXX$$$$$$$$$$$$X    | (_| | (_| | | (_| |
+    :;:.:;;.XXXXXXXXX$$$$$$$$$$$$$$;     \__, |\__,_|_|\__,_|
+    .;;:.:X$$$$$$$$$$$$$$$$$$$$$$X.      |___/
+    ..:;:$$$$$$$$$$$$$$$$$$$$$$X;.
+     :;;;$$$$$$$$$$$$$$$$$$$$::;;
+      ...;$$$$$$$$$$$$$$x;:;;;;;
+        ......:;:....;;;;;;;:.
+         ::::::::::;;;::...
+
+             INITIALIZED
+
+""")
+    return GaiaQuery()
+
 
 __all__ = [
     'zero_point_correction',
@@ -61,29 +90,10 @@ __all__ = [
     'GMModel',
     'BaseFormula',
     'Cluster',
+    'Formulary',
+    'load_base_formulary',
     'Sample',
     'statistics',
-    'plots']
-
-
-# print("""
-# GAIA - GLOBULAR CLUSTERS ANALYSIS SOFTWARE
-#             ..............
-#          ..:;;..:;;;;;:::::;;
-#        ;;;;;;::.::;;;;;;;;;;;;;
-#       ;;;;.:;;;..;XXXXXX.::....:
-#      :;::;::..+XXXXXXXXX+:;;;;;;:
-#     ;::;:.:;;:XXXXXXXXXXX::::::::;        __ _  __ _(_) __ _
-#     .;;..;;;:.:XXXXXXXXX$$$$$$$$$$X.     / _` |/ _` | |/ _` |
-#     :;..:;;;..:xXXXXXXX$$$$$$$$$$$$X    | (_| | (_| | | (_| |
-#     :;:.:;;.XXXXXXXXX$$$$$$$$$$$$$$;     \__, |\__,_|_|\__,_|
-#     .;;:.:X$$$$$$$$$$$$$$$$$$$$$$X.      |___/
-#     ..:;:$$$$$$$$$$$$$$$$$$$$$$X;.
-#      :;;;$$$$$$$$$$$$$$$$$$$$::;;
-#       ...;$$$$$$$$$$$$$$x;:;;;;;
-#         ......:;:....;;;;;;;:.
-#          ::::::::::;;;::...
-
-#              INITIALIZED
-
-# """)
+    'plots',
+    'dr3'
+]
