@@ -41,7 +41,7 @@ from grasp.core.osutils import load_data, load_simulation_data
 import grasp.core.folder_paths as gpaths
 
 from grasp.gaia._zero_point import zero_point_correction
-from grasp.gaia.query import GaiaQuery
+from grasp.gaia.query import GaiaQuery, available_tables
 from grasp.analyzers.mcluster import mcluster_run, docs as mcluster_docs
 from grasp.analyzers import calculus
 from grasp.analyzers._Rcode.r2py_models import RegressionModel, GMModel

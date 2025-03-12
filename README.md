@@ -65,6 +65,24 @@ pip install git+'https://github.com/pietroferraiuolo/GRASP.git'
 <summary>Utilization Examples</summary>
 
 ### Retrieving data
+Right now, the only implemented archive available for data retrievement is the GAIA archive.
+The GAIA archive is comprehensive of various data table, with the main table for data release `X`
+being `gaiadrX.main_table`. To list all the available data tables:
+
+```python
+In [2]: import grasp
+
+In [3]: grasp.available_tables() # or equivalentely grasp.gaia.query.available_tables()
+INFO: Retrieving tables... [astroquery.utils.tap.core]
+INFO: Parsing tables... [astroquery.utils.tap.core]
+INFO: Done. [astroquery.utils.tap.core]
+external.apassdr9
+external.catwise2020
+external.gaiadr2_astrophysical_parameters
+.
+. 
+. # continuing with alla available data tables
+```
 
 ### Data visualization
 
