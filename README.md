@@ -9,18 +9,21 @@ astrometric and photometric data retrievement and GCs dynamical evolution analys
 - [Installation](#installation)
     - [Build R](#build-r)
     - [ANTLR4](#install-latex-parser-dependencies)
+    - [GRASP](#installing-grasp)
 - [Examples](#retrieving-data)
 
 ## Installation
+Since this package uses a combination of Python (mainly), R, C and Fortran, some additional steps, as
+to avoid errors in the code execution, must be done before installing the package.
+
 <ins>NOTE</ins>: The use of a conda environment with `python >= 3.10` is highly recommended for the
 correct functioning of the package.
-<ins>NOTE_2</ins>: All the extra steps necessay will be accounted for in the setup of the package 
+
+<ins>NOTE2</ins>: All the extra steps necessay will be accounted for in the setup of the package 
 itself, sooner or later...
 
 ### Build R
-Since this package uses a combination of Python (mainly), R, C and Fortran, some additional steps, as
-to avoid errors in the code execution, must be done before installing the package. Firstly, one must
-install R, as the `statistics` module of the package uses R code to perform regression routines:
+Firstly, one must install R, as the `statistics` module of the package uses R code to perform regression routines:
 
 ```bash
 sudo apt update
@@ -29,7 +32,7 @@ sudo apt install r-base r-base-dev
 
 This will install the latest R distribution, as well as all the base packages that coome with it. The
 `dev` install makes sure the appropriate compilers are installed, so that R packages can be correctly
-built upon installing them. If compilers error arise (mentioning `GLIBCXX_3.4.XX not found for librosa`), try installing directly the `gcc` compiler:
+built upon installing them. If compiler errors arise (mentioning `GLIBCXX_3.4.XX not found for librosa`), try installing directly the `gcc` compiler:
 
 ```bash
 conda install -c conda-forge gcc
@@ -42,6 +45,20 @@ routine. As of version `0.2.0` of GRASP, the precise version to install is:
 
 ```bash
 pip install antlr4-python3-runtime==4.11
+```
+
+Equivalently:
+
+```bash
+conda install -c conda-forge antlr4-python3-runtime==4.11
+```
+
+### Installing GRASP
+Finally, when everything is set up, install the package through the repository, as no PyPI release
+exists yet:
+
+```bash
+pip install git+'https://github.com/pietroferraiuolo/GRASP.git'
 ```
 
 <details>
