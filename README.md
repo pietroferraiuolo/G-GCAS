@@ -298,13 +298,18 @@ Another example of visualization are the builtin `proper motion` plot and the `d
 ...     'pmdec':'>-50'
 }
 > restricted_sample = newsample.apply_conditions(conditions)
+```
 
-# here we are restricting the sample for visualization purposes and is equivalent to
+Here we are restricting the sample for visualization purposes and is equivalent to
 
-# restricted_sample = newsample[(newsample.pmra >-50) & (newsample.pmra < 50) & (newsample.pmdec >-50) & (newsample.pmdec < 50)]
+```py
+> restricted_sample = newsample[(newsample.pmra >-50) & (newsample.pmra < 50) & (newsample.pmdec >-50) & (newsample.pmdec < 50)]
+```
 
-# with the only difference being that with the latter a `QTable` is returned, while for the 
-# `apply_conditions` function a `Sample` istance is returned
+with the only difference being that with the latter a `QTable` is returned, while for the `apply_conditions` function a `Sample` istance is returned. (<ins>note</ins> that the same result
+could'have been achieved by directly applying these conditions to the initial query).
+
+```py
 > gplt.properMotion(restricted_sample)
 ```
 ![pm1](./docs/pmplot.png)
