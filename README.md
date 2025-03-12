@@ -73,6 +73,7 @@ being `gaiadrX.main_table`. To list all the available data tables:
 In [2]: import grasp
 
 In [3]: grasp.available_tables() # or equivalentely grasp.gaia.query.available_tables()
+```
 INFO: Retrieving tables... [astroquery.utils.tap.core]
 INFO: Parsing tables... [astroquery.utils.tap.core]
 INFO: Done. [astroquery.utils.tap.core]
@@ -81,7 +82,8 @@ external.catwise2020
 external.gaiadr2_astrophysical_parameters
 .
 . 
-. # continuing with alla available data tables
+. # continuing with all available data tables
+```
 ```
 
 ### Data visualization
