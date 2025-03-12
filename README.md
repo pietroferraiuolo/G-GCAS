@@ -6,13 +6,13 @@ astrometric and photometric data retrievement and GCs dynamical evolution analys
 
 ## Table of Contents
 
-- [Installation](#installation)
+- [Installation Guide](#installation)
     - [Build R](#build-r)
     - [ANTLR4](#install-latex-parser-dependencies)
     - [GRASP](#installing-grasp)
 - [Examples](#retrieving-data)
 
-## Installation
+## Installation Guide
 Since this package uses a combination of Python (mainly), R, C and Fortran, some additional steps, as
 to avoid errors in the code execution, must be done before installing the package.
 
@@ -62,7 +62,7 @@ pip install git+'https://github.com/pietroferraiuolo/GRASP.git'
 ```
 
 <details>
-<summary>Utilization Examples</summary>
+<summary>Features Examples</summary>
 
 ### Retrieving data
 Right now, the only implemented archive available for data retrievement is the GAIA archive.
@@ -324,8 +324,47 @@ The `doubleHistScatter` plot is a scatter plot with projected distributions of t
 
 
 ### Computing formulas
+Formula computations are handled through the `formulary` module, which contains the `Formulary`
+class, a collection of formulas either read by a `.frm` file or directly defined through the python
+session. 
 
+```py
+> f = grasp.load_base_formulary()
+> f
+"_base_ formulary from file 'base.frm'"
+"Type: latex"
+```
 
+The `load_base_fornumaly` function is a wrapper for the instance of the Formulary class reading
+the `base.frm` file, which contains formulas included in the package. Let's see what we have:
 
+```py
+> f.display_all()
+"""
+Angular Separation
+theta_{2*D} = 2*asin(sqrt((sin((alpha_{0} - alpha_{1})/2)**2*cos(delta_{1}))*cos(delta_{0}) + sin((delta_{0} - delta_{1})/2)**2))
+
+Los Distance
+r_{x} = 1/omega
+
+Radial Distance 2D
+r_{2*d} = r_{c*g}*tan(theta_{2*D})
+
+Gc Z Coordinate
+d = -r_{c*g} + r_{x}
+
+Radial Distance 3D
+R = sqrt(d**2 + r_{2*d}**2)
+
+In-Shell Dimentionless Poteff
+Sigma = (-x + log(B, E)) - log(Delta_{N}/(sqrt(x)), E)
+
+B Constant
+B = 16*(A*(sqrt(2)*(pi**2*(beta**2*(r_{s}**2*(alpha*(m**3*(sigma**3*(dr*dx)))))))))
+
+Dimentionless Poteff
+Sigma = -log(1 - exp(-w + x), E)
+"""
+```
 
 </details>
