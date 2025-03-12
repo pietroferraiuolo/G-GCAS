@@ -288,6 +288,26 @@ rather than a normal:
 ```
 ![px3](./docs/pxdist_fit_lorentz.png)
 
+Another example of visualization are the builtin `proper motion` plot and the `doubleHistScatter` plot:
+
+```py
+> restricted_sample = newsample[(newsample.pmra >-50) & (newsample.pmra < 50) & (newsample.pmdec >-50) & (newsample.pmdec < 50)] 
+> # here we are restricting the sample for visualization purposes
+> gplt.properMotion(restricted_sample)
+# might output font errors
+"findfont: Generic family 'cursive' not found because none of the following families were found: Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive"
+```
+![pm1](./docs/pmplot.png)
+
+The `doubleHistScatter` plot is a scatter plot with projected distributions of the data in their axes
+(with the `kde` option too)
+
+```py
+> gplt.doubleHistScatter(restricted_sample['pmra'], restricted_sample['pmdec'], ylabel='pmdec', xlabel='pmra', title='Proper Motion')
+```
+![dhs](./docs/dhs.png)
+
+
 ### Computing formulas
 
 </details>

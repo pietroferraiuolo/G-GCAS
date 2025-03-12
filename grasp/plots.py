@@ -32,7 +32,6 @@ label_font = {
     "size": 15,
 }
 title_font = {
-    "family": "cursive",
     "style": "italic",
     "color": "black",
     "weight": "semibold",
