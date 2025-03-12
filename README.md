@@ -70,21 +70,42 @@ The GAIA archive is comprehensive of various data table, with the main table for
 being `gaiadrX.main_table`. To list all the available data tables:
 
 ```python
-    >>> import grasp
+> import grasp
 
-    >>> grasp.available_tables() # or equivalentely grasp.gaia.query.available_tables()
-    INFO: Retrieving tables... [astroquery.utils.tap.core]
-    INFO: Parsing tables... [astroquery.utils.tap.core]
-    INFO: Done. [astroquery.utils.tap.core]
-    external.apassdr9
-    external.catwise2020
-    external.gaiadr2_astrophysical_parameters
-    .
-    . 
-    . # continuing with all available data tables
+> grasp.available_tables() # or equivalentely grasp.gaia.query.available_tables()
+INFO: Retrieving tables... [astroquery.utils.tap.core]
+INFO: Parsing tables... [astroquery.utils.tap.core]
+INFO: Done. [astroquery.utils.tap.core]
+external.apassdr9
+external.catwise2020
+external.gaiadr2_astrophysical_parameters
+.
+. 
+. # continuing with all available data tables
 ```
 
+As for (gaia) data retrievement, there is the `grasp.gaia.query` module containing the `GaiaQuery`
+class, which can be instanced with any of the availble tables, passed as a string. For example, if
+one wants to work with GAIA DR2 data, simply:
 
+```python
+> dr2 = grasp.GaiaQuery('gaiadr2.gaia_source') # or grasp.gaia.query.GaiaQuery()
+Initialized with Gaia table: 'gaiadr2.gaia_source'
+```
+
+Let's say we want to work with the latest (as of 2025) data release, DR3 (there is a fast alias for 
+that):
+
+```python
+> dr3 = grasp.dr3()
+"""Initialized with Gaia table: 'gaiadr3.gaia_source'"""
+> dr3
+"""GAIADR3.GAIA_SOURCE
+-------------------
+This table has an entry for every Gaia observed source as published with this data release. It contains the basic source parameters, in their final state as processed by the Gaia Data Processing and Analysis Consortium from the raw data coming from the spacecraft. The table is complemented with others containing information specific to certain kinds of objects (e.g.~Solar--system objects, non--single stars, variables etc.) and value--added processing (e.g.~astrophysical parameters etc.). Further array data types (spectra, epoch measurements) are presented separately via Datalink resources.
+ 
+<grasp.query.GaiaQuery class>"""
+```
 
 ### Data visualization
 
