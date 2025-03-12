@@ -90,6 +90,8 @@ one wants to work with GAIA DR2 data, simply:
 
 ```python
 > dr2 = grasp.GaiaQuery('gaiadr2.gaia_source') # or grasp.gaia.query.GaiaQuery()
+```
+```
 Initialized with Gaia table: 'gaiadr2.gaia_source'
 ```
 
