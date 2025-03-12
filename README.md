@@ -228,7 +228,7 @@ Harris Catalog 2010 edition Parameters
 """
 ```
 
-All the "fixed" query functions (`.get_astrometry`, `.get_photometry`, `.get_rv`) support as additional
+All the "fixed" query functions (`.get_astrometry`, `.get_photometry`, `.get_rv`) support an additional
 parameter the conditions to be applied on the query. As example
 
 ```py
@@ -240,8 +240,43 @@ parameter the conditions to be applied on the query. As example
 
 We can see how the conditions were applied, excluding quite the number of sources.
 
+While for these functions the data retrieved is fixed, there is the `.free_query` functions which, as
+the name suggests, accepts bot the `data` and `conditions` additional arguments to customize the query.
+
 ### Data visualization
-Let us work with the `a_smple` and the `newsample` from before.
+Let us work with the `a_smple` and the `newsample` from before. All the possible builtin visualization
+functions of the `grasp` package, are within the `plots` module.
+
+```py
+> from grasp import plots as gplt # gplt -> grasp.plots
+```
+
+Just as (cool) examples, let's visualize the `parallax` distributions of the samples, as well as the
+`proper motion` plots.
+
+```py
+> gplt.histogram(a_sample.parallax, xlabel='parallax', xlim=(-2,2))
+```
+![px1](./docs/pxdist_1_1.png)
+
+With so many sources, the visualization is not great, so that limits have been applied. One coul even
+perform analysis at the fly, like _Kerlen Density Estimation_ (here instead of putting limits to the
+visualization only, the sample itself has been restricted, to gain resolution on the histogram bins)
+
+```py
+> gplt.histogram(a_sample.parallax[(a_sample.parallax > -2) & (a_sample.parallax < 2)], kde=True, kde_kind='gaussian', xlabel='parallax')
+"Correctly imported `minpack.lm`."
+```
+![px2](./docs/pxdist_fit_normal.png.png)
+
+And one could see that the distribution is better fitted by a lorentian distribution function
+rather than a normal:
+
+```py
+> gplt.histogram(a_sample.parallax[(a_sample.parallax > -2) & (a_sample.parallax < 2)], kde=True, kde_kind='lorentzian', xlabel='parallax')
+"Correctly imported `minpack.lm`."
+```
+![px2](./docs/pxdist_fit_lorentz.png)
 
 ### Computing formulas
 
