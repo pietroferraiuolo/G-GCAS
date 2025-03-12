@@ -96,15 +96,22 @@ Initialized with Gaia table: 'gaiadr2.gaia_source'
 Let's say we want to work with the latest (as of 2025) data release, DR3 (there is a fast alias for 
 that):
 
-```python
-> dr3 = grasp.dr3()
-"Initialized with Gaia table: 'gaiadr3.gaia_source'"
-> dr3
-"GAIADR3.GAIA_SOURCE"
-"-------------------"
-"This table has an entry for every Gaia observed source as published with this data release. It contains the basic source parameters, in their final state as processed by the Gaia Data Processing and Analysis Consortium from the raw data coming from the spacecraft. The table is complemented with others containing information specific to certain kinds of objects (e.g.~Solar--system objects, non--single stars, variables etc.) and value--added processing (e.g.~astrophysical parameters etc.). Further array data types (spectra, epoch measurements) are presented separately via Datalink resources."
-""
-"<grasp.query.GaiaQuery class>"
+```
+>>> dr3 = grasp.dr3()
+Initialized with Gaia table: 'gaiadr3.gaia_source'
+>>> dr3
+"""
+GAIADR3.GAIA_SOURCE
+-------------------
+This table has an entry for every Gaia observed source as published with this data release. 
+It contains the basic source parameters, in their final state as processed by the Gaia Data 
+Processing and Analysis Consortium from the raw data coming from the spacecraft. The table 
+is complemented with others containing information specific to certain kinds of objects 
+(e.g.~Solar--system objects, non--single stars, variables etc.) and value--added processing 
+(e.g.~astrophysical parameters etc.). Further array data types (spectra, epoch measurements) 
+are presented separately via Datalink resources.
+
+<grasp.query.GaiaQuery class>"""
 ```
 
 ### Data visualization
