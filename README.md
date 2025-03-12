@@ -88,10 +88,8 @@ As for (gaia) data retrievement, there is the `grasp.gaia.query` module containi
 class, which can be instanced with any of the availble tables, passed as a string. For example, if
 one wants to work with GAIA DR2 data, simply:
 
-```python
-> dr2 = grasp.GaiaQuery('gaiadr2.gaia_source') # or grasp.gaia.query.GaiaQuery()
-```
-```
+```pycon
+>>> dr2 = grasp.GaiaQuery('gaiadr2.gaia_source') # or grasp.gaia.query.GaiaQuery()
 Initialized with Gaia table: 'gaiadr2.gaia_source'
 ```
 
