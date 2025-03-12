@@ -261,6 +261,47 @@ class Sample:
                     f"'Cluster' object has no attribute '{key}'\n{ptxt}"
                 )
         return self.gc.__str__()
+    
+
+    def apply_conditions(self, conditions: dict, inplace: bool = False):
+        """
+        Applies conditions to the sample data.
+
+        Parameters
+        ----------
+        conditions : dict
+            The conditions to apply.
+        inplace : bool
+            If True, the operation is done in place, otherwise a new object is returned.
+
+        Returns
+        -------
+        sample : grasp.Sample
+            The sample object containing the filtered data.
+
+        How to Use
+        ----------
+        The correct use of the method resides completely on how the conditions dictionary
+        is structured. The dictionary must have the column name as the key and the condition
+        including the logical operation:
+
+        >>> conditions = {
+        ...     "parallax": "> -5",
+        ...     "parallax": "< 5"
+        ... }
+        >>> sample.apply_conditions(conditions)
+        """
+        sample = self._sample.copy()
+        conds = []
+        for k,v in conditions.items():
+            conds.append(f"(sample.{k} {v})")
+        conds = " & ".join(conds)
+        sample = sample[eval(conds)]
+        if inplace:
+            self._sample = sample
+            return self.__repr__()
+        else:
+            return Sample(sample, self.gc)
 
 
     def __check_simulation(self):

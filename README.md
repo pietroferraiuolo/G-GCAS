@@ -291,11 +291,18 @@ rather than a normal:
 Another example of visualization are the builtin `proper motion` plot and the `doubleHistScatter` plot:
 
 ```py
-> restricted_sample = newsample[(newsample.pmra >-50) & (newsample.pmra < 50) & (newsample.pmdec >-50) & (newsample.pmdec < 50)] 
-> # here we are restricting the sample for visualization purposes
+> conditions = {
+...     'pmra':'>-50',
+...     'pmra':'<50',
+...     'pmdec':'<50',
+...     'pmdec':'>-50'
+}
+> restricted_sample = newsample.apply_conditions(conditions)
+> # here we are restricting the sample for visualization purposes and is equivalent to
+> # restricted_sample = newsample[(newsample.pmra >-50) & (newsample.pmra < 50) & (newsample.pmdec >-50) & (newsample.pmdec < 50)]
+> # with the only difference being that with the second method, a `QTable` is returned, while in the first
+> # a `Sample` istance
 > gplt.properMotion(restricted_sample)
-# might output font errors
-"findfont: Generic family 'cursive' not found because none of the following families were found: Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive"
 ```
 ![pm1](./docs/pmplot.png)
 
@@ -309,5 +316,8 @@ The `doubleHistScatter` plot is a scatter plot with projected distributions of t
 
 
 ### Computing formulas
+
+
+
 
 </details>
