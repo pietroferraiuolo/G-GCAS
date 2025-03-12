@@ -66,8 +66,8 @@ pip install git+'https://github.com/pietroferraiuolo/GRASP.git'
 
 ### Retrieving data
 Right now, the only implemented archive available for data retrievement is the GAIA archive.
-The GAIA archive is comprehensive of various data table, with the main table for data release `X`
-being `gaiadrX.main_table`. To list all the available data tables:
+It is comprehensive of various data tables, with the main table for data release `X`
+being `gaiadrX.gaia_source`. To list all the available data tables:
 
 ```py
 > import grasp
@@ -116,7 +116,7 @@ are presented separately via Datalink resources.
 
 For an easy and fast astrometry (or photometry) data retrival, there are built-in functions.
 Let's assume we want to retrieve astrometric data of all the sources falling within a circle on the 
-sky, with radius `r=$$1.0\deg$$` and center coordinates `$$(\alpha, \delta) = (6.02, -72.08) \deg$$`,
+sky, with radius `$r=1.0\deg$` and center coordinates `$(\alpha, \delta) = (6.02, -72.08) \deg$`,
 and we want to save the data obtained:
 
 ```py
