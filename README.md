@@ -22,27 +22,27 @@ Since this package uses a combination of Python (mainly), R, C and Fortran, some
 to avoid errors in the code execution, must be done before installing the package. Firstly, one must
 install R, as the `statistics` module of the package uses R code to perform regression routines:
 
-    ```bash
-    sudo apt update
-    sudo apt install r-base r-base-dev
-    ```
+```bash
+sudo apt update
+sudo apt install r-base r-base-dev
+```
 
 This will install the latest R distribution, as well as all the base packages that coome with it. The
 `dev` install makes sure the appropriate compilers are installed, so that R packages can be correctly
 built upon installing them. If compilers error arise (mentioning `GLIBCXX_3.4.XX not found for librosa`), try installing directly the `gcc` compiler:
 
-    ```bash
-    conda install -c conda-forge gcc
-    ```
+```bash
+conda install -c conda-forge gcc
+```
 
 ### Install latex parser dependencies: ANTLR4
 Since the `formulary` module, which handles formulas definitions and computations, use both the sympy
 and the latex syntax interpreter, the latter needs an additional package to run: the ANTLR4 python 
 routine. As of version `0.2.0` of GRASP, the precise version to install is:
 
-    ```bash
-    pip install antlr4-python3-runtime==4.11
-    ```
+```bash
+pip install antlr4-python3-runtime==4.11
+```
 
 <details>
 <summary>Utilization Examples</summary>
