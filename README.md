@@ -114,6 +114,122 @@ are presented separately via Datalink resources.
 <grasp.query.GaiaQuery class>"""
 ```
 
+For an easy and fast astrometry (or photometry) data retrival, there are built-in functions.
+Let's assume we want to retrieve astrometric data of all the sources falling within a circle on the 
+sky, with radius `r=$$1.0\deg$$` and center coordinates `$$(\alpha, \delta) = (6.02, -72.08) \deg$$`,
+and we want to save the data obtained:
+
+```py
+> a_sample = dr3.get_astrometry(radius=1., ra=6.02, dec=-72.08, save=True)
+"Not a Cluster: no model available"
+"INFO: Query finished. [astroquery.utils.tap.core]"
+"Sample number of sources: 229382"
+"Path '.../graspdata/query/UNTRACKEDDATA' did not exist. Created."
+".../graspdata/query/UNTRACKEDDATA/20250312_111553/query_data.txt"
+".../graspdata/query/UNTRACKEDDATA/20250312_111553/query_info.ini"
+
+> a_sample
+"""
+Gaia data retrieved at coordinates 
+RA=6.02 DEC=-72.08
+
+Data Columns:
+source_id - ra - ra_error - dec - dec_error - 
+parallax - parallax_error - pmra - pmra_error - pmdec -
+"""
+```
+
+Every query will have a unique tracking numer identifier of the format `YYYYMMDD_hhmmss`. The query
+returns a `grasp.Sample` object, which handles all data and cluster integration in one place. Common
+`pandas` and `astropy.QTable methods are available`:
+
+```py
+> a_sample.head()
+""" 
+             SOURCE_ID        ra   ra_error        dec  dec_error  parallax  \
+0  4689621262329503744  5.934553   0.537742 -72.252166   0.742929 -2.907118   
+1  4689859169153623936  6.723713   0.234891 -71.538202   0.198667 -0.215250   
+2  4688735017312170240  7.703532   0.189104 -72.891773   0.190288  0.002266   
+3  4688735021593281792  7.674888   0.216690 -72.905171   0.215202 -0.011812   
+4  4688735021595344896  7.688834  12.067017 -72.890149   5.270076       NaN   
+
+   parallax_error      pmra  pmra_error     pmdec  pmdec_error  
+0        0.691778  4.077426    0.623827 -0.533118     0.897007  
+1        0.234868 -0.710963    0.298354 -0.390703     0.304819  
+2        0.209810  0.565811    0.251735 -1.081986     0.262715  
+3        0.232426  0.404157    0.278103 -1.143366     0.292574  
+4             NaN       NaN         NaN       NaN          NaN  
+"""
+
+> a_sample.info()
+"""
+<Table length=229382>
+     name       dtype    unit                              description                             n_bad
+-------------- ------- -------- ------------------------------------------------------------------ -----
+     SOURCE_ID   int64          Unique source identifier (unique within a particular Data Release)     0
+            ra float64      deg                                                    Right ascension     0
+      ra_error float32      mas                                  Standard error of right ascension     0
+           dec float64      deg                                                        Declination     0
+     dec_error float32      mas                                      Standard error of declination     0
+      parallax float64      mas                                                           Parallax 38102
+parallax_error float32      mas                                         Standard error of parallax 38102
+          pmra float64 mas / yr                         Proper motion in right ascension direction 38102
+    pmra_error float32 mas / yr       Standard error of proper motion in right ascension direction 38102
+         pmdec float64 mas / yr                             Proper motion in declination direction 38102
+   pmdec_error float32 mas / yr           Standard error of proper motion in declination direction 38102
+"""
+```
+
+Since there is a big focus on globular clusters for the `grasp` package, the same result could be 
+achieved by simply passing as arguments of the functions the radius and the GC name.
+
+The center coordinates used in the previous example, are the coordinates for the center of the GC
+*NGC 104* (as listed in the Harry's 2010 edition catalogue). So we can repeat the query like this:
+
+```py
+> a_sample = dr3.get_astrometry(radius=1., gc='ngc104', save=True)
+"INFO: Query finished. [astroquery.utils.tap.core]"
+"Sample number of sources: 229490"
+"Path '.../graspdata/query/NGC104' did not exist. Created."
+".../graspdata/query/NGC104/20250312_112905/query_data.txt"
+".../graspdata/query/NGC104/20250312_112905/query_info.ini"
+
+> a_sample
+"""
+Data sample for cluster NGC104
+
+Data Columns:
+source_id - ra - ra_error - dec - dec_error - 
+parallax - parallax_error - pmra - pmra_error - pmdec - 
+pmdec_error
+"""
+```
+
+With the addition that we have now available useful data on the Cluster:
+
+```py
+> print(a_sample.gc)
+"""
+Harris Catalog 2010 edition Parameters
+
+       Key                  Value
+----------------------------------------
+.id      Cluster Name       NGC104
+.ra      Position in sky    RA  6.02 deg
+.dec                        DEC -72.08 deg
+.dist    Distance           4.50 kpc
+.w0      W0 Parameter       8.82
+.logc    Concentration      logc=2.07
+.cflag                      Collapsed -> False
+.rc      Core radius        0.006 deg
+.rh      Half-Light radius  0.053 deg
+.rt      Tidal Radius       0.705 deg
+"""
+```
+
+
+
+
 ### Data visualization
 
 ### Computing formulas

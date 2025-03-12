@@ -265,7 +265,10 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
             Result of the async query, stored into an astropy table.
 
         """
-        ra, dec, savename = self._get_coordinates(gc)
+        ra = kwargs.get("ra", None)
+        dec = kwargs.get("dec", None)
+        name = kwargs.get("name", "UntrackedData")
+        gc, ra, dec, savename = self._get_coordinates(gc, ra=ra ,dec=dec ,name=name)
         self._queryInfo = {
             "Scan Info": {"RA": ra, "DEC": dec, "Scan Radius": radius},
             "Flag": {"Query": "free"},
@@ -336,7 +339,10 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         astro_cluster : astropy.Table
             Astropy table with  the query results.
         """
-        ra, dec, savename = self._get_coordinates(gc)
+        ra = kwargs.get("ra", None)
+        dec = kwargs.get("dec", None)
+        name = kwargs.get("name", "UntrackedData")
+        gc, ra, dec, savename = self._get_coordinates(gc, ra=ra ,dec=dec ,name=name)
         astrometry = "source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error"
         self._queryInfo = {
             "Scan Info": {
@@ -411,7 +417,10 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         photo_cluster : astropy.Table
             Astropy table with the results.
         """
-        ra, dec, savename = self._get_coordinates(gc)
+        ra = kwargs.get("ra", None)
+        dec = kwargs.get("dec", None)
+        name = kwargs.get("name", "UntrackedData")
+        gc, ra, dec, savename = self._get_coordinates(gc, ra=ra ,dec=dec ,name=name)
         photometry = "source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot"
         self._queryInfo = {
             "Scan Info": {
@@ -484,7 +493,10 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         rv_cluster : astropy.Table
             Astropy t able with te result.
         """
-        ra, dec, savename = self._get_coordinates(gc)
+        ra = kwargs.get("ra", None)
+        dec = kwargs.get("dec", None)
+        name = kwargs.get("name", "UntrackedData")
+        gc, ra, dec, savename = self._get_coordinates(gc, ra=ra ,dec=dec ,name=name)
         rv = "source_id, radial_velocity, radial_velocity_error"
         self._queryInfo = {
             "Scan Info": {
@@ -729,7 +741,7 @@ Loading it..."""
                 ra = gc.ra
                 dec = gc.dec
                 savename = gc.id
-        return ra, dec, savename
+        return gc, ra, dec, savename
 
     def __check_query_exists(self, name):
         """
