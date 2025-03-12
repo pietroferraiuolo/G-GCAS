@@ -69,7 +69,7 @@ Right now, the only implemented archive available for data retrievement is the G
 The GAIA archive is comprehensive of various data table, with the main table for data release `X`
 being `gaiadrX.main_table`. To list all the available data tables:
 
-```python
+```pycon
 > import grasp
 
 > grasp.available_tables() # or equivalentely grasp.gaia.query.available_tables()
