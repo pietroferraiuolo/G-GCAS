@@ -1,109 +1,56 @@
 # GRASP - Globular clusteR Astrometry and Photometry Software
- ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pietroferraiuolo/G-GCAS/python-test.yaml)
+ ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pietroferraiuolo/GRASP/python-test.yaml)
 
-This package is a software which uses GAIA data releases to retrieve and analyze (mainly) Globular Cluster astrometric and photometric data.
+The GRASP package is a tool for astrophysical data analysis, mainly thought for Globular CLusters 
+astrometric and photometric data retrievement and GCs dynamical evolution analysis.
 
 ## Table of Contents
 
 - [Installation](#installation)
-- [Package](#package-content-description)
+    - [Build R](#build-r)
+    - [ANTLR4](#install-latex-parser-dependencies)
+- [Examples](#retrieving-data)
 
 ## Installation
+<ins>NOTE</ins>: The use of a conda environment with `python >= 3.10` is highly recommended for the
+correct functioning of the package.
+<ins>NOTE_2</ins>: All the extra steps necessay will be accounted for in the setup of the package 
+itself, sooner or later...
 
-As of now, that there is not yet a PyPi version available, intall the package from the github repository:
+### Build R
+Since this package uses a combination of Python (mainly), R, C and Fortran, some additional steps, as
+to avoid errors in the code execution, must be done before installing the package. Firstly, one must
+install R, as the `statistics` module of the package uses R code to perform regression routines:
 
-```bash
-pip install git+https://github.com/pietroferraiuolo/G-GCAS.git
-```
+    ```bash
+    sudo apt update
+    sudo apt install r-base r-base-dev
+    ```
 
-## Package Content Description
+This will install the latest R distribution, as well as all the base packages that coome with it. The
+`dev` install makes sure the appropriate compilers are installed, so that R packages can be correctly
+built upon installing them. If compilers error arise (mentioning `GLIBCXX_3.4.XX not found for librosa`), try installing directly the `gcc` compiler:
 
-### functions.py
-This module provides functions to compute various astronomical and physical quantities, such as angular
-separation, line-of-sight distance, radial distances in 2D and 3D, total velocity, and effective 
-gravitational potential. The classes which define those quantities provide both the analythical formula
-and the methods for computing it, provided the data (and errors and computations if available).
+    ```bash
+    conda install -c conda-forge gcc
+    ```
 
-### plots.py
-This module contains various plotting functions to visualize the useful data of globular clusters. 
-It includes functions for creating scatter plots with histograms, color-magnitude diagrams, proper 
-motion distributions, spatial distributions, histograms with optional kernel density estimation, 
-scatter plots with error bars, and more. Each function is designed to be flexible and customizable 
-through various parameters.
+### Install latex parser dependencies: ANTLR4
+Since the `formulary` module, which handles formulas definitions and computations, use both the sympy
+and the latex syntax interpreter, the latter needs an additional package to run: the ANTLR4 python 
+routine. As of version `0.2.0` of GRASP, the precise version to install is:
 
-### statistics.py
-This module provides a series of functions for the statistical analysis of astronomical data. It 
-includes functions for extreme deconvolution estimation, Gaussian mixture modeling, and regression 
-model estimation. The module leverages R scripts for statistical computations and integrates them into 
-Python using the `rpy2` package. R scripts and other supporting scripts are in the
-`grasp.analyzers._Rcode` module.
+    ```bash
+    pip install antlr4-python3-runtime==4.11
+    ```
 
-### _query.py
-This module contains the `GaiaQuery` class, which facilitates querying the Gaia database using ADQL
-(Astronomical Data Query Language). The class provides methods for performing custom queries as well
-as pre-defined queries for astrometric, photometric, and radial velocity data. It also includes functionality
-for saving query results and their associated metadata.
+<details>
+<summary>Utilization Examples</summary>
 
-### _cluster.py
-This module contains the `Cluster` class, which encapsulates all the information of a specified cluster. 
-The class is designed to load and manage parameters of globular clusters from the Harris Catalogue 2010 Edition.
+### Retrieving data
 
-### analyzers
-This module provides functions for numerical computation and error analysis in the context of globular
-cluster studies. It includes methods for computing numerical values of functions, error propagation, and
-integration using the Gauss-Legendre method. Additionally, it offers an interface to a Fortran90 code for
-integrating the Single-Mass King model and an interface for the `McLuster` C/F code 
-(Kuepper, A. H. W. ; Maschberger, Th. ; Kroupa, P. ; Baumgardt, H.).
+### Data visualization
 
-#### dynamics.py
-This module provides functions for analyzing the dynamics of globular clusters. It includes methods 
-for converting proper motion to velocity, computing 2D and 3D radial distances, total velocity,
-and density profiles.
+### Computing formulas
 
-#### calculus.py
-This module contains various functions to compute numerically analythical equations (written with
-sympy), as well as error formulae derivation and computation. It also has the Gauss-Legendre Quadrature
-numerical integrator, supported by a sub-module, `_glpoints.py`, which contains predefined sets of points
-and weights for 20, 40, 80, and 96-point Gauss-Legendre quadrature.
-
-#### mcluster.py
-This module is a bridge from python to the C/Fortran code `McLuster` and `McLusterSEE`. This code generates
-syntetic data of globular clusters, while it's other, more complicated, version `SEE` includes stellar 
-evolution when generaing the cluster. This code is often used to generate imput for numerical simulations
-tools, such as Nbody6.
-
-#### king.py
-This module is a bridge between python and the fortran code `king.f90`. This Fortran program calculates
-the equilibrium configurations of a gravitational gas using the King distribution function as described
-in the 1966 article by I.P. King (King, I.P. (1966). AJ 71, 64.). The program is designed to analyze
-isotropic King models and can be modified to handle anisotropic Boltzmann functions.
-
-#### _Rcode
-This sub-module contains R source code for statistical analysis, which are:
-- `regression.R`: a code which performs regresison on data of many equations, like 'gaussian', 'linear', 'poisson', and so on...
-- `gaussian_mixture.R`: a code which trains a Gaussian Mixture Model using ``Mclust``.
-In support of bridging python to R, there are two modules, `r_check.py` and `r2py_models.py`, which handle
-the connection and translation between the two languages.
-
-### _utility
-This module provides utility functions for file and data management within the Gaia - Globular Clusters
-Analysis Software as well as defining supportive classes of better data/sample management.
-
-#### folder_paths.py
-This module defines various folder paths used throughout the Gaia - Globular Clusters Analysis Software.
-It includes paths for base data, catalog files, query data, models, and untracked data. Additionally, it
-provides functions to generate specific paths for cluster data and models based on cluster names.
-
-#### base_formula.py
-This module defines the base class inherited by all `functions.py` astronomical formulae.
-
-#### sample.py
-This module provides the `Sample` class, which encapsulates data samples retrieved from the Gaia database.
-It includes methods for data manipulation, filtering, and basic statistical analysis, making it easier
-to work with subsets of data within the G-GCAS framework.
-
-#### osutils.py
-This module provides utility functions for operating system interactions within the Gaia - Globular 
-Clusters Analysis Software. It includes functions for handling file operations, directory management,
-and environment variable manipulation. These utilities help streamline the workflow by providing a
-consistent interface for common OS-related tasks.
+</details>
