@@ -263,7 +263,7 @@ class Sample:
         return self.gc.__str__()
     
 
-    def apply_conditions(self, conditions: dict, inplace: bool = False):
+    def apply_conditions(self, conditions: str|list|dict, inplace: bool = False):
         """
         Applies conditions to the sample data.
 
@@ -281,21 +281,36 @@ class Sample:
 
         How to Use
         ----------
-        The correct use of the method resides completely on how the conditions dictionary
-        is structured. The dictionary must have the column name as the key and the condition
-        including the logical operation:
-
+        The correct use of the method resides completely on how the conditions are passed.
+        If passed as dictionary, the structure is as follows:
+        it must have the column name as the key and the condition including the logical operation:
         >>> conditions = {
         ...     "parallax": "> -5",
         ...     "parallax": "< 5"
         ... }
         >>> sample.apply_conditions(conditions)
+
+        If passed as a string, only one condition is admitted, in the form:
+        >>> conditions = "parallax > -5"
+
+        They can be passed as a list of strings, in the format:
+        >>> conditions = ["parallax > -5", "parallax < 5"]
         """
         sample = self._sample.copy()
-        conds = []
-        for k,v in conditions.items():
-            conds.append(f"(sample.{k} {v})")
-        conds = " & ".join(conds)
+        if isinstance(conditions, dict):
+            conds = []
+            for k,v in conditions.items():
+                conds.append(f"(sample.{k} {v})")
+            conds = " & ".join(conds)
+        elif isinstance(conditions, list):
+            conds = []
+            for condition in conditions:
+                conds.append(f"(sample.{condition})")
+            conds = " & ".join(conds)
+        elif isinstance(conditions, str):
+            conds = f"(sample.{conditions})"
+        else:
+            raise ValueError("Conditions must be a dictionary, list or string.")
         sample = sample[eval(conds)]
         if inplace:
             self._sample = sample

@@ -37,6 +37,7 @@ _utility:
     (eg. load_data, get_file_list, tnlist)
 
 """
+from .__version__ import *
 from grasp.core.osutils import load_data, load_simulation_data
 import grasp.core.folder_paths as gpaths
 
