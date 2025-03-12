@@ -116,7 +116,7 @@ are presented separately via Datalink resources.
 
 For an easy and fast astrometry (or photometry) data retrival, there are built-in functions.
 Let's assume we want to retrieve astrometric data of all the sources falling within a circle on the 
-sky, with radius $r=1.0\deg$ and center coordinates $(\alpha, \delta) = (6.02, -72.08) \deg$,
+sky, with radius $r=1.0\,\deg$ and center coordinates $(\alpha, \delta) = (6.02, -72.08) \deg$,
 and we want to save the data obtained:
 
 ```py
@@ -205,7 +205,8 @@ pmdec_error
 """
 ```
 
-With the addition that we have now available useful data on the Cluster:
+With the addition that we have now available useful data on the Cluster (<ins>NOTE</ins>: this is 
+non other than an implementation of the `grasp.Cluster` class):
 
 ```py
 > print(a_sample.gc)
@@ -227,10 +228,20 @@ Harris Catalog 2010 edition Parameters
 """
 ```
 
+All the "fixed" query functions (`.get_astrometry`, `.get_photometry`, `.get_rv`) support as additional
+parameter the conditions to be applied on the query. As example
 
+```py
+> conditions = ['parallax IS NOT NULL', 'parallax > 0', 'pmra IS NOT NULL', 'pmdec IS NOT NULL'] # uses ADQL
+> newsample = dr3.get_astrometry(radius=1., gc='ngc104', conds=conditions)
+"INFO: Query finished. [astroquery.utils.tap.core]"
+"Sample number of sources: 131482"
+```
 
+We can see how the conditions were applied, excluding quite the number of sources.
 
 ### Data visualization
+Let us work with the `a_smple` and the `newsample` from before.
 
 ### Computing formulas
 
