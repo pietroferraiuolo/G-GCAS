@@ -257,26 +257,36 @@ Just as (cool) examples, let's visualize the `parallax` distributions of the sam
 ```py
 > gplt.histogram(a_sample.parallax, xlabel='parallax', xlim=(-2,2))
 ```
-![px1](./docs/pxdist_1_1.png)
+![px1](./docs/pxdis_1_1.png)
 
 With so many sources, the visualization is not great, so that limits have been applied. One coul even
 perform analysis at the fly, like _Kerlen Density Estimation_ (here instead of putting limits to the
 visualization only, the sample itself has been restricted, to gain resolution on the histogram bins)
 
 ```py
-> gplt.histogram(a_sample.parallax[(a_sample.parallax > -2) & (a_sample.parallax < 2)], kde=True, kde_kind='gaussian', xlabel='parallax')
+> gplt.histogram(
+    a_sample.parallax[(a_sample.parallax > -2) & (a_sample.parallax < 2)], 
+    kde=True, 
+    kde_kind='gaussian', 
+    xlabel='parallax'
+  )
 "Correctly imported `minpack.lm`."
 ```
-![px2](./docs/pxdist_fit_normal.png.png)
+![px2](./docs/pxdist_fit_normal.png)
 
 And one could see that the distribution is better fitted by a lorentian distribution function
 rather than a normal:
 
 ```py
-> gplt.histogram(a_sample.parallax[(a_sample.parallax > -2) & (a_sample.parallax < 2)], kde=True, kde_kind='lorentzian', xlabel='parallax')
+> gplt.histogram(
+    a_sample.parallax[(a_sample.parallax > -2) & (a_sample.parallax < 2)], 
+    kde=True, 
+    kde_kind='lorentzian', 
+    xlabel='parallax'
+  )
 "Correctly imported `minpack.lm`."
 ```
-![px2](./docs/pxdist_fit_lorentz.png)
+![px3](./docs/pxdist_fit_lorentz.png)
 
 ### Computing formulas
 
