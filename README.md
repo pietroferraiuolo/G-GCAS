@@ -69,16 +69,16 @@ Right now, the only implemented archive available for data retrievement is the G
 The GAIA archive is comprehensive of various data table, with the main table for data release `X`
 being `gaiadrX.main_table`. To list all the available data tables:
 
-```pycon
+```py
 > import grasp
 
 > grasp.available_tables() # or equivalentely grasp.gaia.query.available_tables()
-INFO: Retrieving tables... [astroquery.utils.tap.core]
-INFO: Parsing tables... [astroquery.utils.tap.core]
-INFO: Done. [astroquery.utils.tap.core]
-external.apassdr9
-external.catwise2020
-external.gaiadr2_astrophysical_parameters
+"INFO: Retrieving tables... [astroquery.utils.tap.core]"
+"INFO: Parsing tables... [astroquery.utils.tap.core]"
+"INFO: Done. [astroquery.utils.tap.core]"
+"external.apassdr9"
+"external.catwise2020"
+"external.gaiadr2_astrophysical_parameters"
 .
 . 
 . # continuing with all available data tables
@@ -88,18 +88,18 @@ As for (gaia) data retrievement, there is the `grasp.gaia.query` module containi
 class, which can be instanced with any of the availble tables, passed as a string. For example, if
 one wants to work with GAIA DR2 data, simply:
 
-```pycon
->>> dr2 = grasp.GaiaQuery('gaiadr2.gaia_source') # or grasp.gaia.query.GaiaQuery()
-Initialized with Gaia table: 'gaiadr2.gaia_source'
+```py
+> dr2 = grasp.GaiaQuery('gaiadr2.gaia_source') # or grasp.gaia.query.GaiaQuery()
+"Initialized with Gaia table: 'gaiadr2.gaia_source'"
 ```
 
 Let's say we want to work with the latest (as of 2025) data release, DR3 (there is a fast alias for 
 that):
 
-```
->>> dr3 = grasp.dr3()
-Initialized with Gaia table: 'gaiadr3.gaia_source'
->>> dr3
+```py
+> dr3 = grasp.dr3()
+"Initialized with Gaia table: 'gaiadr3.gaia_source'"
+> dr3
 """
 GAIADR3.GAIA_SOURCE
 -------------------
