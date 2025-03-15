@@ -1,7 +1,7 @@
-from __future__ import annotations
 """
 Author(s):
-    - Pietro Ferraiuolo : written in 2024
+----------
+- Pietro Ferraiuolo : written in 2024
 
 Copyright : Pietro Ferraiuolo (pietro.ferraiuolo@inaf.it)
 
@@ -12,12 +12,12 @@ How to Use it
 -------------
 """
 
-import sympy as sp
-import numpy as np
+import sympy as _sp
+import numpy as _np
 from . import _glpoints
-from typing import Dict, Any
-import multiprocessing as mp
-from numpy.typing import ArrayLike
+import multiprocessing as _mp
+from typing import Dict as _Dict, Any as _Any
+from numpy.typing import ArrayLike as _ArrayLike
 
 
 def compute_numerical_function(func, variables, var_data):
@@ -47,8 +47,8 @@ def compute_numerical_function(func, variables, var_data):
     significantly increasing computations times, while being compatible with the
     full computation precision up to 10e-9.
     """
-    n_cores = mp.cpu_count()
-    N = np.array(var_data).shape[-1]
+    n_cores = _mp.cpu_count()
+    N = _np.array(var_data).shape[-1]
     Nf = len(var_data)
     if N < (2000 * n_cores) and Nf < 3:
         # Multicore computation
@@ -61,7 +61,7 @@ def compute_numerical_function(func, variables, var_data):
             "WARNING: computation time exceeding 30s. Compiling expression with NumPy."
         )
         computed_func = _lambdified_computation(func, variables, var_data)
-    return np.array(computed_func)
+    return _np.array(computed_func)
 
 
 def compute_error(err_func, variables, var_data, var_errors, corr_values: list = None):
@@ -95,7 +95,7 @@ def compute_error(err_func, variables, var_data, var_errors, corr_values: list =
     return computed_error
 
 
-def error_propagation(func, variables, correlation: bool = False) -> Dict[str, Any]:
+def error_propagation(func, variables, correlation: bool = False) -> _Dict[str, _Any]:
     """
     Computes the imput function's error with the standard error propagation
     formula:
@@ -120,19 +120,19 @@ def error_propagation(func, variables, correlation: bool = False) -> Dict[str, A
         - "correlations" : list of sympy symbols (only if corr=True)
     """
     if correlation:
-        corr = np.ones((len(variables), len(variables)), dtype=object) - np.eye(
+        corr = _np.ones((len(variables), len(variables)), dtype=object) - _np.eye(
             len(variables), dtype=object
         )
     else:
-        corr = np.eye(len(variables), dtype=object)
+        corr = _np.eye(len(variables), dtype=object)
     errors = []
     for i, var1 in enumerate(variables):
-        errors.append(sp.symbols("epsilon_{}".format(var1)))
+        errors.append(_sp.symbols("epsilon_{}".format(var1)))
         for j, var2 in enumerate(variables):
             if i != j:
-                corr[i][j] = corr[i][j] * sp.symbols(f"rho_{var1}_{var2}")
+                corr[i][j] = corr[i][j] * _sp.symbols(f"rho_{var1}_{var2}")
     # Partial derivatives computation
-    partials = [sp.diff(func, var) for var in variables]
+    partials = [_sp.diff(func, var) for var in variables]
     # Quadratic errors sum
     sum_of_squares = sum(
         (partials[i] ** 2 * errors[i] ** 2) for i, _ in enumerate(variables)
@@ -146,7 +146,7 @@ def error_propagation(func, variables, correlation: bool = False) -> Dict[str, A
                     partials[i] * partials[j] * errors[i] * errors[j] * corr[i][j]
                 )
     # Total error propagation
-    error_formula = sp.sqrt(sum_of_squares + sum_of_correlations)
+    error_formula = _sp.sqrt(sum_of_squares + sum_of_correlations)
     corrs = []
     for x in corr:
         for c in x:
@@ -156,7 +156,7 @@ def error_propagation(func, variables, correlation: bool = False) -> Dict[str, A
         assert len(corrs) % 2 == 0
         assert len(corrs) != 0
         for i in range(0, len(corrs), 2):
-            eformula = sp.nsimplify(error_formula.subs(corrs[i + 1], corrs[i]))
+            eformula = _sp.nsimplify(error_formula.subs(corrs[i + 1], corrs[i]))
             corrs.pop(i + 1)
     except AssertionError:
         eformula = error_formula
@@ -195,17 +195,17 @@ def gaus_legendre_integrator(fnc, a, b, points):
     functions, as it is not implemented yet.
     """
     if points == 20:
-        x = np.array(_glpoints.x20)
-        w = np.array(_glpoints.w20)
+        x = _np.array(_glpoints.x20)
+        w = _np.array(_glpoints.w20)
     elif points == 40:
-        x = np.array(_glpoints.x40)
-        w = np.array(_glpoints.w40)
+        x = _np.array(_glpoints.x40)
+        w = _np.array(_glpoints.w40)
     elif points == 80:
-        x = np.array(_glpoints.x80)
-        w = np.array(_glpoints.w80)
+        x = _np.array(_glpoints.x80)
+        w = _np.array(_glpoints.w80)
     elif points == 96:
-        x = np.array(_glpoints.x96)
-        w = np.array(_glpoints.w96)
+        x = _np.array(_glpoints.x96)
+        w = _np.array(_glpoints.w96)
     else:
         raise ValueError("Supported point values are 20, 40, 80, and 96.")
     area = 0.0
@@ -243,7 +243,7 @@ def _multicore_computation(n_cores, func, val_dicts):
 
     """
     compute = __compute_sympy(func)
-    with mp.Pool(n_cores) as pool:
+    with _mp.Pool(n_cores) as pool:
         computed_func = pool.map(compute.compute, val_dicts)
     return computed_func
 
@@ -267,19 +267,9 @@ def _lambdified_computation(func, variables, var_data):
     computed_func : ndarray
         The result computed function.
     """
-    f_lambdified = sp.lambdify(variables, func, modules="numpy")
+    f_lambdified = _sp.lambdify(variables, func, modules="numpy")
     if not isinstance(var_data, list):
         var_data = [var_data]
-    # var_data = np.array(var_data).T # Transpose the data to (n_samples, n_variables)
-    # result = []
-    # for sample in var_data:
-    #     print("n_sample:",len(sample))
-    #     print("n_variables:",len(variables))
-    #     if len(sample) != len(variables):
-    #         raise ValueError("The number of variables and the number of data points must be the same.")
-    #     else:
-    #         result.append(float(f_lambdified(sample)))
-    # computed_func = np.array(result)
     result = f_lambdified(*var_data)
     computed_func = []
     for x in result:
@@ -287,7 +277,7 @@ def _lambdified_computation(func, variables, var_data):
     return computed_func
 
 
-def _data_dict_creation(variables, var_data: ArrayLike):
+def _data_dict_creation(variables, var_data: _ArrayLike):
     """
     function which creates the list of dictionaries in the format needed to compute
     sympy functions.
@@ -305,7 +295,7 @@ def _data_dict_creation(variables, var_data: ArrayLike):
         A list of dictionaries, each containing the variables with an associated
         value, to be passed to the function in order to be computed.
     """
-    N = np.array(var_data).shape[-1]
+    N = _np.array(var_data).shape[-1]
     val_dicts = []
     for n in range(N):
         data_dict = {}
@@ -325,4 +315,4 @@ class __compute_sympy:
         self.f = func
 
     def compute(self, vals):
-        return float(sp.N(self.f.subs(vals)))
+        return float(_sp.N(self.f.subs(vals)))

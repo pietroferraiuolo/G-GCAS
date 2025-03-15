@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "GRASP",
+			"path": "."
+		}
+	],
+	"settings": {
+		"r.lsp.promptToInstall": false
+	}
+}

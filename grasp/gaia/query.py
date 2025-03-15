@@ -61,16 +61,25 @@ object:
     151 libname_gspphot
 """
 
-import os
-import numpy as np
-import configparser
-from grasp._utility import *
-from astropy import units as u
-from astropy.table import Table
-from astroquery.gaia import Gaia
-from typing import Optional, Union
-from grasp._cluster import Cluster
-from grasp._utility.sample import Sample
+import os as _os
+import numpy as _np
+import configparser as _cp
+from astropy import units as _u
+from astropy.table import Table as _Table
+from astroquery.gaia import Gaia as _Gaia
+from grasp._utility.sample import Sample as _Sample
+from typing import Optional as _Opt, Union as _Union
+from grasp._utility.cluster import Cluster as _Cluster
+from grasp.core.osutils import (
+    get_kwargs,
+    timestamp as _ts,
+    load_data as _loadData,
+    tnlist as _tnlist
+)
+from grasp.core.folder_paths import (
+    BASE_DATA_PATH as _BDP,
+    CLUSTER_DATA_FOLDER as _CDF
+    )
 
 _QDATA = "query_data.txt"
 _QINFO = "query_info.ini"
@@ -88,7 +97,7 @@ def available_tables(key: str = None):
         then only tables relative to the complete 3th data release will be printed
         out. Default is None, meaning all the tables will be printed.
     """
-    tables = Gaia.load_tables(only_names=True)
+    tables = _Gaia.load_tables(only_names=True)
     if key is not None:
         for table in tables:
             name = table.name
@@ -168,7 +177,7 @@ class GaiaQuery:
 
     """
 
-    def __init__(self, gaia_table: Optional[Union[str, list]] = "gaiadr3.gaia_source"):
+    def __init__(self, gaia_table: _Opt[_Union[str, list]] = "gaiadr3.gaia_source"):
         """
         The Constructor
 
@@ -178,10 +187,10 @@ class GaiaQuery:
             Gaia table(s) to initialize the class with. The default is the 3th
             Gaia data release "gaiadr3.gaia_source".
         """
-        Gaia.MAIN_GAIA_TABLE = gaia_table
-        Gaia.ROW_LIMIT = -1
+        _Gaia.MAIN_GAIA_TABLE = gaia_table
+        _Gaia.ROW_LIMIT = -1
         self._table = gaia_table
-        self._path = BASE_DATA_PATH
+        self._path = _BDP
         self._fold = None
         self._queryInfo = {}
         self._baseQ = """SELECT {data}
@@ -207,7 +216,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
     def free_query(
         self,
         radius,
-        gc: Optional[Union[Cluster, str]] = None,
+        gc: _Opt[_Union[_Cluster, str]] = None,
         save: bool = False,
         **kwargs,
     ):
@@ -256,7 +265,10 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
             Result of the async query, stored into an astropy table.
 
         """
-        ra, dec, savename = self._get_coordinates(gc)
+        ra = kwargs.get("ra", None)
+        dec = kwargs.get("dec", None)
+        name = kwargs.get("name", "UntrackedData")
+        gc, ra, dec, savename = self._get_coordinates(gc, ra=ra ,dec=dec ,name=name)
         self._queryInfo = {
             "Scan Info": {"RA": ra, "DEC": dec, "Scan Radius": radius},
             "Flag": {"Query": "free"},
@@ -275,14 +287,14 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         else:
             self._queryInfo["Scan Info"]["Conditions Applied"] = cond
         samp = self._run_query(savename, ra, dec, radius, dat, cond, save)
-        sample = Sample(samp, gc=gc)
+        sample = _Sample(samp, gc=gc)
         sample.qinfo = self._queryInfo["Scan Info"]
         return sample
 
     def get_astrometry(
         self,
         radius,
-        gc: Optional[Union[Cluster, str]] = None,
+        gc: _Opt[_Union[_Cluster, str]] = None,
         save: bool = False,
         **kwargs,
     ):
@@ -327,7 +339,10 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         astro_cluster : astropy.Table
             Astropy table with  the query results.
         """
-        ra, dec, savename = self._get_coordinates(gc)
+        ra = kwargs.get("ra", None)
+        dec = kwargs.get("dec", None)
+        name = kwargs.get("name", "UntrackedData")
+        gc, ra, dec, savename = self._get_coordinates(gc, ra=ra ,dec=dec ,name=name)
         astrometry = "source_id, ra, ra_error, dec, dec_error, parallax, parallax_error, pmra, pmra_error, pmdec, pmdec_error"
         self._queryInfo = {
             "Scan Info": {
@@ -350,14 +365,14 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         astro_cluster = self._run_query(
             savename, ra, dec, radius, astrometry, cond, save
         )
-        astro_sample = Sample(astro_cluster, gc=gc)
+        astro_sample = _Sample(astro_cluster, gc=gc)
         astro_sample.qinfo = self._queryInfo["Scan Info"]
         return astro_sample
 
     def get_photometry(
         self,
         radius,
-        gc: Optional[Union[Cluster, str]] = None,
+        gc: _Opt[_Union[_Cluster, str]] = None,
         save: str = False,
         **kwargs,
     ):
@@ -402,7 +417,10 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         photo_cluster : astropy.Table
             Astropy table with the results.
         """
-        ra, dec, savename = self._get_coordinates(gc)
+        ra = kwargs.get("ra", None)
+        dec = kwargs.get("dec", None)
+        name = kwargs.get("name", "UntrackedData")
+        gc, ra, dec, savename = self._get_coordinates(gc, ra=ra ,dec=dec ,name=name)
         photometry = "source_id, bp_rp, phot_bp_mean_flux, phot_rp_mean_flux, phot_g_mean_mag, phot_bp_rp_excess_factor, teff_gspphot"
         self._queryInfo = {
             "Scan Info": {
@@ -425,14 +443,14 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         photo_cluster = self._run_query(
             savename, ra, dec, radius, photometry, cond, save
         )
-        phot_sample = Sample(photo_cluster, gc=gc)
+        phot_sample = _Sample(photo_cluster, gc=gc)
         phot_sample.qinfo = self._queryInfo["Scan Info"]
         return phot_sample
 
     def get_rv(
         self,
         radius,
-        gc: Optional[Union[Cluster, str]] = None,
+        gc: _Opt[_Union[_Cluster, str]] = None,
         save: bool = False,
         **kwargs,
     ):
@@ -475,7 +493,10 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         rv_cluster : astropy.Table
             Astropy t able with te result.
         """
-        ra, dec, savename = self._get_coordinates(gc)
+        ra = kwargs.get("ra", None)
+        dec = kwargs.get("dec", None)
+        name = kwargs.get("name", "UntrackedData")
+        gc, ra, dec, savename = self._get_coordinates(gc, ra=ra ,dec=dec ,name=name)
         rv = "source_id, radial_velocity, radial_velocity_error"
         self._queryInfo = {
             "Scan Info": {
@@ -496,7 +517,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         else:
             self._queryInfo["Scan Info"]["Conditions Applied"] = cond
         rv_cluster = self._run_query(savename, ra, dec, radius, rv, cond, save)
-        rv_sample = Sample(rv_cluster, gc=gc)
+        rv_sample = _Sample(rv_cluster, gc=gc)
         rv_sample.qinfo = self._queryInfo["Scan Info"]
         return rv_sample
 
@@ -526,7 +547,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
         check = self.__check_query_exists(gc_id)
         if check is False:
             query = self._adqlWriter(ra, dec, radius, data=data, conditions=cond)
-            job = Gaia.launch_job_async(query)
+            job = _Gaia.launch_job_async(query)
             sample = job.get_results()
             print(f"Sample number of sources: {len(sample):d}")
             self.last_result = sample
@@ -538,7 +559,7 @@ WHERE CONTAINS(POINT('ICRS',gaiadr3.gaia_source.ra,gaiadr3.gaia_source.dec),CIRC
 {check[1]}.
 Loading it..."""
             )
-            sample = load_data(check[1])
+            sample = _loadData(check[1], as_sample=False)
             self.last_result = check[1]
             print(f"Sample number of sources: {len(sample):d}")
         return sample
@@ -556,15 +577,15 @@ Loading it..."""
             Where to save the data, usually the cluster's name.
 
         """
-        config = configparser.ConfigParser()
-        tn = timestamp()
+        config = _cp.ConfigParser()
+        tn = _ts()
         fold = self._checkPathExist(name.upper())
-        tnfold = os.path.join(fold, tn)
-        os.mkdir(tnfold)
-        data = os.path.join(tnfold, _QDATA)
-        info = os.path.join(tnfold, _QINFO)
-        if isinstance(dat, Table) is False:
-            dat = Table(dat)
+        tnfold = _os.path.join(fold, tn)
+        _os.mkdir(tnfold)
+        data = _os.path.join(tnfold, _QDATA)
+        info = _os.path.join(tnfold, _QINFO)
+        if isinstance(dat, _Table) is False:
+            dat = _Table(dat)
         dat.write(data, format="ascii.tab")
         for section, options in self._queryInfo.items():
             config[section] = options
@@ -583,14 +604,14 @@ Loading it..."""
             the path to check.
 
         """
-        self._fold = CLUSTER_DATA_FOLDER(dest)
-        if not os.path.exists(self._fold):
-            os.makedirs(self._fold)
+        self._fold = _CDF(dest)
+        if not _os.path.exists(self._fold):
+            _os.makedirs(self._fold)
             print(f"Path '{self._fold}' did not exist. Created.")
         return self._fold
 
     def _formatCheck(
-        self, data: Optional[Union[str, list]], conditions: Optional[Union[str, list]]
+        self, data: _Opt[_Union[str, list]], conditions: _Opt[_Union[str, list]]
     ):
         """
         Function to check and correct the format the 'data' and 'conditions'
@@ -669,12 +690,12 @@ Loading it..."""
             The full string to input the query with.
 
         """
-        if isinstance(ra, u.Quantity):
-            ra = ra / u.deg
-        if isinstance(dec, u.Quantity):
-            dec = dec / u.deg
-        if isinstance(radius, u.Quantity):
-            radius = radius / u.deg
+        if isinstance(ra, _u.Quantity):
+            ra = ra / _u.deg
+        if isinstance(dec, _u.Quantity):
+            dec = dec / _u.deg
+        if isinstance(radius, _u.Quantity):
+            radius = radius / _u.deg
         circle = f"{ra},{dec},{radius:.3f}"
         dat, cond = self._formatCheck(data, conditions)
         query = self._baseQ.format(
@@ -708,19 +729,19 @@ Loading it..."""
         if gc is None:
             ra = kwargs.get("ra", None)
             dec = kwargs.get("dec", None)
-            gc = Cluster(ra=ra, dec=dec)
+            gc = _Cluster(ra=ra, dec=dec)
             savename = kwargs.get("name", "UntrackedData")
         else:
-            if isinstance(gc, Cluster):
+            if isinstance(gc, _Cluster):
                 ra = gc.ra
                 dec = gc.dec
                 savename = gc.id
             elif isinstance(gc, str):
-                gc = Cluster(gc)
+                gc = _Cluster(gc)
                 ra = gc.ra
                 dec = gc.dec
                 savename = gc.id
-        return ra, dec, savename
+        return gc, ra, dec, savename
 
     def __check_query_exists(self, name):
         """
@@ -738,15 +759,15 @@ Loading it..."""
             Either way it is a tuple, which first elemnt is True while the second
             is the complete file path to the corresponding saved data.
         """
-        config = configparser.ConfigParser()
+        config = _cp.ConfigParser()
         try:
-            tns = tnlist(name)
+            tns = _tnlist(name)
         except FileNotFoundError:
             return False
         check = False
         for tn in tns:
-            file_path = os.path.join(tn, _QINFO)
-            if os.path.exists(file_path):
+            file_path = _os.path.join(tn, _QINFO)
+            if _os.path.exists(file_path):
                 config.read(file_path)
                 try:
                     data_acquired = config["Scan Info"]["Data Acquired"]
@@ -768,18 +789,18 @@ Loading it..."""
     def __load_table(self):
         """Loads the instanced table(s)"""
         if isinstance(self._table, list):
-            table = np.zeros(len(self._table), dtype=object)
+            table = _np.zeros(len(self._table), dtype=object)
             for i, t in enumerate(self._table):
-                table[i] = Gaia.load_table(t)
+                table[i] = _Gaia.load_table(t)
         else:
-            table = Gaia.load_table(self._table)
+            table = _Gaia.load_table(self._table)
         return table
 
     def __get_repr(self):
         """Get text for '__repr__' method"""
         table = self.__load_table()
         text = ""
-        if isinstance(table, np.ndarray):
+        if isinstance(table, _np.ndarray):
             for t in table:
                 text += (
                     f"\n{t.name.upper()}\n" + "-" * len(t.name) + f"\n{t.description}\n"
@@ -796,8 +817,8 @@ Loading it..."""
     def __get_str(self):
         """Get text for '__str__' method"""
         tables = self.__load_table()
-        if isinstance(tables, np.ndarray):
-            cols = np.zeros(tables.shape[0], dtype=list)
+        if isinstance(tables, _np.ndarray):
+            cols = _np.zeros(tables.shape[0], dtype=list)
             text = ""
             for t in tables:
                 text += f"{t.name.upper()}" + " " * 10

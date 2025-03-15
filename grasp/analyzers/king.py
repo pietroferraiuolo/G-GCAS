@@ -1,8 +1,28 @@
-""""""
+"""
+:module: grasp.analyzers.king
+:synopsis: This module provides a function to call the Fortran90 code for the
+    Single-Mass King model integration routine.
+
+Author(s)
+---------
+- Pietro Ferraiuolo : Written in 2024
+
+Description
+-----------
+This module provides a function to call the Fortran90 code for the Single-Mass
+King model integration routine.
+
+Functions
+---------
+- king_integrator : Calls the Fortran90 code for the Single-Mass King model
+    integration routine.
+
+"""
 
 import os
 import subprocess
-from grasp._utility import get_file_list, KING_INTEGRATOR_FOLDER
+from grasp.core.osutils import get_file_list
+from grasp.core.folder_paths import KING_INTEGRATOR_FOLDER
 _king_dir = KING_INTEGRATOR_FOLDER
 _king_exe = os.path.join(_king_dir, 'king_integrator')
 

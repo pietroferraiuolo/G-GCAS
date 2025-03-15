@@ -1,4 +1,3 @@
-from __future__ import annotations
 """
 Module: functions.py
 
@@ -643,11 +642,15 @@ class CartesianConversion:
         Parameters
         ----------
         data :_List[ArrayLike]
-            The data to use for the computation. Needs to be in the order [ra, dec, pmra, pmdec].
+            The data to use for the computation. Needs to be in the order
+            [ra, dec, pmra, pmdec].
         errors :_List[ArrayLike], optional
-            The errors to use for the computation. Needs to be in the order [ra_err, dec_err, pmra_err, pmdec_err].
+            The errors to use for the computation. Needs to be in the order
+            [ra_err, dec_err, pmra_err, pmdec_err].
         correlations :_List[ArrayLike], optional
-            The correlations to use for the computation. Needs to be in the order [ra_dec_corr, ra_pmra, ra_pmdec, dec_pmra, dec_pmdec, pmra_pmdec].
+            The correlations to use for the computation. Needs to be in the order 
+            [ra_dec_corr, ra_pmra_corr, ra_pmdec_corr,dec_pmra_corr, dec_pmdec_corr,
+            pmra_pmdec_corr].
 
         Returns
         -------
