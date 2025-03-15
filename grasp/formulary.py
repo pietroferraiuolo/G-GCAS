@@ -259,6 +259,27 @@ class Formulary():
                 print(f"\n{name}\n{formula}")
 
 
+    def show_formula_symbols(self, name: str):
+        """
+        Show the symbols in a formula.
+
+        Parameters
+        ----------
+        name : str
+            The name of the formula.
+        
+        """
+        if name in self.formulas.keys():
+            formula = self.formulas[name]
+            if isinstance(formula, _sp.Equality):
+                symbols = formula.rhs.free_symbols
+            else:
+                symbols = formula.free_symbols
+            print(f"Symbols in '{name}': {symbols}")
+        else:
+            raise ValueError(f"'{name}' not found in the formulary.")
+
+
     def load_formulary(self, filename: str):
         """
         Load a formulary from a file.
