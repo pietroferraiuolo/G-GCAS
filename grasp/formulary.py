@@ -240,7 +240,10 @@ class Formulary():
                     else:
                         raise e
         if not isinstance(formula, _sp.Equality):
-            formula = _sp.Eq(_sp.Symbol(_dummyF[self._add_count]+f'_{self._add_count//4}'), formula)
+            formula = _sp.Eq(
+                _sp.Symbol(f"{_dummyF[self._add_count]}_{self._add_count//4}"),
+                formula
+                )
             self._add_count += 1
         self.__setitem__(name, formula)
         self.symbols.update(formula.free_symbols)
