@@ -102,7 +102,7 @@ def load_data(
             try:
                 from grasp import Cluster
 
-                gc = _os.path.dirname(file).split("/")[-2]
+                gc = _os.path.basename(_os.path.dirname(_os.path.dirname(file)))
                 gc = Cluster(gc)
             except Exception:
                 gc = "UntrackedData"
@@ -188,7 +188,7 @@ def get_file_list(tn: str = None, fold: str = None, key: str = None) -> str | li
                 if isinstance(paths, str):
                     paths = [paths]
                 for path in paths:
-                    if fold in path.split("/")[-2]:
+                    if fold in _os.path.basename(_os.path.dirname(_os.path.normpath(path))):
                         fl = sorted(
                             [_os.path.join(path, file) for file in _os.listdir(path)]
                         )
@@ -202,7 +202,7 @@ def get_file_list(tn: str = None, fold: str = None, key: str = None) -> str | li
         try:
             selected_list = []
             for file in fl:
-                if key in file.split("/")[-1]:
+                if key in _os.path.basename(file):
                     selected_list.append(file)
         except TypeError as err:
             raise TypeError("'key' argument must be a string") from err

@@ -26,7 +26,11 @@ from grasp.core.folder_paths import KING_INTEGRATOR_FOLDER
 from grasp.core.osutils import get_file_list
 
 _king_dir = KING_INTEGRATOR_FOLDER
-_king_exe = os.path.join(_king_dir, "king_integrator")
+# The repository ships a Linux (ELF) build as ``king_integrator`` and a native
+# Windows build (MinGW-w64 gfortran, static) as ``king_integrator.exe``.
+_king_exe = os.path.join(
+    _king_dir, "king_integrator.exe" if os.name == "nt" else "king_integrator"
+)
 
 
 def king_integrator(

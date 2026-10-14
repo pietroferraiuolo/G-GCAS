@@ -265,7 +265,16 @@ def _multicore_computation(
 
     """
     compute = __compute_sympy(func)
-    with _mp.Pool(n_cores) as pool:
+    try:
+        pool = _mp.Pool(n_cores)
+    except OSError as err:  # includes PermissionError
+        # Process pools need OS primitives (named pipes on Windows, semaphores
+        # on POSIX) that restricted/sandboxed environments may deny.
+        _logger.warning(
+            "Could not start a multiprocessing pool (%s); computing serially.", err
+        )
+        return [compute.compute(vd) for vd in val_dicts]
+    with pool:
         computed_func = pool.map(compute.compute, val_dicts)
     return computed_func
 

@@ -28,7 +28,7 @@ class TestOsutils(unittest.TestCase):
         self.assertTrue(np.array_equal(result['col1'], mock_table['col1']))
         self.assertTrue(np.array_equal(result['col2'], mock_table['col2']))
         #mock_findTracknum.assert_called_once_with('dummy_tracking_number', complete_path=True)
-        mock_read.assert_called_once_with('/mock/path/query_data.fits', format='fits')
+        mock_read.assert_called_once_with(os.path.join('/mock/path', 'query_data.fits'), format='fits')
 
     def test_get_kwargs(self):
         # Test with key present in kwargs
@@ -67,7 +67,7 @@ class TestOsutils(unittest.TestCase):
 
         # Test the tnlist function
         result = osu.tnlist('gc_name')
-        expected = ['/basepath/gc_name/tn1', '/basepath/gc_name/tn2', '/basepath/gc_name/tn3']
+        expected = [os.path.join('/basepath/gc_name', tn) for tn in ('tn1', 'tn2', 'tn3')]
         self.assertEqual(result, expected)
 
     def test_timestamp(self):
@@ -102,13 +102,9 @@ class TestOsutils(unittest.TestCase):
         # Test with complete_path=True
         mock_listdir_res()
         result = osu._findTracknum('tn_3', complete_path=True)
-        expected = os.path.join(
-            os.path.join(
-                fn.QUERY_DATA_FOLDER,
-                'gc_folder3'
-            ),
-            'tn_3'
-        )
+        # os.path.join is mocked to join with "/", so build the expectation the
+        # same way (QUERY_DATA_FOLDER itself was joined natively at import).
+        expected = "/".join([fn.BASE_DATA_PATH, "query", "gc_folder3", "tn_3"])
         self.assertEqual(result, expected)
 
 if __name__ == '__main__':

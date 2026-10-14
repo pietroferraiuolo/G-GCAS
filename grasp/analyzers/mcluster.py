@@ -30,8 +30,26 @@ from grasp.core.osutils import (
     timestamp as _timestamp,
 )
 
-_mcluster = _os.path.join(_MCSC, "mcluster")
-_mcluster_sse = _os.path.join(_MCSC, "mcluster_sse")
+# Linux builds are produced on demand by ``make``; on Windows the repository
+# ships native MinGW-w64 builds (``*.exe``, compiled with ``-include
+# win_compat.h``), since ``make``/``gcc`` are usually not available there.
+_EXE = ".exe" if _os.name == "nt" else ""
+_mcluster = _os.path.join(_MCSC, "mcluster" + _EXE)
+_mcluster_sse = _os.path.join(_MCSC, "mcluster_sse" + _EXE)
+
+
+def _ensure_executable(exe: str, target: str) -> None:
+    """Build ``exe`` with ``make <target>`` if it is missing (POSIX only)."""
+    if _os.path.isfile(exe):
+        return
+    if _os.name == "nt":
+        raise FileNotFoundError(
+            f"{exe} not found. On Windows build it with MinGW-w64 from {_MCSC}, e.g.\n"
+            "  gcc -O2 -fopenmp -static -include win_compat.h -o mcluster.exe main.c -lm"
+        )
+    _os.system(f"cd {_MCSC} && make clean")
+    print(f"{_os.path.basename(exe)} executable not found. Compiling code...")
+    _os.system(f"cd {_MCSC} && make {target}")
 
 
 def mcluster_run(SSE: bool = False, **arguments: dict[str, int | float]) -> _QTable:
@@ -109,20 +127,12 @@ def mcluster_run(SSE: bool = False, **arguments: dict[str, int | float]) -> _QTa
             key = key[0]
         args.append(f"-{key} {str(value)}")
     if SSE:
-        if _mcluster_sse not in _os.listdir(_MCSC):
-            if _mcluster in _os.listdir(_MCSC):
-                _os.system(f"cd {_MCSC} && make clean")
-            print("mcluster_see executable not found. Compiling code...")
-            _os.system(f"cd {_MCSC} && make mcluster_sse")
+        _ensure_executable(_mcluster_sse, "mcluster_sse")
         process = _subp.Popen(
             [_mcluster_sse] + args, stdout=_subp.PIPE, stderr=_subp.PIPE, text=True
         )
     else:
-        if _mcluster not in _os.listdir(_MCSC):
-            if _mcluster_sse in _os.listdir(_MCSC):
-                _os.system(f"cd {_MCSC} && make clean")
-            print("mcluster executable not found. Compiling code...")
-            _os.system(f"cd {_MCSC} && make mcluster")
+        _ensure_executable(_mcluster, "mcluster")
         process = _subp.Popen(
             [_mcluster] + args, stdout=_subp.PIPE, stderr=_subp.PIPE, text=True
         )
@@ -146,13 +156,12 @@ def _manage_output_files(filename: str) -> str:
     Move the output files to a new folder with a timestamp as the name.
     """
     tn = _timestamp()
-    fold = _subp.run(["pwd"], capture_output=True, text=True)
-    fold = fold.stdout.strip()
+    fold = _os.getcwd()
     _os.mkdir(_os.path.join(_SF, tn))
     output_data = _get_file_list(fold=fold, key=f"{filename}.txt")
     output_info = _get_file_list(fold=fold, key=f"{filename}.info")
-    data_path = _os.path.join(_SF, tn, output_data.split("/")[-1].strip())
-    info_path = _os.path.join(_SF, tn, output_info.split("/")[-1].strip())
+    data_path = _os.path.join(_SF, tn, _os.path.basename(output_data.strip()))
+    info_path = _os.path.join(_SF, tn, _os.path.basename(output_info.strip()))
     _sh.move(output_data, data_path)
     _sh.move(output_info, info_path)
     print(data_path + "\n" + info_path)
